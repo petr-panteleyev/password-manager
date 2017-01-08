@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.panteleyev</groupId>
+    <artifactId>password-manager</artifactId>
+    <version>1.0.0alpha</version>
+    <packaging>jar</packaging>
+    <parent>
+        <groupId>org.panteleyev</groupId>
+        <artifactId>java</artifactId>
+        <version>20170110</version>
+    </parent>
+    <properties>
+        <app.main.class>org.panteleyev.pwdmanager.PasswordManagerApplication</app.main.class>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>crypto</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.9.6</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.fxml</include>
+                    <include>**/*.css</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <executions>
+                    <execution>
+                        <id>dist-win</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${env.JAVA_HOME}/bin/javapackager
+                            </executable>
+                            <arguments>
+                                <argument>-deploy</argument>
+                                <argument>-native</argument>
+                                <argument>exe</argument>
+                                <argument>-name</argument>
+                                <argument>Password Manager</argument>
+                                <argument>-outdir</argument>
+                                <argument>target/dists</argument>
+                                <argument>-outfile</argument>
+                                <argument>Password Generator</argument>
+                                <argument>-srcfiles</argument>
+                                <argument>target/${project.artifactId}-${project.version}.jar</argument>
+                                <argument>-Bicon=icons.ico</argument>
+                                <argument>-BappVersion=${project.version}</argument>
+                                <argument>-BsystemWide=true</argument>
+                                <argument>-Bcopyright=Copyright (c) 2016, 2017, Petr Panteleyev</argument>
+                                <argument>-Bvendor=Petr Panteleyev</argument>
+                                <argument>-Bwin.menuGroup=Petr Panteleyev</argument>
+                                <argument>-appclass</argument>
+                                <argument>${app.main.class}</argument>
+                                <argument>-v</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>dist-mac</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${env.JAVA_HOME}/bin/javapackager
+                            </executable>
+                            <arguments>
+                                <argument>-deploy</argument>
+                                <argument>-native</argument>
+                                <argument>image</argument>
+                                <argument>-name</argument>
+                                <argument>Password Manager</argument>
+                                <argument>-outdir</argument>
+                                <argument>target/dists</argument>
+                                <argument>-outfile</argument>
+                                <argument>Password Generator</argument>
+                                <argument>-srcfiles</argument>
+                                <argument>target/${project.artifactId}-${project.version}.jar</argument>
+                                <argument>-Bicon=icons.icns</argument>
+                                <argument>-BappVersion=${project.version}</argument>
+                                <argument>-appclass</argument>
+                                <argument>${app.main.class}</argument>
+                                <argument>-v</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>dist-linux</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${env.JAVA_HOME}/bin/javapackager
+                            </executable>
+                            <arguments>
+                                <argument>-deploy</argument>
+                                <argument>-native</argument>
+                                <argument>deb</argument>
+                                <argument>-name</argument>
+                                <argument>Password Manager</argument>
+                                <argument>-outdir</argument>
+                                <argument>target/dists</argument>
+                                <argument>-outfile</argument>
+                                <argument>Password Generator</argument>
+                                <argument>-srcfiles</argument>
+                                <argument>target/${project.artifactId}-${project.version}.jar</argument>
+                                <argument>-Bicon=icon.png</argument>
+                                <argument>-BappVersion=${project.version}</argument>
+                                <argument>-BsystemWide=true</argument>
+                                <argument>-Bcopyright=Copyright (c) 2016, 2017, Petr Panteleyev</argument>
+                                <argument>-Bvendor=Petr Panteleyev</argument>
+                                <argument>-Bcategory=Utility</argument>
+                                <argument>-Bemail=petr@panteleyev.org</argument>
+                                <argument>-BlicenseType=BSD</argument>
+                                <argument>-appclass</argument>
+                                <argument>${app.main.class}</argument>
+                                <argument>-v</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>dist-rpm</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${env.JAVA_HOME}/bin/javapackager
+                            </executable>
+                            <arguments>
+                                <argument>-deploy</argument>
+                                <argument>-native</argument>
+                                <argument>rpm</argument>
+                                <argument>-name</argument>
+                                <argument>Password Manager</argument>
+                                <argument>-outdir</argument>
+                                <argument>target/dists</argument>
+                                <argument>-outfile</argument>
+                                <argument>Password Generator</argument>
+                                <argument>-srcfiles</argument>
+                                <argument>target/${project.artifactId}-${project.version}.jar</argument>
+                                <argument>-Bicon=icon.png</argument>
+                                <argument>-BappVersion=${project.version}</argument>
+                                <argument>-BsystemWide=true</argument>
+                                <argument>-Bcopyright=Copyright (c) 2016, 2017, Petr Panteleyev</argument>
+                                <argument>-Bvendor=Petr Panteleyev</argument>
+                                <argument>-Bcategory=Utility</argument>
+                                <argument>-Bemail=petr@panteleyev.org</argument>
+                                <argument>-BlicenseType=BSD</argument>
+                                <argument>-appclass</argument>
+                                <argument>${app.main.class}</argument>
+                                <argument>-v</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="542.0" prefWidth="788.0" stylesheets="@PasswordManager.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.panteleyev.pwdmanager.MainWindowController">
+   <center>
+      <SplitPane dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+            <TitledPane fx:id="treeViewPane" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <content>
+                  <BorderPane>
+                     <top>
+                        <TextField fx:id="searchTextField" promptText="Search" BorderPane.alignment="CENTER" />
+                     </top>
+                     <center>
+                        <TreeView fx:id="cardTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" showRoot="false" BorderPane.alignment="CENTER" />
+                     </center>
+                  </BorderPane>
+               </content>
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </TitledPane>
+            <BorderPane fx:id="recordViewPane">
+               <top>
+                  <Label fx:id="cardContentTitleLabel" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="36.0" />
+                     </font></Label>
+               </top>
+               <bottom>
+                  <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <buttons>
+                      <Button fx:id="cardEditButton" mnemonicParsing="false" onAction="#onEditCard" text="Edit..." />
+                    </buttons>
+                  </ButtonBar>
+               </bottom>
+            </BorderPane>
+        </items>
+      </SplitPane>
+   </center>
+   <top>
+      <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" onAction="#onNewFile" text="New">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator></MenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#onOpenFile" text="Open...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator></MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="importMenuItem" mnemonicParsing="false" onAction="#onImport" text="Import..." />
+                  <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" onAction="#onExport" text="Export..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem mnemonicParsing="false" onAction="#onExit" text="Exit" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+                  <MenuItem fx:id="newCategoryMenuItem" mnemonicParsing="false" onAction="#onNewCategory" text="New Category...">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                     </accelerator></MenuItem>
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem fx:id="newCardMenuItem" mnemonicParsing="false" onAction="#onNewCard" text="New Card..." />
+                  <MenuItem fx:id="newNoteMenuItem" mnemonicParsing="false" onAction="#onNewNote" text="New Note..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Tools">
+              <items>
+                <MenuItem fx:id="changePasswordMenuItem" mnemonicParsing="false" onAction="#onChangePassword" text="Change Password..." />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#onAbout" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
