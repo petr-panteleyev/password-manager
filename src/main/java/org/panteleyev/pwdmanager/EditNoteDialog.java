@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,58 +25,53 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.util.Objects;
 import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
+import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import org.controlsfx.validation.ValidationResult;
+import org.panteleyev.utilities.fx.BaseDialog;
+import java.net.URL;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
-public class EditNoteDialog extends Dialog<Note> {
-    private final TextField noteNameEdit = new TextField();
-    private final TextArea  noteEditor = new TextArea();
+public class EditNoteDialog extends BaseDialog<Note> implements Initializable {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/EditNoteDialog.fxml";
 
-    public EditNoteDialog(Note note) {
-        setTitle("Edit Note");
-        initControls(note);
+    @FXML private TextField nameEdit;
+    @FXML private TextArea noteEdit;
 
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    private final Note note;
 
-        BorderPane pane = new BorderPane();
-
-        GridPane cardPropsPane = new GridPane();
-        cardPropsPane.setHgap(5);
-        cardPropsPane.setVgap(5);
-        cardPropsPane.add(new Label("Name:"), 1, 1);
-        cardPropsPane.add(noteNameEdit, 2, 1);
-
-        pane.setTop(cardPropsPane);
-        pane.setCenter(noteEditor);
-
-        getDialogPane().setContent(pane);
-
-        setResultConverter((ButtonType b) -> {
-            return (b == ButtonType.OK) ?
-                new Note(note.getId(), noteNameEdit.getText(), noteEditor.getText())
-                : null;
-        });
-
-        Platform.runLater(() -> noteEditor.requestFocus());
-    }
-
-    private void initControls(Note note) {
+    EditNoteDialog(Note note) {
+        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
         Objects.requireNonNull(note);
 
-        noteNameEdit.setText(note.getName());
-        noteEditor.setText(note.getText());
+        this.note = note;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setTitle(resources.getString("editNoteDialog.title"));
+        createDefaultButtons();
+
+        nameEdit.setText(note.getName());
+        noteEdit.setText(note.getText());
+
+        setResultConverter((ButtonType b) -> (b == ButtonType.OK) ?
+                new Note(note.getId(), nameEdit.getText(), noteEdit.getText())
+                : null);
+
+        Platform.runLater(this::setupValidator);
+        Platform.runLater(nameEdit::requestFocus);
     }
 
     private ContextMenu createContextMenu() {
@@ -107,5 +102,11 @@ public class EditNoteDialog extends Dialog<Note> {
 
 */
         return menu;
+    }
+
+    private void setupValidator() {
+        validation.registerValidator(nameEdit, (Control c, String value) ->
+                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+        validation.initInitialDecoration();
     }
 }

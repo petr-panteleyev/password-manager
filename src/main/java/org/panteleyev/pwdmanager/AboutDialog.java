@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,39 +25,29 @@
  */
 package org.panteleyev.pwdmanager;
 
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import org.panteleyev.utilities.fx.BaseDialog;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class AboutDialog extends Dialog {
-    private static final String BUILD = "1.0.0-alpha";
+public class AboutDialog extends BaseDialog implements Initializable {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/AboutDialog.fxml";
+    private static final String BUILD = "1.0.0-beta";
 
+    @FXML private Label buildLabel;
 
-    public AboutDialog() {
+    AboutDialog() {
+        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         setTitle("About Password Manager");
-
         getDialogPane().getButtonTypes().addAll(ButtonType.OK);
 
-        GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(5);
-
-        int y = 1;
-
-        Label mainLabel = new Label("Password Manager");
-        Font font = mainLabel.getFont();
-        mainLabel.setFont(Font.font(font.getFamily(), FontWeight.BOLD, font.getSize() * 1.5));
-
-        pane.add(mainLabel, 1, y++, 2, 1);
-        pane.add(new Label("Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>"), 1, y++, 2, 1);
-        pane.add(new Label("Build:"), 1, y);
-        pane.add(new Label(BUILD), 2, y++);
-        pane.add(new Label("Encryption: "), 1, y);
-        pane.add(new Label("256-bit AES"), 2, y++);
-
-        getDialogPane().setContent(pane);
+        buildLabel.setText(BUILD);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,40 +25,20 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
-import javafx.scene.control.TextField;
-import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
-import java.util.ResourceBundle;
+import javafx.scene.control.ListCell;
+import javafx.scene.image.ImageView;
 
-public class NoteDialog extends BaseDialog<Note> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/NoteDialog.fxml";
-
-    @FXML private TextField nameEdit;
-
-    NoteDialog() {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
-    }
-
+final class PictureListCell extends ListCell<Picture> {
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("noteDialog.title"));
-        createDefaultButtons();
+    public void updateItem(Picture item, boolean empty) {
+        super.updateItem(item, empty);
 
-        setResultConverter(b -> b == ButtonType.OK ?
-                new Note(nameEdit.getText(), "") : null);
-
-        Platform.runLater(this::setupValidator);
-    }
-
-    private void setupValidator() {
-        validation.registerValidator(nameEdit, (Control c, String value) ->
-                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
-        validation.initInitialDecoration();
+        if (empty || item == null) {
+            setText(null);
+            setGraphic(null);
+        } else {
+            setText(null);
+            setGraphic(new ImageView(item.getImage()));
+        }
     }
 }

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,49 +25,45 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import javafx.scene.control.*;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import org.panteleyev.utilities.fx.Controller;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
 
-public class CardViewer extends BorderPane {
-    private final GridPane grid = new GridPane();
-    private final Label noteLabel = new Label();
-    private final Label noteViewer = new Label();
+public class CardViewer extends Controller<CardViewer> implements Initializable {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/CardViewer.fxml";
 
-    public CardViewer() {
-        VBox vBox = new VBox();
-        vBox.setFillWidth(true);
+    @FXML private BorderPane pane;
+    @FXML private GridPane   grid;
+    @FXML private Label      noteLabel;
+    @FXML private Label      noteViewer;
 
-        grid.setHgap(5);
-        grid.setVgap(5);
+    CardViewer() {
+        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH, false);
+    }
 
-        vBox.getChildren().addAll(grid, noteLabel, noteViewer);
-
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         noteLabel.setGraphic(new ImageView(Picture.NOTE.getImage()));
-        noteLabel.setText("Notes");
+    }
 
-        noteLabel.getStyleClass().add("noteLabel");
-        noteViewer.getStyleClass().add("noteViewer");
-
-        noteViewer.setVisible(false);
-        noteLabel.setVisible(false);
-
-        ScrollPane scroll = new ScrollPane(vBox);
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setFitToWidth(true);
-        scroll.getStyleClass().add("whiteBackground");
-
-        setCenter(scroll);
-        grid.setStyle("-fx-alignment: TOP-CENTER;");
+    BorderPane getPane() {
+        return pane;
     }
 
     void setData(List<FieldWrapper> items, String note) {
@@ -125,8 +121,7 @@ public class CardViewer extends BorderPane {
         MenuItem copyMenuItem = new MenuItem("Copy " + field.getName());
         copyMenuItem.setOnAction(x -> onCopy(field));
 
-        ContextMenu menu = new ContextMenu(copyMenuItem);
-        return menu;
+        return new ContextMenu(copyMenuItem);
     }
 
     private void onCopy(Field field) {

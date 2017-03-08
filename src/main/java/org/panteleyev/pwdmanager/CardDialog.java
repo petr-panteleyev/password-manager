@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,57 +25,56 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.util.Objects;
+import javafx.application.Platform;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import java.net.URL;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
-public class CardDialog extends RecordDialog<Card> {
+public class CardDialog extends RecordDialog<Card> implements Initializable {
+    private final RecordType defaultType;
+    private final Card card;
 
-    public CardDialog(RecordType defaultType, Card card) {
+    CardDialog(RecordType defaultType, Card card) {
         Objects.requireNonNull(defaultType);
 
-        setTitle("Card");
-        initControls(defaultType, card);
+        this.defaultType = defaultType;
+        this.card = card;
+    }
 
-        GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(5);
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setTitle(resources.getString("cardDialog.title"));
+        createDefaultButtons();
 
-        pane.add(new Label("Name:"), 1, 1);
-        pane.add(nameEdit, 2, 1);
-        pane.add(new Label("Type:"), 1, 2);
-        pane.add(typeList, 2, 2);
-        pane.add(new Label("Icon:"), 1, 3);
-        pane.add(pictureList, 2, 3);
+        initLists();
+        setTypeLabelText(resources.getString("label.type"));
 
-        getDialogPane().setContent(pane);
+        if (card != null) {
+            getNameEdit().setText(card.getName());
+            getTypeList().getSelectionModel().select(card.getType());
+            getPictureList().getSelectionModel().select(card.getPicture());
+        } else {
+            getNameEdit().setText("");
+            getTypeList().getSelectionModel().select(defaultType);
+            getPictureList().getSelectionModel().select(RecordType.PASSWORD.getPicture());
+        }
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                RecordType type = typeList.getSelectionModel().getSelectedItem();
+                RecordType type = getTypeList().getSelectionModel().getSelectedItem();
                 return new Card(
-                    nameEdit.getText(),
-                    pictureList.getSelectionModel().getSelectedItem(),
-                    type.getFieldSet()
+                        getNameEdit().getText(),
+                        getPictureList().getSelectionModel().getSelectedItem(),
+                        type.getFieldSet()
                 );
             } else {
                 return null;
             }
         });
-    }
 
-    private void initControls(RecordType defaultType, Card card) {
-        initLists();
-
-        if (card != null) {
-            nameEdit.setText(card.getName());
-            typeList.getSelectionModel().select(card.getType());
-            pictureList.getSelectionModel().select(card.getPicture());
-        } else {
-            nameEdit.setText(null);
-            typeList.getSelectionModel().select(defaultType);
-            pictureList.getSelectionModel().select(RecordType.PASSWORD.getPicture());
-        }
+        Platform.runLater(this::setupValidator);
+        Platform.runLater(getNameEdit()::requestFocus);
     }
 }

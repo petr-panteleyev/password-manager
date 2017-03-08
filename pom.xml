@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>1.0.0alpha</version>
+    <version>1.0.0beta</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>org.panteleyev</groupId>
@@ -16,29 +16,22 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>utilities</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>crypto</artifactId>
             <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.9.6</version>
+            <version>6.11</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.fxml</include>
-                    <include>**/*.css</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -92,7 +85,7 @@
                             <arguments>
                                 <argument>-deploy</argument>
                                 <argument>-native</argument>
-                                <argument>image</argument>
+                                <argument>dmg</argument>
                                 <argument>-name</argument>
                                 <argument>Password Manager</argument>
                                 <argument>-outdir</argument>

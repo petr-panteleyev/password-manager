@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -51,11 +51,14 @@ public class Note extends Record {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
         if (o instanceof Note) {
             Note that = (Note)o;
-
             return super.equals(that)
-                && Objects.equals(this.text, that.text);
+                    && Objects.equals(this.text, that.text);
         } else {
             return false;
         }
@@ -63,8 +66,6 @@ public class Note extends Record {
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
-        hash = 19 * hash + Objects.hashCode(this.text);
-        return hash;
+        return Objects.hash(super.hashCode(), text);
     }
 }

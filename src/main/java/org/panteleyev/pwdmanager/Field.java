@@ -93,6 +93,10 @@ public class Field implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
         if (o instanceof Field) {
             Field that = (Field)o;
 
@@ -106,10 +110,6 @@ public class Field implements Cloneable {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.type.get());
-        hash = 89 * hash + Objects.hashCode(this.name.get());
-        hash = 89 * hash + Objects.hashCode(this.value.get());
-        return hash;
+        return Objects.hash(type.get(), name.get(), value.get());
     }
 }

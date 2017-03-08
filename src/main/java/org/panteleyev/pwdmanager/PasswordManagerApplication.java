@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,24 +25,27 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class PasswordManagerApplication extends Application {
+    private static Application application;
+
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
     public void start(Stage stage) throws Exception {
+        application = this;
+
         Thread.currentThread().setUncaughtExceptionHandler((Thread t, Throwable e) -> {
             e.printStackTrace();
             while (e.getCause() != null) {
@@ -52,9 +55,9 @@ public class PasswordManagerApplication extends Application {
             alert.showAndWait();
         });
 
-        ResourceBundle bundle = ResourceBundle.getBundle("org.panteleyev.pwdmanager.bundles.PasswordManager");
+        ResourceBundle bundle = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-        stage.setTitle(bundle.getString("main_window_title"));
+        stage.setTitle(bundle.getString("mainWindow.title"));
 
         URL location = getClass().getResource("/org/panteleyev/pwdmanager/MainWindow.fxml");
 
@@ -64,4 +67,7 @@ public class PasswordManagerApplication extends Application {
         stage.show();
     }
 
+    static Application getApplication() {
+        return application;
+    }
 }

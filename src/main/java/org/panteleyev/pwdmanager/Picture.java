@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -27,10 +27,9 @@ package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
+@SuppressWarnings("unused")
 public enum Picture {
     GENERIC,
     PASSWORD,
@@ -74,7 +73,7 @@ public enum Picture {
     private final Image image;
     private final Image bigImage;
 
-    private Picture() {
+    Picture() {
         String res = name().toLowerCase() + ".png";
         String bigRes = name().toLowerCase() + "-48.png";
 
@@ -90,27 +89,10 @@ public enum Picture {
         return bigImage;
     }
 
-    public static ComboBox<Picture> getComboBox() {
-        return new ComboBox<Picture>() {{
-            setCellFactory(p -> new PictureListCell());
-            setButtonCell(new PictureListCell());
-            setItems(FXCollections.observableArrayList(Picture.values()));
-        }};
-    }
-}
-
-final class PictureListCell extends ListCell<Picture> {
-    @Override
-    public void updateItem(Picture item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (empty || item == null) {
-            setText(null);
-            setGraphic(null);
-        } else {
-            setText(null);
-            setGraphic(new ImageView(item.getImage()));
-        }
+    public static void setupComboBox(ComboBox<Picture> comboBox) {
+        comboBox.setCellFactory(p -> new PictureListCell());
+        comboBox.setButtonCell(new PictureListCell());
+        comboBox.setItems(FXCollections.observableArrayList(Picture.values()));
     }
 }
 

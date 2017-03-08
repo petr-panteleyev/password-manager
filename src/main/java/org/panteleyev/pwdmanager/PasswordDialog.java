@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,58 +25,39 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.io.File;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.layout.GridPane;
+import org.panteleyev.utilities.fx.BaseDialog;
+import java.io.File;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class PasswordDialog extends Dialog<String> {
-    private final PasswordField passwordEdit = new PasswordField();
-    private final PasswordField passwordEdit2 = new PasswordField();
+public class PasswordDialog extends BaseDialog<String> implements Initializable {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/PasswordDialog.fxml";
 
-    public PasswordDialog(File file) {
-        this(file, false);
+    @FXML private Label         fileNameLabel;
+    @FXML private PasswordField passwordEdit;
+
+    private final File file;
+
+    PasswordDialog(File file) {
+        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        this.file = file;
     }
 
-    public PasswordDialog(File file, boolean newPassword) {
-        setTitle("Password");
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setTitle(resources.getString("passwordDialog.title"));
 
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        createDefaultButtons();
 
-        GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(5);
+        fileNameLabel.setText(file.getAbsolutePath());
 
-        pane.add(new Label("File:"), 1, 1);
-        pane.add(new Label(file.getAbsolutePath()), 2, 1);
-
-        pane.add(new Label("Password:"), 1, 2);
-        pane.add(passwordEdit, 2, 2);
-
-        if (newPassword) {
-            pane.add(new Label("Repeat:"), 1, 3);
-            pane.add(passwordEdit2, 2, 3);
-
-            final Button btOk = (Button) getDialogPane().lookupButton(ButtonType.OK);
-            btOk.addEventFilter(ActionEvent.ACTION, event -> {
-                if (!passwordEdit.getText().equals(passwordEdit2.getText())) {
-                    event.consume();
-                }
-            });
-        }
-
-        passwordEdit.setPrefColumnCount(32);
-
-        getDialogPane().setContent(pane);
-
-        setResultConverter((ButtonType b) -> {
-            return b == ButtonType.OK ? passwordEdit.getText() : null;
-        });
+        setResultConverter(b -> b == ButtonType.OK ? passwordEdit.getText() : null);
 
         Platform.runLater(() -> passwordEdit.requestFocus());
     }

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,53 +25,50 @@
  */
 package org.panteleyev.pwdmanager;
 
+import javafx.application.Platform;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class CategoryDialog extends RecordDialog<Category> {
+public class CategoryDialog extends RecordDialog<Category> implements Initializable {
+    private final Category category;
 
-    public CategoryDialog(Category category) {
-        setTitle("Category");
-        initControls(category);
+    CategoryDialog(Category category) {
+        this.category = category;
+    }
 
-        GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(5);
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setTitle(resources.getString("categoryDialog.title"));
+        createDefaultButtons();
 
-        pane.add(new Label("Name:"), 1, 1);
-        pane.add(nameEdit, 2, 1);
-        pane.add(new Label("Default Type:"), 1, 2);
-        pane.add(typeList, 2, 2);
-        pane.add(new Label("Icon:"), 1, 3);
-        pane.add(pictureList, 2, 3);
+        initLists();
+        setTypeLabelText(resources.getString("label.defaultType"));
 
-        getDialogPane().setContent(pane);
+        if (category != null) {
+            getNameEdit().setText(category.getName());
+            getTypeList().getSelectionModel().select(category.getType());
+            getPictureList().getSelectionModel().select(category.getPicture());
+        } else {
+            getNameEdit().setText("");
+            getTypeList().getSelectionModel().select(RecordType.PASSWORD);
+            getPictureList().getSelectionModel().select(Picture.FOLDER);
+        }
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 return new Category(
-                    nameEdit.getText(),
-                    typeList.getSelectionModel().getSelectedItem(),
-                    pictureList.getSelectionModel().getSelectedItem()
+                        getNameEdit().getText(),
+                        getTypeList().getSelectionModel().getSelectedItem(),
+                        getPictureList().getSelectionModel().getSelectedItem()
                 );
             } else {
                 return null;
             }
         });
-    }
 
-    private void initControls(Category category) {
-        initLists();
-
-        if (category != null) {
-            nameEdit.setText(category.getName());
-            typeList.getSelectionModel().select(category.getType());
-            pictureList.getSelectionModel().select(category.getPicture());
-        } else {
-            nameEdit.setText("");
-            typeList.getSelectionModel().select(RecordType.PASSWORD);
-            pictureList.getSelectionModel().select(Picture.FOLDER);
-        }
+        Platform.runLater(this::setupValidator);
+        Platform.runLater(getNameEdit()::requestFocus);
     }
 }

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,20 +25,7 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.function.Function;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -53,7 +40,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
@@ -66,8 +52,24 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.panteleyev.crypto.AES;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.function.Function;
+import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 public class MainWindowController implements Initializable {
+    public static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
+
     private static final String PREF_CURRENT_FILE = "currentFile";
 
     public static final String CSS_DROP_TARGET = "dropTarget";
@@ -100,7 +102,7 @@ public class MainWindowController implements Initializable {
     @FXML private MenuItem          deleteMenuItem;
 
     private final NoteViewer        noteViewer = new NoteViewer();
-    private final CardViewer        cardContentView = new CardViewer();
+    private final CardViewer        cardContentView = new CardViewer().load();
 
     private Record rootRecord;
 
@@ -109,14 +111,16 @@ public class MainWindowController implements Initializable {
 
     private final Preferences preferences = Preferences.userNodeForPackage(MainWindowController.class);
 
+    private static MainWindowController mainWindowController;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        mainWindowController = this;
+
         cardTreeView.setContextMenu(createTreeViewContextMenu());
         cardTreeView.setCellFactory((TreeView<Record> p) -> new CardTreeViewCell(this));
         cardTreeView.setShowRoot(false);
-        cardTreeView.getSelectionModel().selectedItemProperty().addListener(x -> {
-            onTreeViewSelected();
-        });
+        cardTreeView.getSelectionModel().selectedItemProperty().addListener(x -> onTreeViewSelected());
 
         menuBar.setUseSystemMenuBar(true);
 
@@ -126,9 +130,16 @@ public class MainWindowController implements Initializable {
             treeViewPane.setText(newValue != null? newValue.getName() : "");
         });
 
-        String currentFilePath = preferences.get(PREF_CURRENT_FILE, null);
-        if (currentFilePath != null) {
-            loadDocument(new File(currentFilePath));
+        // Cmd parameter overrides stored file but does not overwrite the setting.
+        Application.Parameters params = PasswordManagerApplication.getApplication().getParameters();
+        String fileName = params.getNamed().get("file");
+        if (fileName != null && !fileName.isEmpty()) {
+            loadDocument(new File(fileName), false);
+        } else {
+            String currentFilePath = preferences.get(PREF_CURRENT_FILE, null);
+            if (currentFilePath != null) {
+                loadDocument(new File(currentFilePath), true);
+            }
         }
 
         Platform.runLater(() -> cardTreeView.requestFocus());
@@ -142,18 +153,22 @@ public class MainWindowController implements Initializable {
         deleteMenuItem.disableProperty().bind(currentFile.isNull());
     }
 
+    static MainWindowController getMainWindow() {
+        return mainWindowController;
+    }
+
     private Optional<TreeItem<Record>> getSelectedItem() {
         return Optional.ofNullable(cardTreeView.getSelectionModel().getSelectedItem());
     }
 
-    private void loadDocument(File file) {
+    private void loadDocument(File file, boolean changeSettings) {
         if (!file.exists()) {
             currentFile.set(null);
-            preferences.put(PREF_CURRENT_FILE, "");
+            if (changeSettings) {
+                preferences.put(PREF_CURRENT_FILE, "");
+            }
         } else {
-            PasswordDialog pwdDialog = new PasswordDialog(file);
-
-            pwdDialog.showAndWait().ifPresent(password -> {
+            new PasswordDialog(file).load().showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
                 try (InputStream in = new FileInputStream(file)) {
@@ -168,8 +183,11 @@ public class MainWindowController implements Initializable {
                     }
 
                     cardTreeView.setRoot(root);
+
                     currentFile.set(file);
-                    preferences.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
+                    if (changeSettings) {
+                        preferences.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
+                    }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -215,8 +233,7 @@ public class MainWindowController implements Initializable {
         );
         File file = d.showSaveDialog(null);
         if (file != null) {
-            PasswordDialog pwdDialog = new PasswordDialog(file, true);
-            pwdDialog.showAndWait().ifPresent(password -> {
+            new NewPasswordDialog(file).load().showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
                 rootRecord = new Category("root", RecordType.EMPTY, Picture.FOLDER);
@@ -240,7 +257,7 @@ public class MainWindowController implements Initializable {
         );
         File file = d.showOpenDialog(null);
         if (file != null) {
-            loadDocument(file);
+            loadDocument(file, true);
         }
     }
 
@@ -282,23 +299,19 @@ public class MainWindowController implements Initializable {
         RecordType defaultType = (selected != null && selected.getValue() instanceof Category)?
             selected.getValue().getType() : RecordType.PASSWORD;
 
-        CardDialog d = new CardDialog(defaultType, null);
-        Optional<Card> result = d.showAndWait();
-        if (result.isPresent()) {
-            processNewRecord(result.get());
-        }
+        new CardDialog(defaultType, null).load()
+                .showAndWait()
+                .ifPresent(this::processNewRecord);
     }
 
     public void onNewCategory() {
-        CategoryDialog d = new CategoryDialog(null);
-        Optional<Category> result = d.showAndWait();
-        if (result.isPresent()) {
-            processNewRecord(result.get());
-        }
+        new CategoryDialog(null).load()
+                .showAndWait()
+                .ifPresent(this::processNewRecord);
     }
 
     public void onNewNote() {
-        new NoteDialog().showAndWait().ifPresent(this::processNewRecord);
+        new NoteDialog().load().showAndWait().ifPresent(this::processNewRecord);
     }
 
     private void setupRecordViewer(TreeItem<Record> item) {
@@ -316,14 +329,12 @@ public class MainWindowController implements Initializable {
                 recordViewPane.setCenter(noteViewer);
             } else {
                 if (record instanceof Card) {
-                    recordViewPane.setCenter(cardContentView);
+                    recordViewPane.setCenter(cardContentView.getPane());
 
                     List<FieldWrapper> wrappers = ((Card)record).getFields().stream()
                         .filter(f -> !f.getValue().isEmpty())
                         .map(FieldWrapper::new).collect(Collectors.toList());
                     cardContentView.setData(FXCollections.observableArrayList(wrappers), ((Card)record).getNote());
-                } else {
-
                 }
             }
         }
@@ -352,22 +363,17 @@ public class MainWindowController implements Initializable {
 
         if (item != null) {
             if (item.getValue() instanceof Card) {
-                EditCardDialog d = new EditCardDialog((Card)item.getValue());
-
-                d.showAndWait().ifPresent(result -> {
+                new EditCardDialog((Card)item.getValue()).load().showAndWait().ifPresent(result -> {
                     processEditedRecord(item, result);
                 });
             } else {
                 if (item.getValue() instanceof Note) {
-                    EditNoteDialog d = new EditNoteDialog((Note)item.getValue());
-
-                    d.showAndWait().ifPresent(result -> {
+                    new EditNoteDialog((Note)item.getValue()).load().showAndWait().ifPresent(result -> {
                         processEditedRecord(item, result);
                     });
                 } else {
                     if (item.getValue() instanceof Category) {
-                        CategoryDialog d = new CategoryDialog((Category)item.getValue());
-                        d.showAndWait().ifPresent(result -> {
+                        new CategoryDialog((Category)item.getValue()).load().showAndWait().ifPresent(result -> {
                             processEditedRecord(item, result);
                         });
                     }
@@ -429,15 +435,14 @@ public class MainWindowController implements Initializable {
     }
 
     public void onChangePassword() {
-        PasswordDialog pwdDialog = new PasswordDialog(currentFile.get(), true);
-        pwdDialog.showAndWait().ifPresent(password -> {
+        new NewPasswordDialog(currentFile.get()).load().showAndWait().ifPresent(password -> {
             currentPassword = password;
             writeDocument(currentFile.get());
         });
     }
 
     public void onAbout() {
-        new AboutDialog().showAndWait();
+        new AboutDialog().load().showAndWait();
     }
 
     public void onImport() {
@@ -594,47 +599,6 @@ public class MainWindowController implements Initializable {
             .filter(x -> ((Link)x.getValue()).getTargetId().equals(id))
             .collect(Collectors.toList());
 
-        toDelete.forEach(x -> {
-            root.getChildren().remove(x);
-        });
-    }
-}
-
-final class FieldWrapper extends Field {
-    private boolean show;
-
-    FieldWrapper(Field that) {
-        super(that);
-    }
-
-    void toggleShow() {
-        show = !show;
-    }
-
-    boolean getShow() {
-        return show;
-    }
-}
-
-final class FieldValueCellImpl extends TableCell<FieldWrapper,FieldWrapper> {
-    @Override
-    protected void updateItem(FieldWrapper item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty || item == null) {
-            textProperty().set(null);
-        } else {
-            switch (item.getType()) {
-                case HIDDEN:
-                    if (item.getShow() || item.getValue().isEmpty()) {
-                        textProperty().set(item.getValue());
-                    } else {
-                        textProperty().set("***");
-                    }
-                    break;
-                default:
-                    textProperty().set(item.getValue());
-                    break;
-            }
-        }
+        toDelete.forEach(x -> root.getChildren().remove(x));
     }
 }

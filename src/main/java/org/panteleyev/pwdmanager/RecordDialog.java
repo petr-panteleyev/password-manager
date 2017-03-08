@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,61 +25,53 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
+import org.controlsfx.validation.ValidationResult;
+import org.panteleyev.utilities.fx.BaseDialog;
 
-public class RecordDialog<T extends Record> extends Dialog<T> {
-    protected final TextField nameEdit = new TextField();
-    protected final ComboBox<RecordType>  typeList = new ComboBox<>();
-    protected final ComboBox<Picture>  pictureList = Picture.getComboBox();
+abstract class RecordDialog<T extends Record> extends BaseDialog<T> {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/RecordDialog.fxml";
 
-    protected RecordDialog() {
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    @FXML private TextField             nameEdit;
+    @FXML private ComboBox<RecordType>  typeList;
+    @FXML private ComboBox<Picture>     pictureList;
+    @FXML private Label                 typeLabel;
 
-        final Button btOk = (Button) getDialogPane().lookupButton(ButtonType.OK);
-        btOk.addEventFilter(ActionEvent.ACTION, event -> {
-            if (!validateFields()) {
-                event.consume();
-            }
-        });
-
-
-        Platform.runLater(nameEdit::requestFocus);
+    RecordDialog() {
+        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
     }
 
-    protected boolean validateFields() {
-        final String name = nameEdit.getText();
-
-        return name != null
-            && !name.isEmpty();
+    TextField getNameEdit() {
+        return nameEdit;
     }
 
-    protected void initLists() {
+    ComboBox<RecordType> getTypeList() {
+        return typeList;
+    }
+
+    ComboBox<Picture> getPictureList() {
+        return pictureList;
+    }
+
+    void setTypeLabelText(String text) {
+        typeLabel.setText(text);
+    }
+
+    void initLists() {
         typeList.setItems(FXCollections.observableArrayList(RecordType.values()));
         typeList.setCellFactory(p -> new CardTypeListCell());
         typeList.setButtonCell(new CardTypeListCell());
+        Picture.setupComboBox(pictureList);
     }
-}
 
-final class CardTypeListCell extends ListCell<RecordType> {
-    @Override
-    public void updateItem(RecordType item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (empty || item == null) {
-            setText(null);
-            setGraphic(null);
-        } else {
-            setText(item.getName());
-            setGraphic(new ImageView(item.getImage()));
-        }
+    void setupValidator() {
+        validation.registerValidator(nameEdit, (Control c, String value) ->
+                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+        validation.initInitialDecoration();
     }
 }

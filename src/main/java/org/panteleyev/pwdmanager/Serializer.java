@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.scene.control.TreeItem;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -202,6 +203,14 @@ public class Serializer {
         Category category = new Category(id, modified, name, type, picture, expanded);
         TreeItem<Record> result = new TreeItem<>(category);
         result.setExpanded(expanded);
+
+        category.expandedProperty().bind(result.expandedProperty());
+
+        result.expandedProperty().addListener((x,oldValue,newValue) -> {
+            if (oldValue != newValue) {
+                Platform.runLater(() -> MainWindowController.getMainWindow().writeDocument());
+            }
+        });
 
         // children
         NodeList childNodes = element.getChildNodes();

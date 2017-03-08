@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,35 +30,62 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.Validator;
 import org.panteleyev.utilities.fx.BaseDialog;
+import java.io.File;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
-public class NoteDialog extends BaseDialog<Note> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/NoteDialog.fxml";
+public class NewPasswordDialog extends BaseDialog<String> implements Initializable {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/NewPasswordDialog.fxml";
 
-    @FXML private TextField nameEdit;
+    @FXML private Label         fileNameLabel;
+    @FXML private PasswordField passwordEdit;
+    @FXML private PasswordField passwordEdit2;
 
-    NoteDialog() {
+    private final File file;
+
+    NewPasswordDialog(File file) {
         super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+
+        this.file = file;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("noteDialog.title"));
+        setTitle(resources.getString("newPasswordDialog.title"));
+
         createDefaultButtons();
 
-        setResultConverter(b -> b == ButtonType.OK ?
-                new Note(nameEdit.getText(), "") : null);
+        fileNameLabel.setText(file.getAbsolutePath());
 
-        Platform.runLater(this::setupValidator);
+        setResultConverter(b -> b == ButtonType.OK ? passwordEdit.getText() : null);
+
+        Platform.runLater(this::createValidationSupport);
+        Platform.runLater(() -> passwordEdit.requestFocus());
     }
 
-    private void setupValidator() {
-        validation.registerValidator(nameEdit, (Control c, String value) ->
-                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
-        validation.initInitialDecoration();
+    private void createValidationSupport() {
+        Validator<String> v1 = (Control c, String value) -> {
+            // Main password invalidates repeated password
+            String s = passwordEdit2.getText();
+            passwordEdit2.setText(UUID.randomUUID().toString());
+            passwordEdit2.setText(s);
+
+            return ValidationResult.fromErrorIf(c, null, false);
+        };
+
+        Validator<String> v2 = (Control c, String value) -> {
+            boolean equal = Objects.equals(passwordEdit.getText(), passwordEdit2.getText());
+            return ValidationResult.fromErrorIf(c, null, !equal);
+        };
+
+        validation.registerValidator(passwordEdit, v1);
+        validation.registerValidator(passwordEdit2, v2);
     }
 }
