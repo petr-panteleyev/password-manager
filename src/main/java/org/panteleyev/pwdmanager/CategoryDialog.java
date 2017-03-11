@@ -58,11 +58,11 @@ public class CategoryDialog extends RecordDialog<Category> implements Initializa
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return new Category(
+                return new NewRecordDescriptor<>(isParentRoot(), new Category(
                         getNameEdit().getText(),
                         getTypeList().getSelectionModel().getSelectedItem(),
                         getPictureList().getSelectionModel().getSelectedItem()
-                );
+                ));
             } else {
                 return null;
             }

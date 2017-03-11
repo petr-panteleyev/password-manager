@@ -27,6 +27,7 @@ package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -34,13 +35,14 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.utilities.fx.BaseDialog;
 
-abstract class RecordDialog<T extends Record> extends BaseDialog<T> {
+abstract class RecordDialog<T extends Record> extends BaseDialog<NewRecordDescriptor<T>> {
     private static final String FXML_PATH = "/org/panteleyev/pwdmanager/RecordDialog.fxml";
 
     @FXML private TextField             nameEdit;
     @FXML private ComboBox<RecordType>  typeList;
     @FXML private ComboBox<Picture>     pictureList;
     @FXML private Label                 typeLabel;
+    @FXML private CheckBox              parentRoot;
 
     RecordDialog() {
         super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
@@ -58,8 +60,16 @@ abstract class RecordDialog<T extends Record> extends BaseDialog<T> {
         return pictureList;
     }
 
+    CheckBox getParentRoot() {
+        return parentRoot;
+    }
+
     void setTypeLabelText(String text) {
         typeLabel.setText(text);
+    }
+
+    boolean isParentRoot() {
+        return parentRoot.isSelected();
     }
 
     void initLists() {

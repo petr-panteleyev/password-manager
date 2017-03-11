@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,28 +23,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.panteleyev.pwdmanager;
 
-import java.util.ResourceBundle;
+final class NewRecordDescriptor<R extends Record> {
+    private final boolean parentRoot;
+    private final R record;
 
-public enum FieldType {
-    STRING,
-    HIDDEN,
-    EMAIL,
-    CREDIT_CARD_NUMBER,
-    LINK;
-
-    private static final String BUNDLE = "org.panteleyev.pwdmanager.FieldType";
-
-    private final String name;
-
-    FieldType() {
-        ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE);
-        this.name = bundle.getString(name());
+    NewRecordDescriptor(boolean parentRoot, R record) {
+        this.parentRoot = parentRoot;
+        this.record = record;
     }
 
-    @Override
-    public String toString() {
-        return name;
+    boolean isParentRoot() {
+        return parentRoot;
+    }
+
+    R getRecord() {
+        return record;
     }
 }

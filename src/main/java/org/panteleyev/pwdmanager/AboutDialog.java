@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 
 public class AboutDialog extends BaseDialog implements Initializable {
     private static final String FXML_PATH = "/org/panteleyev/pwdmanager/AboutDialog.fxml";
-    private static final String BUILD = "1.0.0-beta";
+    private static final String BUILD = "1.0.0";
 
     @FXML private Label buildLabel;
 

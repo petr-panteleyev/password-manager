@@ -78,16 +78,19 @@ class CardTreeViewCell extends TreeCell<Record> {
 
     CardTreeViewCell(MainWindowController mainWindow) {
         setOnDragDetected((MouseEvent event) -> {
-            Record record = getItem();
-            if (record != null) {
-                Dragboard db = (record instanceof Category || record instanceof Link)?
-                    startDragAndDrop(TransferMode.MOVE) : startDragAndDrop(TransferMode.ANY);
-                db.setDragView(snapshot(null, null));
-                ClipboardContent cnt = new ClipboardContent();
-                cnt.put(Record.DATA_FORMAT, record.getId());
-                db.setContent(cnt);
-                sourceItem = getTreeItem();
-                getTreeView().getSelectionModel().select(null);
+            // Prohibit DND if tree shows search result
+            if (mainWindow.searchTextProperty().get().isEmpty()) {
+                Record record = getItem();
+                if (record != null) {
+                    Dragboard db = (record instanceof Category || record instanceof Link) ?
+                            startDragAndDrop(TransferMode.MOVE) : startDragAndDrop(TransferMode.ANY);
+                    db.setDragView(snapshot(null, null));
+                    ClipboardContent cnt = new ClipboardContent();
+                    cnt.put(Record.DATA_FORMAT, record.getId());
+                    db.setContent(cnt);
+                    sourceItem = getTreeItem();
+                    getTreeView().getSelectionModel().select(null);
+                }
             }
             event.consume();
         });

@@ -27,19 +27,19 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
@@ -51,6 +51,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,6 +60,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,19 +74,26 @@ public class MainWindowController implements Initializable {
 
     private static final String PREF_CURRENT_FILE = "currentFile";
 
-    public static final String CSS_DROP_TARGET = "dropTarget";
-    public static final String CSS_DROP_BELOW = "dropBelow";
-    public static final String CSS_DROP_ABOVE = "dropAbove";
+    static final String CSS_DROP_TARGET = "dropTarget";
+    static final String CSS_DROP_BELOW = "dropBelow";
+    static final String CSS_DROP_ABOVE = "dropAbove";
 
-    public static final String[] CSS_DND_STYLES = { CSS_DROP_TARGET, CSS_DROP_BELOW, CSS_DROP_ABOVE };
+    static final String[] CSS_DND_STYLES = { CSS_DROP_TARGET, CSS_DROP_BELOW, CSS_DROP_ABOVE };
 
     // TreeView clipboard
     private boolean cut = false;
 
-    private MenuItem    cardPasteMenuItem;
-    private MenuItem    cardPasteLinkMenuItem;
+    @FXML private BorderPane        leftPane;
 
-    @FXML private TextField         searchTextField;
+    @FXML private MenuItem          ctxNewCardMenuItem;
+    @FXML private MenuItem          ctxNewNoteMenuItem;
+    @FXML private MenuItem          ctxNewCategoryMenuItem;
+    @FXML private MenuItem          ctxCutMenuItem;
+    @FXML private MenuItem          ctxDeleteMenuItem;
+    @FXML private MenuItem          ctxCardPasteMenuItem;
+    @FXML private MenuItem          ctxCardPasteLinkMenuItem;
+
+    private TextField               searchTextField;
     @FXML private TreeView<Record>  cardTreeView;
     @FXML private TitledPane        treeViewPane;
     @FXML private Label             cardContentTitleLabel;
@@ -105,6 +114,7 @@ public class MainWindowController implements Initializable {
     private final CardViewer        cardContentView = new CardViewer().load();
 
     private Record rootRecord;
+    private TreeItem<Record>        rootTreeItem;       // store root item for full tree
 
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private String currentPassword;
@@ -117,7 +127,6 @@ public class MainWindowController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         mainWindowController = this;
 
-        cardTreeView.setContextMenu(createTreeViewContextMenu());
         cardTreeView.setCellFactory((TreeView<Record> p) -> new CardTreeViewCell(this));
         cardTreeView.setShowRoot(false);
         cardTreeView.getSelectionModel().selectedItemProperty().addListener(x -> onTreeViewSelected());
@@ -129,6 +138,15 @@ public class MainWindowController implements Initializable {
         currentFile.addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
             treeViewPane.setText(newValue != null? newValue.getName() : "");
         });
+
+        searchTextField = TextFields.createClearableTextField();
+        searchTextField.textProperty().addListener((x,oldValue,newValue) -> {
+            if (!Objects.equals(oldValue, newValue)) {
+                doSearch(newValue);
+            }
+        });
+        leftPane.setTop(searchTextField);
+        BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
 
         // Cmd parameter overrides stored file but does not overwrite the setting.
         Application.Parameters params = PasswordManagerApplication.getApplication().getParameters();
@@ -144,13 +162,81 @@ public class MainWindowController implements Initializable {
 
         Platform.runLater(() -> cardTreeView.requestFocus());
 
+        // Main menu items
         importMenuItem.disableProperty().bind(currentFile.isNull());
         exportMenuItem.disableProperty().bind(currentFile.isNull());
-        newCardMenuItem.disableProperty().bind(currentFile.isNull());
-        newCategoryMenuItem.disableProperty().bind(currentFile.isNull());
-        newNoteMenuItem.disableProperty().bind(currentFile.isNull());
+        newCardMenuItem.disableProperty().bind(currentFile.isNull()
+                .or(searchTextField.textProperty().isEmpty().not()));
+        newCategoryMenuItem.disableProperty().bind(currentFile.isNull()
+                .or(searchTextField.textProperty().isEmpty().not()));
+        newNoteMenuItem.disableProperty().bind(currentFile.isNull()
+                .or(searchTextField.textProperty().isEmpty().not()));
         changePasswordMenuItem.disableProperty().bind(currentFile.isNull());
         deleteMenuItem.disableProperty().bind(currentFile.isNull());
+
+        // Context menu items
+        ctxNewCardMenuItem.disableProperty().bind(newCardMenuItem.disableProperty());
+        ctxNewNoteMenuItem.disableProperty().bind(newNoteMenuItem.disableProperty());
+        ctxNewCategoryMenuItem.disableProperty().bind(newCategoryMenuItem.disableProperty());
+        ctxCutMenuItem.disableProperty().bind(searchTextField.textProperty().isEmpty().not());
+        ctxDeleteMenuItem.disableProperty().bind(currentFile.isNull());
+        ctxDeleteMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+    }
+
+    ReadOnlyStringProperty searchTextProperty() {
+        return searchTextField.textProperty();
+    }
+
+    private void doSearch(String newValue) {
+        if (newValue.isEmpty()) {
+            cardTreeView.setRoot(rootTreeItem);
+        } else {
+            TreeItem<Record> root = new TreeItem<>();
+            searchTree(rootTreeItem, newValue.toLowerCase())
+                    .forEach(x -> root.getChildren().add(new TreeItem<>(x)));
+            cardTreeView.setRoot(root);
+        }
+    }
+
+    private List<Record> getAll(TreeItem<Record> root) {
+        List<Record> result = new ArrayList<>();
+
+        for (TreeItem<Record> child : root.getChildren()) {
+            Record r = child.getValue();
+            if (r instanceof Link) {
+                continue;
+            }
+
+            if (r instanceof Category) {
+                result.addAll(getAll(child));
+            } else {
+                result.add(r);
+            }
+        }
+
+        return result;
+    }
+
+    private List<Record> searchTree(TreeItem<Record> root, String newValue) {
+        List<Record> result = new ArrayList<>();
+
+        for (TreeItem<Record> child : root.getChildren()) {
+            Record r = child.getValue();
+            if (r instanceof Category) {
+                if (r.getName().toLowerCase().contains(newValue)) {
+                    // Category name matched -> add entire subtree
+                    result.addAll(getAll(child));
+                } else {
+                    result.addAll(searchTree(child, newValue));
+                }
+            } else {
+                if (!(r instanceof Link) && r.getName().toLowerCase().contains(newValue)) {
+                    result.add(r);
+                }
+            }
+        }
+
+        return result;
     }
 
     static MainWindowController getMainWindow() {
@@ -172,17 +258,15 @@ public class MainWindowController implements Initializable {
                 currentPassword = password;
 
                 try (InputStream in = new FileInputStream(file)) {
-                    TreeItem<Record> root;
-
                     if (!currentPassword.isEmpty()) {
                         try (InputStream cin = AES.aes256().getInputStream(in, password)) {
-                            root = Serializer.deserialize(cin);
+                            rootTreeItem = Serializer.deserialize(cin);
                         }
                     } else {
-                        root = Serializer.deserialize(in);
+                        rootTreeItem = Serializer.deserialize(in);
                     }
 
-                    cardTreeView.setRoot(root);
+                    cardTreeView.setRoot(rootTreeItem);
 
                     currentFile.set(file);
                     if (changeSettings) {
@@ -261,19 +345,20 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    private void processNewRecord(Record record) {
-        TreeItem<Record> selected = cardTreeView.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            selected = cardTreeView.getRoot();
+    private void processNewRecord(NewRecordDescriptor<? extends Record> recordDescriptor) {
+        TreeItem<Record> parentItem;
+
+        if (recordDescriptor.isParentRoot()) {
+            parentItem = cardTreeView.getRoot();
+        } else {
+            parentItem = cardTreeView.getSelectionModel().getSelectedItem();
+            if (parentItem == null || !(parentItem.getValue() instanceof Category)) {
+                parentItem = cardTreeView.getRoot();
+            }
         }
 
-        Record parent = selected.getValue();
-        if (!(parent instanceof Category)) {
-            selected = cardTreeView.getRoot();
-        }
-
-        selected.getChildren().add(new TreeItem<>(record));
-        selected.setExpanded(true);
+        parentItem.getChildren().add(new TreeItem<>(recordDescriptor.getRecord()));
+        parentItem.setExpanded(true);
 
         writeDocument();
     }
@@ -363,75 +448,21 @@ public class MainWindowController implements Initializable {
 
         if (item != null) {
             if (item.getValue() instanceof Card) {
-                new EditCardDialog((Card)item.getValue()).load().showAndWait().ifPresent(result -> {
-                    processEditedRecord(item, result);
-                });
+                new EditCardDialog((Card)item.getValue()).load()
+                        .showAndWait().ifPresent(result -> processEditedRecord(item, result));
             } else {
                 if (item.getValue() instanceof Note) {
-                    new EditNoteDialog((Note)item.getValue()).load().showAndWait().ifPresent(result -> {
-                        processEditedRecord(item, result);
-                    });
+                    new EditNoteDialog((Note)item.getValue()).load()
+                            .showAndWait().ifPresent(result -> processEditedRecord(item, result));
                 } else {
                     if (item.getValue() instanceof Category) {
-                        new CategoryDialog((Category)item.getValue()).load().showAndWait().ifPresent(result -> {
-                            processEditedRecord(item, result);
-                        });
+                        new EditCategoryDialog((Category)item.getValue()).load()
+                                .showAndWait().ifPresent(result -> processEditedRecord(item, result));
                     }
                 }
 
             }
         }
-    }
-
-    private ContextMenu createTreeViewContextMenu() {
-        ContextMenu menu = new ContextMenu();
-        menu.setOnShowing(e -> onCardTreeContextMenuShowing());
-
-        MenuItem m1 = new MenuItem("New Card...");
-        m1.setOnAction(a -> onNewCard());
-
-        MenuItem m2 = new MenuItem("New Category...");
-        m2.setOnAction(a -> onNewCategory());
-
-        MenuItem m3 = new MenuItem("Delete...");
-        m3.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-        m3.setOnAction(a -> onDeleteRecord());
-
-        MenuItem m4 = new MenuItem("New Note...");
-        m4.setOnAction(a -> onNewNote());
-
-        MenuItem m5 = new MenuItem("Cut");
-        m5.setOnAction(a -> onCardCut());
-
-        MenuItem m6 = new MenuItem("Copy");
-        m6.setOnAction(a -> onCardCopy());
-
-        cardPasteMenuItem = new MenuItem("Paste");
-        cardPasteMenuItem.setOnAction(a -> onCardPaste());
-
-        cardPasteLinkMenuItem = new MenuItem("Paste Link");
-        cardPasteLinkMenuItem.setOnAction(a -> onCardPasteLink());
-
-        menu.getItems().addAll(
-            m2,
-            new SeparatorMenuItem(),
-            m1,
-            m4,
-            new SeparatorMenuItem(),
-            m3,
-            new SeparatorMenuItem(),
-            m5,
-            m6,
-            cardPasteMenuItem,
-            cardPasteLinkMenuItem
-        );
-
-        m1.disableProperty().bind(currentFile.isNull());
-        m2.disableProperty().bind(currentFile.isNull());
-        m3.disableProperty().bind(currentFile.isNull());
-        m4.disableProperty().bind(currentFile.isNull());
-
-        return menu;
     }
 
     public void onChangePassword() {
@@ -492,8 +523,9 @@ public class MainWindowController implements Initializable {
             }
         }
 
-        cardPasteMenuItem.setDisable(!pasteEnable);
-        cardPasteLinkMenuItem.setDisable(!pasteEnable || cut);
+
+        ctxCardPasteMenuItem.setDisable(!pasteEnable || !searchTextField.getText().isEmpty());
+        ctxCardPasteLinkMenuItem.setDisable(!pasteEnable || cut || searchTextField.getText().isEmpty());
     }
 
     private boolean checkForParentCategory(TreeItem item, TreeItem target) {

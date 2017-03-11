@@ -2,13 +2,13 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.input.KeyCodeCombination?>
@@ -21,12 +21,26 @@
         <items>
             <TitledPane fx:id="treeViewPane" collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <content>
-                  <BorderPane>
-                     <top>
-                        <TextField fx:id="searchTextField" promptText="Search" BorderPane.alignment="CENTER" />
-                     </top>
+                  <BorderPane fx:id="leftPane">
                      <center>
-                        <TreeView fx:id="cardTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" showRoot="false" BorderPane.alignment="CENTER" />
+                        <TreeView fx:id="cardTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" showRoot="false" BorderPane.alignment="CENTER">
+                           <contextMenu>
+                              <ContextMenu onShowing="#onCardTreeContextMenuShowing">
+                                <items>
+                                    <MenuItem fx:id="ctxNewCategoryMenuItem" mnemonicParsing="false" onAction="#onNewCategory" text="%menu.edit.newCategory" />
+                                    <SeparatorMenuItem mnemonicParsing="false" />
+                                  <MenuItem fx:id="ctxNewCardMenuItem" mnemonicParsing="false" onAction="#onNewCard" text="%menu.edit.newCard" />
+                                    <MenuItem fx:id="ctxNewNoteMenuItem" mnemonicParsing="false" onAction="#onNewNote" text="%menu.edit.newNote" />
+                                    <SeparatorMenuItem mnemonicParsing="false" />
+                                    <MenuItem fx:id="ctxDeleteMenuItem" mnemonicParsing="false" onAction="#onDeleteRecord" text="%menu.edit.delete" />
+                                    <SeparatorMenuItem mnemonicParsing="false" />
+                                    <MenuItem fx:id="ctxCutMenuItem" mnemonicParsing="false" onAction="#onCardCut" text="%menu.edit.cut" />
+                                    <MenuItem mnemonicParsing="false" onAction="#onCardCopy" text="%menu.edit.copy" />
+                                    <MenuItem fx:id="ctxCardPasteMenuItem" mnemonicParsing="false" onAction="#onCardPaste" text="%menu.edit.paste" />
+                                    <MenuItem fx:id="ctxCardPasteLinkMenuItem" mnemonicParsing="false" onAction="#onCardPasteLink" text="%menu.edit.pasteLink" />
+                                </items>
+                              </ContextMenu>
+                           </contextMenu></TreeView>
                      </center>
                   </BorderPane>
                </content>
@@ -55,44 +69,44 @@
    <top>
       <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu mnemonicParsing="false" text="%menu.file">
             <items>
-                  <MenuItem mnemonicParsing="false" onAction="#onNewFile" text="New">
+                  <MenuItem mnemonicParsing="false" onAction="#onNewFile" text="%menu.file.new">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator></MenuItem>
-                  <MenuItem mnemonicParsing="false" onAction="#onOpenFile" text="Open...">
+                  <MenuItem mnemonicParsing="false" onAction="#onOpenFile" text="%menu.file.open">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator></MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="importMenuItem" mnemonicParsing="false" onAction="#onImport" text="Import..." />
-                  <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" onAction="#onExport" text="Export..." />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem mnemonicParsing="false" onAction="#onExit" text="Exit" />
+                  <MenuItem fx:id="importMenuItem" mnemonicParsing="false" onAction="#onImport" text="%menu.file.import" visible="false" />
+                  <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" onAction="#onExport" text="%menu.file.export" visible="false" />
+                  <SeparatorMenuItem mnemonicParsing="false" visible="false" />
+              <MenuItem mnemonicParsing="false" onAction="#onExit" text="%menu.file.exit" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
+          <Menu mnemonicParsing="false" text="%menu.edit">
             <items>
-                  <MenuItem fx:id="newCategoryMenuItem" mnemonicParsing="false" onAction="#onNewCategory" text="New Category...">
+                  <MenuItem fx:id="newCategoryMenuItem" mnemonicParsing="false" onAction="#onNewCategory" text="%menu.edit.newCategory">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="T" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                      </accelerator></MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="newCardMenuItem" mnemonicParsing="false" onAction="#onNewCard" text="New Card..." />
-                  <MenuItem fx:id="newNoteMenuItem" mnemonicParsing="false" onAction="#onNewNote" text="New Note..." />
+                  <MenuItem fx:id="newCardMenuItem" mnemonicParsing="false" onAction="#onNewCard" text="%menu.edit.newCard" />
+                  <MenuItem fx:id="newNoteMenuItem" mnemonicParsing="false" onAction="#onNewNote" text="%menu.edit.newNote" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" text="Delete" />
+              <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" text="%menu.edit.delete" />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="Tools">
+            <Menu mnemonicParsing="false" text="%menu.tools">
               <items>
-                <MenuItem fx:id="changePasswordMenuItem" mnemonicParsing="false" onAction="#onChangePassword" text="Change Password..." />
+                <MenuItem fx:id="changePasswordMenuItem" mnemonicParsing="false" onAction="#onChangePassword" text="%menu.tools.changePassword" />
               </items>
             </Menu>
-          <Menu mnemonicParsing="false" text="Help">
+          <Menu mnemonicParsing="false" text="%menu.help">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#onAbout" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#onAbout" text="%menu.help.about" />
             </items>
           </Menu>
         </menus>

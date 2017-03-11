@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -28,14 +28,15 @@ package org.panteleyev.pwdmanager;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ResourceBundle;
 import javafx.scene.image.Image;
 
 public enum RecordType {
-    EMPTY("Empty", Picture.GENERIC, Collections.EMPTY_LIST),
-    CREDIT_CARD("Credit card", Picture.CREDIT_CARD, Arrays.asList(
+    EMPTY(Picture.GENERIC, Collections.EMPTY_LIST),
+    CREDIT_CARD(Picture.CREDIT_CARD, Arrays.asList(
         new Field(FieldType.STRING, "Card Provider", ""),
         new Field(FieldType.STRING, "Credit Card Type", ""),
-        new Field(FieldType.STRING, "Card Number", ""),
+        new Field(FieldType.CREDIT_CARD_NUMBER, "Card Number", ""),
         new Field(FieldType.STRING, "Expiration Date", ""),
         new Field(FieldType.HIDDEN, "PIN", ""),
         new Field(FieldType.STRING, "Name on Card", ""),
@@ -44,7 +45,7 @@ public enum RecordType {
         new Field(FieldType.STRING, "User Name", ""),
         new Field(FieldType.HIDDEN, "Password", "")
     )),
-    CAR("Car", Picture.AUTO, Arrays.asList(
+    CAR(Picture.AUTO, Arrays.asList(
         new Field(FieldType.STRING, "Title", ""),
         new Field(FieldType.STRING, "VIN", ""),
         new Field(FieldType.STRING, "Passport", ""),
@@ -53,7 +54,7 @@ public enum RecordType {
         new Field(FieldType.STRING, "Body", ""),
         new Field(FieldType.STRING, "Plate", "")
     )),
-    GLASSES("Glasses", Picture.GLASSES, Arrays.asList(
+    GLASSES(Picture.GLASSES, Arrays.asList(
         new Field(FieldType.STRING, "Right (O.D.) SPH", ""),
         new Field(FieldType.STRING, "Right CYL", ""),
         new Field(FieldType.HIDDEN, "Right AXIS", ""),
@@ -65,14 +66,14 @@ public enum RecordType {
         new Field(FieldType.STRING, "Doctor's Phone #", ""),
         new Field(FieldType.STRING, "Other Information", "")
     )),
-    PASSPORT("Passport", Picture.PASSPORT, Arrays.asList(
+    PASSPORT(Picture.PASSPORT, Arrays.asList(
         new Field(FieldType.STRING, "Title", ""),
         new Field(FieldType.STRING, "Number", ""),
         new Field(FieldType.STRING, "Issued", ""),
         new Field(FieldType.STRING, "Valid Until", ""),
         new Field(FieldType.STRING, "Issuer", "")
     )),
-    EMAIL("E-Mail", Picture.EMAIL, Arrays.asList(
+    EMAIL(Picture.EMAIL, Arrays.asList(
         new Field(FieldType.STRING, "System", ""),
         new Field(FieldType.EMAIL, "E-Mail Address", ""),
         new Field(FieldType.STRING, "User Name", ""),
@@ -82,15 +83,19 @@ public enum RecordType {
         new Field(FieldType.STRING, "SMTP", ""),
         new Field(FieldType.STRING, "SMTP Port", "")
     )),
-    PASSWORD("Password", Picture.GENERIC, Arrays.asList(
+    PASSWORD(Picture.GENERIC, Arrays.asList(
         new Field(FieldType.STRING, "System", ""),
         new Field(FieldType.STRING, "User Name", ""),
         new Field(FieldType.HIDDEN, "Password", ""),
         new Field(FieldType.LINK, "URL", "")
     ));
 
-    private RecordType(String name, Picture picture, List<Field> fieldSet) {
-        this.name = name;
+    private static final String BUNDLE = "org.panteleyev.pwdmanager.RecordType";
+
+    RecordType(Picture picture, List<Field> fieldSet) {
+        ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE);
+        this.name = bundle.getString(name());
+
         this.picture = picture;
         this.fieldSet = fieldSet;
     }

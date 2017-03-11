@@ -64,11 +64,11 @@ public class CardDialog extends RecordDialog<Card> implements Initializable {
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 RecordType type = getTypeList().getSelectionModel().getSelectedItem();
-                return new Card(
+                return new NewRecordDescriptor<>(isParentRoot(), new Card(
                         getNameEdit().getText(),
                         getPictureList().getSelectionModel().getSelectedItem(),
                         type.getFieldSet()
-                );
+                ));
             } else {
                 return null;
             }

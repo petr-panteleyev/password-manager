@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,36 +26,66 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.utilities.fx.BaseDialog;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/NoteDialog.fxml";
+public class EditCategoryDialog extends BaseDialog<Category> implements Initializable {
+    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/EditCategoryDialog.fxml";
 
-    @FXML private TextField nameEdit;
-    @FXML private CheckBox  createFromTop;
+    private final Category category;
 
-    NoteDialog() {
+    @FXML private TextField            nameEdit;
+    @FXML private ComboBox<RecordType> typeList;
+    @FXML private ComboBox<Picture>    pictureList;
+
+    EditCategoryDialog(Category category) {
         super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        Objects.requireNonNull(category);
+        this.category = category;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("noteDialog.title"));
+        setTitle(resources.getString("categoryDialog.title"));
         createDefaultButtons();
 
-        setResultConverter(b -> b == ButtonType.OK ?
-                new NewRecordDescriptor<>(createFromTop.isSelected(), new Note(nameEdit.getText(), "")) : null);
+        initLists();
+
+        nameEdit.setText(category.getName());
+        typeList.getSelectionModel().select(category.getType());
+        pictureList.getSelectionModel().select(category.getPicture());
+
+        setResultConverter((ButtonType b) -> {
+            if (b == ButtonType.OK) {
+                return new Category(
+                        nameEdit.getText(),
+                        typeList.getSelectionModel().getSelectedItem(),
+                        pictureList.getSelectionModel().getSelectedItem()
+                );
+            } else {
+                return null;
+            }
+        });
 
         Platform.runLater(this::setupValidator);
+        Platform.runLater(nameEdit::requestFocus);
+    }
+
+    private void initLists() {
+        typeList.setItems(FXCollections.observableArrayList(RecordType.values()));
+        typeList.setCellFactory(p -> new CardTypeListCell());
+        typeList.setButtonCell(new CardTypeListCell());
+        Picture.setupComboBox(pictureList);
     }
 
     private void setupValidator() {
