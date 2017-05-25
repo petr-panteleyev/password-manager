@@ -26,42 +26,57 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class EditNoteDialog extends BaseDialog<Note> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/EditNoteDialog.fxml";
+class EditNoteDialog extends BaseDialog<Note> {
+    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    @FXML private TextField nameEdit;
-    @FXML private TextArea noteEdit;
+    private final TextField nameEdit = new TextField();
+    private final TextArea noteEdit = new TextArea();
 
     private final Note note;
 
     EditNoteDialog(Note note) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(null);
+
         Objects.requireNonNull(note);
 
         this.note = note;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("editNoteDialog.title"));
-        createDefaultButtons();
+    private void initialize() {
+        setTitle(rb.getString("editNoteDialog.title"));
+
+        HBox box = new HBox(5, new Label(rb.getString("label.Name")), nameEdit);
+        box.setAlignment(Pos.CENTER_LEFT);
+        box.setPadding(new Insets(0, 0, 5, 0));
+        nameEdit.setPrefColumnCount(25);
+
+        BorderPane pane = new BorderPane(noteEdit, box, null, null, null);
+        BorderPane.setAlignment(noteEdit, Pos.CENTER);
+        BorderPane.setAlignment(box, Pos.CENTER_LEFT);
+
+        getDialogPane().setContent(pane);
+        createDefaultButtons(rb);
 
         nameEdit.setText(note.getName());
         noteEdit.setText(note.getText());

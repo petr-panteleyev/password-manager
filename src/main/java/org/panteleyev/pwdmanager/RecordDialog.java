@@ -26,26 +26,41 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.utilities.fx.BaseDialog;
+import java.util.ResourceBundle;
 
-abstract class RecordDialog<T extends Record> extends BaseDialog<NewRecordDescriptor<T>> {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/RecordDialog.fxml";
+abstract class RecordDialog<T extends Record> extends BaseDialog<NewRecordDescriptor<T>> implements Styles {
+    final ResourceBundle               rb = PasswordManagerApplication.getBundle();
 
-    @FXML private TextField             nameEdit;
-    @FXML private ComboBox<RecordType>  typeList;
-    @FXML private ComboBox<Picture>     pictureList;
-    @FXML private Label                 typeLabel;
-    @FXML private CheckBox              parentRoot;
+    private final TextField            nameEdit = new TextField();
+    private final ComboBox<RecordType> typeList = new ComboBox<>();
+    private final ComboBox<Picture>    pictureList = new ComboBox<>();
+    private final Label                typeLabel = new Label(rb.getString("label.type"));
+    private final CheckBox             parentRoot = new CheckBox(rb.getString("label.createFromRoot"));
 
     RecordDialog() {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(MainWindowController.CSS_PATH);
+
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GRID_PANE);
+
+        grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);
+        grid.addRow(1, typeLabel, typeList);
+        grid.addRow(2, new Label(rb.getString("label.Icon")), pictureList);
+        grid.addRow(3, parentRoot);
+
+        nameEdit.setPrefColumnCount(25);
+        GridPane.setColumnSpan(parentRoot, 2);
+
+        getDialogPane().setContent(grid);
     }
 
     TextField getNameEdit() {

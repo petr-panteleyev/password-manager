@@ -26,31 +26,39 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
 import java.util.ResourceBundle;
 
-public class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/NoteDialog.fxml";
+class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Styles {
+    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    @FXML private TextField nameEdit;
-    @FXML private CheckBox  createFromTop;
+    private final TextField nameEdit = new TextField();
+    private final CheckBox  createFromTop = new CheckBox(rb.getString("label.createFromRoot"));
 
     NoteDialog() {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
-    }
+        super(MainWindowController.CSS_PATH);
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("noteDialog.title"));
-        createDefaultButtons();
+        setTitle(rb.getString("noteDialog.title"));
+
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GRID_PANE);
+
+        grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);
+        grid.addRow(1, createFromTop);
+
+        GridPane.setColumnSpan(createFromTop, 2);
+
+        getDialogPane().setContent(grid);
+        createDefaultButtons(rb);
+
+        nameEdit.setPrefColumnCount(20);
 
         setResultConverter(b -> b == ButtonType.OK ?
                 new NewRecordDescriptor<>(createFromTop.isSelected(), new Note(nameEdit.getText(), "")) : null);

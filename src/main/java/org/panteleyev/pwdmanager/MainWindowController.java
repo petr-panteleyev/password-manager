@@ -25,21 +25,30 @@
  */
 package org.panteleyev.pwdmanager;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
@@ -49,8 +58,10 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
 import java.io.ByteArrayOutputStream;
@@ -59,7 +70,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -69,8 +79,10 @@ import java.util.function.Function;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-public class MainWindowController implements Initializable {
-    public static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
+public class MainWindowController extends BorderPane implements Styles {
+    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
+
+    static final String CSS_PATH = "/org/panteleyev/pwdmanager/PasswordManager.css";
 
     private static final String PREF_CURRENT_FILE = "currentFile";
 
@@ -83,35 +95,32 @@ public class MainWindowController implements Initializable {
     // TreeView clipboard
     private boolean cut = false;
 
-    @FXML private BorderPane        leftPane;
+    private final TreeView<Record>  cardTreeView = new TreeView<>();
+    private final BorderPane        leftPane = new BorderPane(cardTreeView);
+    private final TitledPane        treeViewPane = new TitledPane("", leftPane);
 
-    @FXML private MenuItem          ctxNewCardMenuItem;
-    @FXML private MenuItem          ctxNewNoteMenuItem;
-    @FXML private MenuItem          ctxNewCategoryMenuItem;
-    @FXML private MenuItem          ctxCutMenuItem;
-    @FXML private MenuItem          ctxDeleteMenuItem;
-    @FXML private MenuItem          ctxCardPasteMenuItem;
-    @FXML private MenuItem          ctxCardPasteLinkMenuItem;
+    private final MenuItem          ctxNewCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
+    private final MenuItem          ctxNewNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
+    private final MenuItem          ctxNewCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
+    private final MenuItem          ctxCutMenuItem = new MenuItem(rb.getString("menu.edit.cut"));
+    private final MenuItem          ctxDeleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
+    private final MenuItem          ctxCardPasteMenuItem = new MenuItem(rb.getString("menu.edit.paste"));
+    private final MenuItem          ctxCardPasteLinkMenuItem = new MenuItem(rb.getString("menu.edit.pasteLink"));
 
     private TextField               searchTextField;
-    @FXML private TreeView<Record>  cardTreeView;
-    @FXML private TitledPane        treeViewPane;
-    @FXML private Label             cardContentTitleLabel;
-    @FXML private Button            cardEditButton;
-    @FXML private BorderPane        recordViewPane;
+    private final Label             cardContentTitleLabel = new Label();
+    private final Button            cardEditButton = new Button("Edit...");
+    private final BorderPane        recordViewPane = new BorderPane();
 
     // Menu items
-    @FXML private MenuBar           menuBar;
-    @FXML private MenuItem          newCardMenuItem;
-    @FXML private MenuItem          newCategoryMenuItem;
-    @FXML private MenuItem          newNoteMenuItem;
-    @FXML private MenuItem          changePasswordMenuItem;
-    @FXML private MenuItem          importMenuItem;
-    @FXML private MenuItem          exportMenuItem;
-    @FXML private MenuItem          deleteMenuItem;
+    private final MenuItem          newCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
+    private final MenuItem          newCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
+    private final MenuItem          newNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
+    private final MenuItem          changePasswordMenuItem = new MenuItem(rb.getString("menu.tools.changePassword"));
+    private final MenuItem          deleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
 
     private final NoteViewer        noteViewer = new NoteViewer();
-    private final CardViewer        cardContentView = new CardViewer().load();
+    private final CardViewer        cardContentView = new CardViewer();
 
     private Record rootRecord;
     private TreeItem<Record>        rootTreeItem;       // store root item for full tree
@@ -123,15 +132,121 @@ public class MainWindowController implements Initializable {
 
     private static MainWindowController mainWindowController;
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public MainWindowController() {
+        createMainMenu();
+        createControls();
+        createCardTreeContextMenu();
+        initialize();
+        setupScrolling();
+    }
+
+    private void createMainMenu() {
+        // File
+        MenuItem fileNewMenuItem = new MenuItem(rb.getString("menu.file.new"));
+        fileNewMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
+        fileNewMenuItem.setOnAction(a -> onNewFile());
+
+        MenuItem fileOpenMenuitem = new MenuItem(rb.getString("menu.file.open"));
+        fileOpenMenuitem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
+        fileOpenMenuitem.setOnAction(a -> onOpenFile());
+
+        MenuItem fileExitMenuItem = new MenuItem(rb.getString("menu.file.exit"));
+        fileExitMenuItem.setOnAction(a -> onExit());
+
+        Menu fileMenu = new Menu(rb.getString("menu.file"), null,
+                fileNewMenuItem, fileOpenMenuitem, new SeparatorMenuItem(), fileExitMenuItem);
+
+        // Edit
+        newCategoryMenuItem.setOnAction(a -> onNewCategory());
+        newCategoryMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN));
+
+        newCardMenuItem.setOnAction(a -> onNewCard());
+        newNoteMenuItem.setOnAction(a -> onNewNote());
+
+        Menu editMenu = new Menu(rb.getString("menu.edit"), null,
+                newCategoryMenuItem, new SeparatorMenuItem(),
+                newCardMenuItem, newNoteMenuItem, new SeparatorMenuItem(),
+                deleteMenuItem);
+
+        // Tools
+        changePasswordMenuItem.setOnAction(a -> onChangePassword());
+        Menu toolsMenu = new Menu(rb.getString("menu.tools"), null, changePasswordMenuItem);
+
+        // Help
+        MenuItem helpAboutMenuItem = new MenuItem(rb.getString("menu.help.about"));
+        helpAboutMenuItem.setOnAction(a -> onAbout());
+        Menu helpMenu = new Menu(rb.getString("menu.help"), null, helpAboutMenuItem);
+
+        MenuBar menuBar = new MenuBar(fileMenu, editMenu, toolsMenu, helpMenu);
+        menuBar.setUseSystemMenuBar(true);
+
+        setTop(menuBar);
+    }
+
+    private void createControls() {
+        cardTreeView.setShowRoot(false);
+        BorderPane.setAlignment(cardTreeView, Pos.CENTER);
+
+        cardEditButton.setOnAction(a -> onEditCard());
+
+        ButtonBar buttonBar = new ButtonBar();
+        buttonBar.getButtons().setAll(cardEditButton);
+
+        recordViewPane.setTop(cardContentTitleLabel);
+        recordViewPane.setBottom(buttonBar);
+
+        BorderPane.setMargin(buttonBar, new Insets(5, 5, 5, 5));
+
+        cardContentTitleLabel.getStyleClass().add(CARD_CONTENT_TITLE);
+        BorderPane.setAlignment(cardContentTitleLabel, Pos.CENTER);
+        BorderPane.setAlignment(buttonBar, Pos.CENTER);
+
+        treeViewPane.setMaxHeight(Double.MAX_VALUE);
+        treeViewPane.setMaxWidth(Double.MAX_VALUE);
+
+        SplitPane split = new SplitPane(treeViewPane, recordViewPane);
+        split.setDividerPositions(0.30);
+
+        setCenter(split);
+    }
+
+    private void createCardTreeContextMenu() {
+        ctxNewCategoryMenuItem.setOnAction(a -> onNewCategory());
+        ctxNewCardMenuItem.setOnAction(a -> onNewCard());
+        ctxNewNoteMenuItem.setOnAction(a -> onNewNote());
+        ctxDeleteMenuItem.setOnAction(a -> onDeleteRecord());
+        ctxCutMenuItem.setOnAction(a -> onCardCut());
+        ctxCardPasteMenuItem.setOnAction(a -> onCardPaste());
+        ctxCardPasteLinkMenuItem.setOnAction(a -> onCardPasteLink());
+
+        MenuItem copyMenuItem = new MenuItem(rb.getString("menu.edit.copy"));
+        copyMenuItem.setOnAction(a -> onCardCopy());
+
+        ContextMenu menu = new ContextMenu(
+                ctxNewCategoryMenuItem,
+                new SeparatorMenuItem(),
+                ctxNewCardMenuItem,
+                ctxNewNoteMenuItem,
+                new SeparatorMenuItem(),
+                ctxDeleteMenuItem,
+                new SeparatorMenuItem(),
+                ctxCutMenuItem,
+                copyMenuItem,
+                ctxCardPasteMenuItem,
+                ctxCardPasteLinkMenuItem
+        );
+
+        menu.setOnShowing(e -> onCardTreeContextMenuShowing());
+
+        cardTreeView.setContextMenu(menu);
+    }
+
+    private void initialize() {
         mainWindowController = this;
 
         cardTreeView.setCellFactory((TreeView<Record> p) -> new CardTreeViewCell(this));
         cardTreeView.setShowRoot(false);
         cardTreeView.getSelectionModel().selectedItemProperty().addListener(x -> onTreeViewSelected());
-
-        menuBar.setUseSystemMenuBar(true);
 
         cardEditButton.disableProperty().bind(cardTreeView.getSelectionModel().selectedItemProperty().isNull());
 
@@ -163,8 +278,6 @@ public class MainWindowController implements Initializable {
         Platform.runLater(() -> cardTreeView.requestFocus());
 
         // Main menu items
-        importMenuItem.disableProperty().bind(currentFile.isNull());
-        exportMenuItem.disableProperty().bind(currentFile.isNull());
         newCardMenuItem.disableProperty().bind(currentFile.isNull()
                 .or(searchTextField.textProperty().isEmpty().not()));
         newCategoryMenuItem.disableProperty().bind(currentFile.isNull()
@@ -254,7 +367,7 @@ public class MainWindowController implements Initializable {
                 preferences.put(PREF_CURRENT_FILE, "");
             }
         } else {
-            new PasswordDialog(file).load().showAndWait().ifPresent(password -> {
+            new PasswordDialog(file, false).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
                 try (InputStream in = new FileInputStream(file)) {
@@ -279,7 +392,7 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void writeDocument() {
+    void writeDocument() {
         Objects.requireNonNull(currentFile);
         writeDocument(currentFile.get());
     }
@@ -302,14 +415,14 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void onExit() {
+    private void onExit() {
         if (currentFile.get() != null) {
             writeDocument();
         }
         System.exit(0);
     }
 
-    public void onNewFile() throws Exception {
+    private void onNewFile() {
         FileChooser d = new FileChooser();
         d.setTitle("New File");
         d.getExtensionFilters().addAll(
@@ -317,7 +430,7 @@ public class MainWindowController implements Initializable {
         );
         File file = d.showSaveDialog(null);
         if (file != null) {
-            new NewPasswordDialog(file).load().showAndWait().ifPresent(password -> {
+            new PasswordDialog(file, true).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
                 rootRecord = new Category("root", RecordType.EMPTY, Picture.FOLDER);
@@ -333,7 +446,7 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void onOpenFile() throws Exception {
+    private void onOpenFile() {
         FileChooser d = new FileChooser();
         d.setTitle("Open File");
         d.getExtensionFilters().addAll(
@@ -363,7 +476,7 @@ public class MainWindowController implements Initializable {
         writeDocument();
     }
 
-    public void onDeleteRecord() {
+    private void onDeleteRecord() {
         getSelectedItem().ifPresent((TreeItem<Record> item) -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> {
@@ -379,24 +492,24 @@ public class MainWindowController implements Initializable {
         });
     }
 
-    public void onNewCard() {
+    private void onNewCard() {
         TreeItem<Record> selected = cardTreeView.getSelectionModel().getSelectedItem();
         RecordType defaultType = (selected != null && selected.getValue() instanceof Category)?
             selected.getValue().getType() : RecordType.PASSWORD;
 
-        new CardDialog(defaultType, null).load()
+        new CardDialog(defaultType, null)
                 .showAndWait()
                 .ifPresent(this::processNewRecord);
     }
 
-    public void onNewCategory() {
-        new CategoryDialog(null).load()
+    private void onNewCategory() {
+        new CategoryDialog(null)
                 .showAndWait()
                 .ifPresent(this::processNewRecord);
     }
 
-    public void onNewNote() {
-        new NoteDialog().load().showAndWait().ifPresent(this::processNewRecord);
+    private void onNewNote() {
+        new NoteDialog().showAndWait().ifPresent(this::processNewRecord);
     }
 
     private void setupRecordViewer(TreeItem<Record> item) {
@@ -414,7 +527,7 @@ public class MainWindowController implements Initializable {
                 recordViewPane.setCenter(noteViewer);
             } else {
                 if (record instanceof Card) {
-                    recordViewPane.setCenter(cardContentView.getPane());
+                    recordViewPane.setCenter(cardContentView);
 
                     List<FieldWrapper> wrappers = ((Card)record).getFields().stream()
                         .filter(f -> !f.getValue().isEmpty())
@@ -425,7 +538,7 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void onTreeViewSelected() {
+    private void onTreeViewSelected() {
         TreeItem<Record> item = cardTreeView.getSelectionModel().getSelectedItem();
 
         if (item == null || item.getValue() instanceof Category) {
@@ -443,20 +556,20 @@ public class MainWindowController implements Initializable {
         writeDocument();
     }
 
-    public void onEditCard() throws Exception {
+    public void onEditCard() {
         TreeItem<Record> item = cardTreeView.getSelectionModel().getSelectedItem();
 
         if (item != null) {
             if (item.getValue() instanceof Card) {
-                new EditCardDialog((Card)item.getValue()).load()
+                new EditCardDialog((Card)item.getValue())
                         .showAndWait().ifPresent(result -> processEditedRecord(item, result));
             } else {
                 if (item.getValue() instanceof Note) {
-                    new EditNoteDialog((Note)item.getValue()).load()
+                    new EditNoteDialog((Note)item.getValue())
                             .showAndWait().ifPresent(result -> processEditedRecord(item, result));
                 } else {
                     if (item.getValue() instanceof Category) {
-                        new EditCategoryDialog((Category)item.getValue()).load()
+                        new EditCategoryDialog((Category)item.getValue())
                                 .showAndWait().ifPresent(result -> processEditedRecord(item, result));
                     }
                 }
@@ -465,15 +578,15 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void onChangePassword() {
-        new NewPasswordDialog(currentFile.get()).load().showAndWait().ifPresent(password -> {
+    private void onChangePassword() {
+        new PasswordDialog(currentFile.get(), true).showAndWait().ifPresent(password -> {
             currentPassword = password;
             writeDocument(currentFile.get());
         });
     }
 
-    public void onAbout() {
-        new AboutDialog().load().showAndWait();
+    private void onAbout() {
+        new AboutDialog().showAndWait();
     }
 
     public void onImport() {
@@ -508,7 +621,7 @@ public class MainWindowController implements Initializable {
         }
     }
 
-    public void onCardTreeContextMenuShowing() {
+    private void onCardTreeContextMenuShowing() {
         boolean pasteEnable = false;
 
         Clipboard cb = Clipboard.getSystemClipboard();
@@ -552,14 +665,14 @@ public class MainWindowController implements Initializable {
         cb.setContent(content);
     }
 
-    public void onCardCut() {
+    private void onCardCut() {
         getSelectedItem().ifPresent(item -> {
             putCardToClipboard(item.getValue());
             cut = true;
         });
     }
 
-    public void onCardCopy() {
+    private void onCardCopy() {
         getSelectedItem().ifPresent(item -> {
             putCardToClipboard(item.getValue());
             cut = false;
@@ -595,12 +708,11 @@ public class MainWindowController implements Initializable {
         });
     }
 
-
-    public void onCardPaste() {
+    private void onCardPaste() {
         genericPaste(sourceItem -> cut ? sourceItem : new TreeItem<>(sourceItem.getValue().cloneWithNewId()));
     }
 
-    public void onCardPasteLink() {
+    private void onCardPasteLink() {
         genericPaste(sourceItem -> new TreeItem<>(new Link(sourceItem.getValue().getId())));
     }
 
@@ -632,5 +744,45 @@ public class MainWindowController implements Initializable {
             .collect(Collectors.toList());
 
         toDelete.forEach(x -> root.getChildren().remove(x));
+    }
+
+    /*
+        Autoscroll implementation, based on:
+        http://programmingtipsandtraps.blogspot.ru/2015/10/drag-and-drop-in-treetableview-with.html
+     */
+
+    private double scrollDirection = 0;
+    private final Timeline scrollTimeline = new Timeline();
+
+    private Optional<ScrollBar> getVerticalScrollbar() {
+        return cardTreeView.lookupAll(".scroll-bar").stream()
+                .filter(n -> n instanceof ScrollBar)
+                .map(n -> (ScrollBar)n)
+                .filter(n -> n.getOrientation().equals(Orientation.VERTICAL))
+                .findFirst();
+    }
+
+    private void dragScroll() {
+        getVerticalScrollbar().ifPresent(sb -> {
+            double newValue = sb.getValue() + scrollDirection;
+            newValue = Math.min(newValue, 1.0);
+            newValue = Math.max(newValue, 0.0);
+            sb.setValue(newValue);
+        });
+    }
+
+    private void setupScrolling() {
+        scrollTimeline.setCycleCount(Timeline.INDEFINITE);
+        scrollTimeline.getKeyFrames().add(new KeyFrame(Duration.millis(20), "Scroll", (ActionEvent) -> dragScroll()));
+        cardTreeView.setOnDragExited(event -> {
+            if (event.getY() > 0) {
+                scrollDirection = 1.0 / cardTreeView.getExpandedItemCount();
+            } else {
+                scrollDirection = -1.0 / cardTreeView.getExpandedItemCount();
+            }
+            scrollTimeline.play();
+        });
+        cardTreeView.setOnDragEntered(event -> scrollTimeline.stop());
+        cardTreeView.setOnDragDone(event -> scrollTimeline.stop());
     }
 }

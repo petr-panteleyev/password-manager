@@ -26,46 +26,97 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class EditCardDialog extends BaseDialog<Card> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/EditCardDialog.fxml";
+class EditCardDialog extends BaseDialog<Card> implements Styles {
+    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    @FXML private TableView<Field>          cardContentView;
-    @FXML private TableColumn<Field,String> fieldNameColumn;
-    @FXML private TableColumn<Field,String> fieldValueColumn;
-    @FXML private TextField                 fieldNameEdit;
-    @FXML private ComboBox<FieldType>       fieldTypeCombo;
-    @FXML private TextField                 cardNameEdit;
-    @FXML private ComboBox<Picture>         pictureList;
-    @FXML private TextArea                  noteEditor;
+    private final TableView<Field>          cardContentView = new TableView<>();
+    private final TableColumn<Field,String> fieldNameColumn = new TableColumn<>();
+    private final TableColumn<Field,String> fieldValueColumn = new TableColumn<>();
+    private final TextField                 fieldNameEdit = new TextField();
+    private final ComboBox<FieldType>       fieldTypeCombo = new ComboBox<>();
+    private final TextField                 cardNameEdit = new TextField();
+    private final ComboBox<Picture>         pictureList = new ComboBox<>();
+    private final TextArea                  noteEditor = new TextArea();
 
     private Card card;
 
     EditCardDialog(Card card) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(MainWindowController.CSS_PATH);
         this.card = card;
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("editCardDialog.title"));
-        createDefaultButtons();
+    private void initialize() {
+        setTitle(rb.getString("editCardDialog.title"));
+
+        MenuItem newFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.addField"));
+        newFieldMenuItem.setOnAction(a -> onNewField());
+        MenuItem deleteFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.deleteField"));
+        deleteFieldMenuItem.setOnAction(a -> onDeleteField());
+
+        ContextMenu contextMenu = new ContextMenu(newFieldMenuItem, new SeparatorMenuItem(), deleteFieldMenuItem);
+
+        fieldNameColumn.setSortable(false);
+        fieldNameColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
+        fieldValueColumn.setSortable(false);
+        fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
+        cardContentView.getColumns().setAll(fieldNameColumn, fieldValueColumn);
+        cardContentView.setContextMenu(contextMenu);
+        cardContentView.setEditable(true);
+
+        GridPane grid1 = new GridPane();
+        grid1.getStyleClass().add(GRID_PANE);
+        grid1.addRow(0, new Label(rb.getString("label.FieldName")), fieldNameEdit);
+        grid1.addRow(1, new Label(rb.getString("label.FieldType")), fieldTypeCombo);
+
+        BorderPane pane = new BorderPane(cardContentView, null, null, grid1, null);
+        BorderPane.setAlignment(grid1, Pos.CENTER);
+        BorderPane.setMargin(grid1, new Insets(5, 0, 0, 0));
+
+        Tab tab1 = new Tab(rb.getString("editCardDialog.tab.fields"), pane);
+        tab1.setClosable(false);
+
+        Tab tab2 = new Tab(rb.getString("editCardDialog.tab.notes"), noteEditor);
+        tab2.setClosable(false);
+
+        GridPane grid3 = new GridPane();
+        grid3.getStyleClass().add(GRID_PANE);
+        grid3.setPadding(new Insets(5, 5, 5, 5));
+        grid3.addRow(0, new Label(rb.getString("label.Name")), cardNameEdit);
+        grid3.addRow(1, new Label(rb.getString("label.Icon")), pictureList);
+        cardNameEdit.setPrefColumnCount(30);
+
+        Tab tab3 = new Tab(rb.getString("editCardDialog.tab.properties"), grid3);
+        tab3.setClosable(false);
+
+        TabPane tabPane = new TabPane(tab1, tab2, tab3);
+
+        getDialogPane().setContent(tabPane);
+        createDefaultButtons(rb);
 
         fieldValueColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -115,13 +166,13 @@ public class EditCardDialog extends BaseDialog<Card> implements Initializable {
         });
     }
 
-    public void onNewField() {
+    private void onNewField() {
         Field f = new Field(FieldType.STRING, "New field", "");
         cardContentView.getItems().add(f);
         cardContentView.getSelectionModel().select(f);
     }
 
-    public void onDeleteField() {
+    private void onDeleteField() {
         getSelectedField().ifPresent(sel -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> cardContentView.getItems().remove(sel));

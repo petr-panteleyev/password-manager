@@ -26,39 +26,68 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.layout.GridPane;
+import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.Validator;
 import org.panteleyev.utilities.fx.BaseDialog;
 import java.io.File;
-import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
-public class PasswordDialog extends BaseDialog<String> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/PasswordDialog.fxml";
+class PasswordDialog extends BaseDialog<String> implements Styles {
 
-    @FXML private Label         fileNameLabel;
-    @FXML private PasswordField passwordEdit;
+    private final PasswordField passwordEdit = new PasswordField();
+    private final PasswordField passwordEdit2 = new PasswordField();
 
-    private final File file;
+    PasswordDialog(File file, boolean change) {
+        super(MainWindowController.CSS_PATH);
 
-    PasswordDialog(File file) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
-        this.file = file;
-    }
+        ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("passwordDialog.title"));
+        setTitle(rb.getString("passwordDialog.title"));
 
-        createDefaultButtons();
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GRID_PANE);
 
-        fileNameLabel.setText(file.getAbsolutePath());
+        grid.addRow(0, new Label(rb.getString("label.File")), new Label(file.getAbsolutePath()));
+        grid.addRow(1, new Label(rb.getString("label.Password")), passwordEdit);
+        if (change) {
+            grid.addRow(2, new Label(rb.getString("label.Repeat")), passwordEdit2);
+        }
+        passwordEdit.setPrefColumnCount(32);
+
+        getDialogPane().setContent(grid);
+        createDefaultButtons(rb);
 
         setResultConverter(b -> b == ButtonType.OK ? passwordEdit.getText() : null);
 
-        Platform.runLater(() -> passwordEdit.requestFocus());
+        if (change) {
+            Platform.runLater(this::createValidationSupport);
+        }
+        Platform.runLater(passwordEdit::requestFocus);
+    }
+
+    private void createValidationSupport() {
+        Validator<String> v1 = (Control c, String value) -> {
+            // Main password invalidates repeated password
+            String s = passwordEdit2.getText();
+            passwordEdit2.setText(UUID.randomUUID().toString());
+            passwordEdit2.setText(s);
+
+            return ValidationResult.fromErrorIf(c, null, false);
+        };
+
+        Validator<String> v2 = (Control c, String value) -> {
+            boolean equal = Objects.equals(passwordEdit.getText(), passwordEdit2.getText());
+            return ValidationResult.fromErrorIf(c, null, !equal);
+        };
+
+        validation.registerValidator(passwordEdit, v1);
+        validation.registerValidator(passwordEdit2, v2);
     }
 }

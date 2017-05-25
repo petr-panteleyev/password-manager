@@ -26,17 +26,18 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PasswordManagerApplication extends Application {
-    private static Application application;
+    private static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
+
+    private static PasswordManagerApplication application;
+
+    private final ResourceBundle rb = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
     public static void main(String[] args) {
         launch(args);
@@ -55,19 +56,22 @@ public class PasswordManagerApplication extends Application {
             alert.showAndWait();
         });
 
-        ResourceBundle bundle = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
+        stage.setTitle(rb.getString("mainWindow.title"));
 
-        stage.setTitle(bundle.getString("mainWindow.title"));
+        Scene scene = new Scene(new MainWindowController());
+        scene.getStylesheets().add(MainWindowController.CSS_PATH);
+        stage.setScene(scene);
 
-        URL location = getClass().getResource("/org/panteleyev/pwdmanager/MainWindow.fxml");
-
-        FXMLLoader loader = new FXMLLoader(location, bundle);
-        Parent parent = loader.load();
-        stage.setScene(new Scene(parent));
+        stage.setHeight(542);
+        stage.setWidth(800);
         stage.show();
     }
 
-    static Application getApplication() {
+    static PasswordManagerApplication getApplication() {
         return application;
+    }
+
+    static ResourceBundle getBundle() {
+        return application.rb;
     }
 }

@@ -25,45 +25,58 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import org.panteleyev.utilities.fx.Controller;
+import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class CardViewer extends Controller<CardViewer> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/CardViewer.fxml";
+class CardViewer extends BorderPane implements Styles {
+    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    @FXML private BorderPane pane;
-    @FXML private GridPane   grid;
-    @FXML private Label      noteLabel;
-    @FXML private Label      noteViewer;
+    private final GridPane grid = new GridPane();
+    private final Label    noteLabel =
+            new Label(rb.getString("label.notesNoSemicolon"), new ImageView(Picture.NOTE.getImage()));
+    private final Label    noteViewer = new Label();
 
     CardViewer() {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH, false);
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        noteLabel.setGraphic(new ImageView(Picture.NOTE.getImage()));
-    }
+    private void initialize() {
+        grid.getStyleClass().add(GRID_PANE);
+        grid.setAlignment(Pos.TOP_CENTER);
 
-    BorderPane getPane() {
-        return pane;
+        VBox vBox = new VBox(
+                grid,
+                noteLabel,
+                noteViewer
+        );
+
+        noteLabel.getStyleClass().add("noteLabel");
+        noteViewer.getStyleClass().add("noteViewer");
+
+        ScrollPane pane = new ScrollPane(vBox);
+        pane.getStyleClass().add("whiteBackground");
+        pane.setFitToWidth(true);
+        pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        setCenter(pane);
+
+        BorderPane.setAlignment(pane, Pos.CENTER);
     }
 
     void setData(List<FieldWrapper> items, String note) {

@@ -25,29 +25,36 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-public class AboutDialog extends BaseDialog implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/AboutDialog.fxml";
-    private static final String BUILD = "1.0.0";
-
-    @FXML private Label buildLabel;
+class AboutDialog extends BaseDialog implements Styles {
+    private static final String BUILD = "${version}";
 
     AboutDialog() {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
-    }
+        super(MainWindowController.CSS_PATH);
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
         setTitle("About Password Manager");
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK);
 
-        buildLabel.setText(BUILD);
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GRID_PANE);
+
+        Label l0 = new Label("Password Manager");
+        l0.getStyleClass().add(ABOUT_LABEL);
+
+        Label l1 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
+
+        grid.addRow(0, l0);
+        grid.addRow(1, l1);
+        grid.addRow(2, new Label("Version:"), new Label(BUILD));
+        grid.addRow(3, new Label("Encryption:"), new Label("256-bit AES"));
+
+        GridPane.setColumnSpan(l0, 2);
+        GridPane.setColumnSpan(l1, 2);
+
+        getDialogPane().setContent(grid);
+        getDialogPane().getButtonTypes().addAll(ButtonType.OK);
     }
 }

@@ -26,25 +26,22 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-public class CategoryDialog extends RecordDialog<Category> implements Initializable {
+class CategoryDialog extends RecordDialog<Category> {
     private final Category category;
 
     CategoryDialog(Category category) {
         this.category = category;
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("categoryDialog.title"));
-        createDefaultButtons();
+    private void initialize() {
+        setTitle(rb.getString("categoryDialog.title"));
+        createDefaultButtons(rb);
 
         initLists();
-        setTypeLabelText(resources.getString("label.defaultType"));
+        setTypeLabelText(rb.getString("label.defaultType"));
 
         if (category != null) {
             getNameEdit().setText(category.getName());

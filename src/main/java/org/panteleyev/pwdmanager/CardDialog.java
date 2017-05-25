@@ -26,13 +26,10 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
-import java.net.URL;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
-public class CardDialog extends RecordDialog<Card> implements Initializable {
+class CardDialog extends RecordDialog<Card> {
     private final RecordType defaultType;
     private final Card card;
 
@@ -41,15 +38,16 @@ public class CardDialog extends RecordDialog<Card> implements Initializable {
 
         this.defaultType = defaultType;
         this.card = card;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("cardDialog.title"));
-        createDefaultButtons();
+    private void initialize() {
+        setTitle(rb.getString("cardDialog.title"));
+        createDefaultButtons(rb);
 
         initLists();
-        setTypeLabelText(resources.getString("label.type"));
+        setTypeLabelText(rb.getString("label.type"));
 
         if (card != null) {
             getNameEdit().setText(card.getName());

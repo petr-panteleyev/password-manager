@@ -3,21 +3,63 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
-    <parent>
-        <groupId>org.panteleyev</groupId>
-        <artifactId>java</artifactId>
-        <version>20170110</version>
-    </parent>
+
+    <profiles>
+        <profile>
+            <id>fatjar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>2.4.3</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <transformers>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <manifestEntries>
+                                                <Main-Class>${app.main.class}</Main-Class>
+                                            </manifestEntries>
+                                        </transformer>
+                                    </transformers>
+                                    <filters>
+                                        <filter>
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <properties>
         <app.main.class>org.panteleyev.pwdmanager.PasswordManagerApplication</app.main.class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>utilities</artifactId>
-            <version>1.5.0</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -31,8 +73,22 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>filtering-java-templates</id>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -60,7 +116,7 @@
                                 <argument>Password Generator</argument>
                                 <argument>-srcfiles</argument>
                                 <argument>target/${project.artifactId}-${project.version}.jar</argument>
-                                <argument>-Bicon=icons.ico</argument>
+                                <argument>-Bicon=icons/icons.ico</argument>
                                 <argument>-BappVersion=${project.version}</argument>
                                 <argument>-BsystemWide=true</argument>
                                 <argument>-Bcopyright=Copyright (c) 2016, 2017, Petr Panteleyev</argument>
@@ -94,7 +150,7 @@
                                 <argument>Password Generator</argument>
                                 <argument>-srcfiles</argument>
                                 <argument>target/${project.artifactId}-${project.version}.jar</argument>
-                                <argument>-Bicon=icons.icns</argument>
+                                <argument>-Bicon=icons/icons.icns</argument>
                                 <argument>-BappVersion=${project.version}</argument>
                                 <argument>-appclass</argument>
                                 <argument>${app.main.class}</argument>
@@ -124,7 +180,7 @@
                                 <argument>Password Generator</argument>
                                 <argument>-srcfiles</argument>
                                 <argument>target/${project.artifactId}-${project.version}.jar</argument>
-                                <argument>-Bicon=icon.png</argument>
+                                <argument>-Bicon=icons/icon.png</argument>
                                 <argument>-BappVersion=${project.version}</argument>
                                 <argument>-BsystemWide=true</argument>
                                 <argument>-Bcopyright=Copyright (c) 2016, 2017, Petr Panteleyev</argument>
@@ -160,7 +216,7 @@
                                 <argument>Password Generator</argument>
                                 <argument>-srcfiles</argument>
                                 <argument>target/${project.artifactId}-${project.version}.jar</argument>
-                                <argument>-Bicon=icon.png</argument>
+                                <argument>-Bicon=icons/icon.png</argument>
                                 <argument>-BappVersion=${project.version}</argument>
                                 <argument>-BsystemWide=true</argument>
                                 <argument>-Bcopyright=Copyright (c) 2016, 2017, Petr Panteleyev</argument>

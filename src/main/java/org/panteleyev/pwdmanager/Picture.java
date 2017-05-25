@@ -68,6 +68,11 @@ public enum Picture {
     MALE,
     EDUCATION,
     STEAM,
+    GITHUB,
+    BITBUCKET,
+    TELEGRAM,
+    APPLE,
+    YAHOO,
     FOLDER;
 
     private final Image image;

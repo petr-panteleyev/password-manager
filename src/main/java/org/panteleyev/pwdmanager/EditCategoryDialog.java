@@ -27,37 +27,48 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class EditCategoryDialog extends BaseDialog<Category> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/pwdmanager/EditCategoryDialog.fxml";
+class EditCategoryDialog extends BaseDialog<Category> implements Styles {
+    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
     private final Category category;
 
-    @FXML private TextField            nameEdit;
-    @FXML private ComboBox<RecordType> typeList;
-    @FXML private ComboBox<Picture>    pictureList;
+    private final TextField            nameEdit = new TextField();
+    private final ComboBox<RecordType> typeList = new ComboBox<>();
+    private final ComboBox<Picture>    pictureList = new ComboBox<>();
 
     EditCategoryDialog(Category category) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(MainWindowController.CSS_PATH);
         Objects.requireNonNull(category);
         this.category = category;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle(resources.getString("categoryDialog.title"));
-        createDefaultButtons();
+    private void initialize() {
+        setTitle(rb.getString("categoryDialog.title"));
+
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GRID_PANE);
+
+        grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);
+        grid.addRow(1, new Label(rb.getString("label.defaultType")), typeList);
+        grid.addRow(2, new Label(rb.getString("label.Icon")), pictureList);
+
+        nameEdit.setPrefColumnCount(25);
+
+        getDialogPane().setContent(grid);
+        createDefaultButtons(rb);
 
         initLists();
 
