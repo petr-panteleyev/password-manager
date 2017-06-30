@@ -19,19 +19,11 @@ cd utilities
 mvn install
 ```
 
-## Building JAR File
+## Building Standalone JAR File
 
 ```
 cd password-manager
 mvn package
-```
-
-## Building Standalone JAR
-Standalone (fat) JAR is always signed.
-
-```
-cd password-manager
-mvn package -P fatjar
 ```
 
 ## Building Native Packages
@@ -39,7 +31,7 @@ mvn package -P fatjar
 ```
 cd password-manager
 mvn clean
-mvn package -P fatjar
+mvn package
 mvn exec:exec@<native-dist>
 ```
 
