@@ -30,8 +30,7 @@ mvn package
 
 ```
 cd password-manager
-mvn clean
-mvn package
+mvn clean package
 mvn exec:exec@<native-dist>
 ```
 
