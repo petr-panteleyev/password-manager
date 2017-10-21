@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.2] - 2017-10-21
+
+* Migration to Java 9
+
 ## [1.0.1] - 2017-05-25
 
 * New icons

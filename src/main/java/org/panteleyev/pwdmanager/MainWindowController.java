@@ -36,7 +36,6 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -62,7 +61,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -90,40 +88,40 @@ public class MainWindowController extends BorderPane implements Styles {
     static final String CSS_DROP_BELOW = "dropBelow";
     static final String CSS_DROP_ABOVE = "dropAbove";
 
-    static final String[] CSS_DND_STYLES = { CSS_DROP_TARGET, CSS_DROP_BELOW, CSS_DROP_ABOVE };
+    static final String[] CSS_DND_STYLES = {CSS_DROP_TARGET, CSS_DROP_BELOW, CSS_DROP_ABOVE};
 
     // TreeView clipboard
     private boolean cut = false;
 
-    private final TreeView<Record>  cardTreeView = new TreeView<>();
-    private final BorderPane        leftPane = new BorderPane(cardTreeView);
-    private final TitledPane        treeViewPane = new TitledPane("", leftPane);
+    private final TreeView<Record> cardTreeView = new TreeView<>();
+    private final BorderPane leftPane = new BorderPane(cardTreeView);
+    private final TitledPane treeViewPane = new TitledPane("", leftPane);
 
-    private final MenuItem          ctxNewCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
-    private final MenuItem          ctxNewNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
-    private final MenuItem          ctxNewCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
-    private final MenuItem          ctxCutMenuItem = new MenuItem(rb.getString("menu.edit.cut"));
-    private final MenuItem          ctxDeleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
-    private final MenuItem          ctxCardPasteMenuItem = new MenuItem(rb.getString("menu.edit.paste"));
-    private final MenuItem          ctxCardPasteLinkMenuItem = new MenuItem(rb.getString("menu.edit.pasteLink"));
+    private final MenuItem ctxNewCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
+    private final MenuItem ctxNewNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
+    private final MenuItem ctxNewCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
+    private final MenuItem ctxCutMenuItem = new MenuItem(rb.getString("menu.edit.cut"));
+    private final MenuItem ctxDeleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
+    private final MenuItem ctxCardPasteMenuItem = new MenuItem(rb.getString("menu.edit.paste"));
+    private final MenuItem ctxCardPasteLinkMenuItem = new MenuItem(rb.getString("menu.edit.pasteLink"));
 
-    private TextField               searchTextField;
-    private final Label             cardContentTitleLabel = new Label();
-    private final Button            cardEditButton = new Button("Edit...");
-    private final BorderPane        recordViewPane = new BorderPane();
+    private TextField searchTextField;
+    private final Label cardContentTitleLabel = new Label();
+    private final Button cardEditButton = new Button("Edit...");
+    private final BorderPane recordViewPane = new BorderPane();
 
     // Menu items
-    private final MenuItem          newCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
-    private final MenuItem          newCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
-    private final MenuItem          newNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
-    private final MenuItem          changePasswordMenuItem = new MenuItem(rb.getString("menu.tools.changePassword"));
-    private final MenuItem          deleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
+    private final MenuItem newCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
+    private final MenuItem newCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
+    private final MenuItem newNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
+    private final MenuItem changePasswordMenuItem = new MenuItem(rb.getString("menu.tools.changePassword"));
+    private final MenuItem deleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
 
-    private final NoteViewer        noteViewer = new NoteViewer();
-    private final CardViewer        cardContentView = new CardViewer();
+    private final NoteViewer noteViewer = new NoteViewer();
+    private final CardViewer cardContentView = new CardViewer();
 
     private Record rootRecord;
-    private TreeItem<Record>        rootTreeItem;       // store root item for full tree
+    private TreeItem<Record> rootTreeItem;       // store root item for full tree
 
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private String currentPassword;
@@ -251,11 +249,11 @@ public class MainWindowController extends BorderPane implements Styles {
         cardEditButton.disableProperty().bind(cardTreeView.getSelectionModel().selectedItemProperty().isNull());
 
         currentFile.addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
-            treeViewPane.setText(newValue != null? newValue.getName() : "");
+            treeViewPane.setText(newValue != null ? newValue.getName() : "");
         });
 
-        searchTextField = TextFields.createClearableTextField();
-        searchTextField.textProperty().addListener((x,oldValue,newValue) -> {
+        searchTextField = new TextField();
+        searchTextField.textProperty().addListener((x, oldValue, newValue) -> {
             if (!Objects.equals(oldValue, newValue)) {
                 doSearch(newValue);
             }
@@ -275,7 +273,7 @@ public class MainWindowController extends BorderPane implements Styles {
             }
         }
 
-        Platform.runLater(() -> cardTreeView.requestFocus());
+        Platform.runLater(cardTreeView::requestFocus);
 
         // Main menu items
         newCardMenuItem.disableProperty().bind(currentFile.isNull()
@@ -426,7 +424,7 @@ public class MainWindowController extends BorderPane implements Styles {
         FileChooser d = new FileChooser();
         d.setTitle("New File");
         d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
+                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
         File file = d.showSaveDialog(null);
         if (file != null) {
@@ -450,7 +448,7 @@ public class MainWindowController extends BorderPane implements Styles {
         FileChooser d = new FileChooser();
         d.setTitle("Open File");
         d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
+                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
         File file = d.showOpenDialog(null);
         if (file != null) {
@@ -494,8 +492,8 @@ public class MainWindowController extends BorderPane implements Styles {
 
     private void onNewCard() {
         TreeItem<Record> selected = cardTreeView.getSelectionModel().getSelectedItem();
-        RecordType defaultType = (selected != null && selected.getValue() instanceof Category)?
-            selected.getValue().getType() : RecordType.PASSWORD;
+        RecordType defaultType = (selected != null && selected.getValue() instanceof Category) ?
+                selected.getValue().getType() : RecordType.PASSWORD;
 
         new CardDialog(defaultType, null)
                 .showAndWait()
@@ -516,23 +514,23 @@ public class MainWindowController extends BorderPane implements Styles {
         Record record = item.getValue();
 
         if (record instanceof Link) {
-            Optional<TreeItem<Record>> target = findRecordById(((Link)record).getTargetId(), cardTreeView.getRoot());
+            Optional<TreeItem<Record>> target = findRecordById(((Link) record).getTargetId(), cardTreeView.getRoot());
             target.ifPresent(this::setupRecordViewer);
         } else {
             cardContentTitleLabel.setText(item.getValue().getName());
             cardContentTitleLabel.setGraphic(new ImageView(item.getValue().getPicture().getBigImage()));
 
             if (record instanceof Note) {
-                noteViewer.setText(((Note)record).getText());
+                noteViewer.setText(((Note) record).getText());
                 recordViewPane.setCenter(noteViewer);
             } else {
                 if (record instanceof Card) {
                     recordViewPane.setCenter(cardContentView);
 
-                    List<FieldWrapper> wrappers = ((Card)record).getFields().stream()
-                        .filter(f -> !f.getValue().isEmpty())
-                        .map(FieldWrapper::new).collect(Collectors.toList());
-                    cardContentView.setData(FXCollections.observableArrayList(wrappers), ((Card)record).getNote());
+                    List<FieldWrapper> wrappers = ((Card) record).getFields().stream()
+                            .filter(f -> !f.getValue().isEmpty())
+                            .map(FieldWrapper::new).collect(Collectors.toList());
+                    cardContentView.setData(FXCollections.observableArrayList(wrappers), ((Card) record).getNote());
                 }
             }
         }
@@ -561,15 +559,15 @@ public class MainWindowController extends BorderPane implements Styles {
 
         if (item != null) {
             if (item.getValue() instanceof Card) {
-                new EditCardDialog((Card)item.getValue())
+                new EditCardDialog((Card) item.getValue())
                         .showAndWait().ifPresent(result -> processEditedRecord(item, result));
             } else {
                 if (item.getValue() instanceof Note) {
-                    new EditNoteDialog((Note)item.getValue())
+                    new EditNoteDialog((Note) item.getValue())
                             .showAndWait().ifPresent(result -> processEditedRecord(item, result));
                 } else {
                     if (item.getValue() instanceof Category) {
-                        new EditCategoryDialog((Category)item.getValue())
+                        new EditCategoryDialog((Category) item.getValue())
                                 .showAndWait().ifPresent(result -> processEditedRecord(item, result));
                     }
                 }
@@ -593,7 +591,7 @@ public class MainWindowController extends BorderPane implements Styles {
         FileChooser d = new FileChooser();
         d.setTitle("Open eWallet Text File");
         d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("eWallet Text Files", "*.txt")
+                new FileChooser.ExtensionFilter("eWallet Text Files", "*.txt")
         );
         File file = d.showOpenDialog(null);
         if (file != null) {
@@ -609,7 +607,7 @@ public class MainWindowController extends BorderPane implements Styles {
         FileChooser d = new FileChooser();
         d.setTitle("Password Manager XML");
         d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Password Manager XML Files", "*.xml")
+                new FileChooser.ExtensionFilter("Password Manager XML Files", "*.xml")
         );
         File file = d.showSaveDialog(null);
         if (file != null) {
@@ -628,7 +626,7 @@ public class MainWindowController extends BorderPane implements Styles {
         Optional<TreeItem<Record>> targetItem = getSelectedItem();
 
         if (cb.hasContent(Record.DATA_FORMAT) && targetItem.isPresent()) {
-            String sourceId = (String)cb.getContent(Record.DATA_FORMAT);
+            String sourceId = (String) cb.getContent(Record.DATA_FORMAT);
             Optional<TreeItem<Record>> sourceItem = findRecordById(sourceId, cardTreeView.getRoot());
 
             if (sourceItem.isPresent()) {
@@ -682,7 +680,7 @@ public class MainWindowController extends BorderPane implements Styles {
     private void genericPaste(Function<TreeItem<Record>, TreeItem<Record>> getNewItem) {
         getSelectedItem().ifPresent(targetItem -> {
             Clipboard cb = Clipboard.getSystemClipboard();
-            String sourceId = (String)cb.getContent(Record.DATA_FORMAT);
+            String sourceId = (String) cb.getContent(Record.DATA_FORMAT);
 
             findRecordById(sourceId, cardTreeView.getRoot()).ifPresent(sourceItem -> {
                 TreeItem<Record> newItem = getNewItem.apply(sourceItem);
@@ -736,12 +734,12 @@ public class MainWindowController extends BorderPane implements Styles {
 
     private static void deleteBrokenLinks(String id, TreeItem<Record> root) {
         root.getChildren().stream()
-            .filter(x -> !x.getChildren().isEmpty()).forEach(x -> deleteBrokenLinks(id, x));
+                .filter(x -> !x.getChildren().isEmpty()).forEach(x -> deleteBrokenLinks(id, x));
 
         List<TreeItem> toDelete = root.getChildren().stream()
-            .filter(x -> x.getValue() instanceof Link)
-            .filter(x -> ((Link)x.getValue()).getTargetId().equals(id))
-            .collect(Collectors.toList());
+                .filter(x -> x.getValue() instanceof Link)
+                .filter(x -> ((Link) x.getValue()).getTargetId().equals(id))
+                .collect(Collectors.toList());
 
         toDelete.forEach(x -> root.getChildren().remove(x));
     }
@@ -757,7 +755,7 @@ public class MainWindowController extends BorderPane implements Styles {
     private Optional<ScrollBar> getVerticalScrollbar() {
         return cardTreeView.lookupAll(".scroll-bar").stream()
                 .filter(n -> n instanceof ScrollBar)
-                .map(n -> (ScrollBar)n)
+                .map(n -> (ScrollBar) n)
                 .filter(n -> n.getOrientation().equals(Orientation.VERTICAL))
                 .findFirst();
     }
