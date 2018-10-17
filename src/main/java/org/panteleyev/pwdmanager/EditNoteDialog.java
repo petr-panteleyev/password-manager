@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,12 +66,12 @@ class EditNoteDialog extends BaseDialog<Note> {
     private void initialize() {
         setTitle(rb.getString("editNoteDialog.title"));
 
-        HBox box = new HBox(5, new Label(rb.getString("label.Name")), nameEdit);
+        var box = new HBox(5, new Label(rb.getString("label.Name")), nameEdit);
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 0, 5, 0));
         nameEdit.setPrefColumnCount(25);
 
-        BorderPane pane = new BorderPane(noteEdit, box, null, null, null);
+        var pane = new BorderPane(noteEdit, box, null, null, null);
         BorderPane.setAlignment(noteEdit, Pos.CENTER);
         BorderPane.setAlignment(box, Pos.CENTER_LEFT);
 
@@ -90,9 +90,9 @@ class EditNoteDialog extends BaseDialog<Note> {
     }
 
     private ContextMenu createContextMenu() {
-        ContextMenu menu = new ContextMenu();
+        var menu = new ContextMenu();
 
-        MenuItem m1 = new MenuItem("Copy...");
+        var m1 = new MenuItem("Copy...");
         m1.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         m1.setOnAction(x -> {
 

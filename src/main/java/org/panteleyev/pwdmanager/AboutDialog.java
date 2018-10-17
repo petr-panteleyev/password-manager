@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import org.panteleyev.utilities.fx.BaseDialog;
+
 import java.util.ResourceBundle;
 
 class AboutDialog extends BaseDialog implements Styles {
@@ -37,18 +38,18 @@ class AboutDialog extends BaseDialog implements Styles {
     AboutDialog() {
         super(MainWindowController.CSS_PATH);
 
-        ResourceBundle buildInfo = ResourceBundle.getBundle(BUILD_INFO);
+        var buildInfo = ResourceBundle.getBundle(BUILD_INFO);
 
 
         setTitle("About Password Manager");
 
-        GridPane grid = new GridPane();
+        var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
-        Label l0 = new Label("Password Manager");
+        var l0 = new Label("Password Manager");
         l0.getStyleClass().add(ABOUT_LABEL);
 
-        Label l1 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
+        var l1 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
 
         grid.addRow(0, l0);
         grid.addRow(1, l1);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,12 +25,12 @@
  */
 package org.panteleyev.pwdmanager;
 
+import javafx.scene.control.TreeItem;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.control.TreeItem;
 
 class ImportExport {
     private static TreeItem<Record> catItem = null;
@@ -48,7 +48,7 @@ class ImportExport {
                 record = new Note(cardName, note.toString());
                 note = null;
             } else {
-                String cNote = (cardNotes == null)? "" : cardNotes.toString();
+                var cNote = cardNotes == null ? "" : cardNotes.toString();
                 record = new Card(cardName, Picture.PASSWORD, fields, cNote);
                 cardNotes = null;
             }
@@ -62,16 +62,16 @@ class ImportExport {
     private static void parseField(String line) {
         int colon = line.indexOf(':');
         if (colon != -1) {
-            String fName = line.substring(0, colon);
-            String fValue = line.substring(colon + 1).trim();
-            Field field = new Field(FieldType.STRING, fName, fValue);
+            var fName = line.substring(0, colon);
+            var fValue = line.substring(colon + 1).trim();
+            var field = new Field(FieldType.STRING, fName, fValue);
             fields.add(field);
         } else {
             int space = line.indexOf(' ');
             if (space != -1) {
-                String fName = line.substring(0, space);
-                String fValue = line.substring(space + 1).trim();
-                Field field = new Field(FieldType.STRING, fName, fValue);
+                var fName = line.substring(0, space);
+                var fValue = line.substring(space + 1).trim();
+                var field = new Field(FieldType.STRING, fName, fValue);
                 fields.add(field);
             }
         }
@@ -86,8 +86,8 @@ class ImportExport {
                     finalizeCard();
 
                     int colon = line.indexOf(':');
-                    String name = line.substring(colon + 1).trim();
-                    Category cat = new Category(name, RecordType.EMPTY, Picture.FOLDER);
+                    var name = line.substring(colon + 1).trim();
+                    var cat = new Category(name, RecordType.EMPTY, Picture.FOLDER);
                     catItem = new TreeItem<>(cat);
                     root.getChildren().add(catItem);
                     endOfSection = false;

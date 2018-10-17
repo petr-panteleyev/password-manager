@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ public class Note extends Record {
         }
 
         if (o instanceof Note) {
-            Note that = (Note)o;
+            var that = (Note) o;
             return super.equals(that)
                     && Objects.equals(this.text, that.text);
         } else {

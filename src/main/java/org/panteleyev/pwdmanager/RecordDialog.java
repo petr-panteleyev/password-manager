@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
@@ -49,7 +48,7 @@ abstract class RecordDialog<T extends Record> extends BaseDialog<NewRecordDescri
     RecordDialog() {
         super(MainWindowController.CSS_PATH);
 
-        GridPane grid = new GridPane();
+        var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
         grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);

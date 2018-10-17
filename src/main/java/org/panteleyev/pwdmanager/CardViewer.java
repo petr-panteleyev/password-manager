@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ class CardViewer extends BorderPane implements Styles {
         grid.getStyleClass().add(GRID_PANE);
         grid.setAlignment(Pos.TOP_CENTER);
 
-        VBox vBox = new VBox(
+        var vBox = new VBox(
                 grid,
                 noteLabel,
                 noteViewer
@@ -69,7 +69,7 @@ class CardViewer extends BorderPane implements Styles {
         noteLabel.getStyleClass().add("noteLabel");
         noteViewer.getStyleClass().add("noteViewer");
 
-        ScrollPane pane = new ScrollPane(vBox);
+        var pane = new ScrollPane(vBox);
         pane.getStyleClass().add("whiteBackground");
         pane.setFitToWidth(true);
         pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -83,8 +83,8 @@ class CardViewer extends BorderPane implements Styles {
         grid.getChildren().clear();
 
         int y = 1;
-        for (FieldWrapper field : items) {
-            Label nameLabel = new Label(field.getName());
+        for (var field : items) {
+            var nameLabel = new Label(field.getName());
             nameLabel.getStyleClass().add("fieldName");
 
             Labeled valueLabel;
@@ -138,10 +138,10 @@ class CardViewer extends BorderPane implements Styles {
     }
 
     private void onCopy(Field field) {
-        Clipboard cb = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
+        var cb = Clipboard.getSystemClipboard();
+        var content = new ClipboardContent();
 
-        String value = field.getValue();
+        var value = field.getValue();
         if (field.getType() == FieldType.CREDIT_CARD_NUMBER) {
             // remove all spaces from credit card number
             value = value.trim().replaceAll(" ", "");

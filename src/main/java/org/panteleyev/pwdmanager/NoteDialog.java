@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Styles
 
         setTitle(rb.getString("noteDialog.title"));
 
-        GridPane grid = new GridPane();
+        var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
         grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);

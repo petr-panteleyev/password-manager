@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,10 +25,10 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.util.Objects;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import java.util.Objects;
 
 public class Field implements Cloneable {
     private SimpleObjectProperty<FieldType> type = new SimpleObjectProperty<>();
@@ -43,6 +43,7 @@ public class Field implements Cloneable {
 
     /**
      * Copy constructor.
+     *
      * @param that copy from
      */
     public Field(Field that) {
@@ -54,7 +55,7 @@ public class Field implements Cloneable {
     @Override
     public Field clone() {
         try {
-            Field result = (Field)super.clone();
+            var result = (Field) super.clone();
 
             result.type = new SimpleObjectProperty<>(type.get());
             result.name = new SimpleStringProperty(name.get());
@@ -98,11 +99,11 @@ public class Field implements Cloneable {
         }
 
         if (o instanceof Field) {
-            Field that = (Field)o;
+            var that = (Field) o;
 
             return Objects.equals(this.type.get(), that.type.get())
-                && Objects.equals(this.name.get(), that.name.get())
-                && Objects.equals(this.value.get(), that.value.get());
+                    && Objects.equals(this.name.get(), that.name.get())
+                    && Objects.equals(this.value.get(), that.value.get());
         } else {
             return false;
         }

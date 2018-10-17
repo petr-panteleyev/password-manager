@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -93,7 +93,7 @@ public enum RecordType {
     private static final String BUNDLE = "org.panteleyev.pwdmanager.RecordType";
 
     RecordType(Picture picture, List<Field> fieldSet) {
-        ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE);
+        var bundle = ResourceBundle.getBundle(BUNDLE);
         this.name = bundle.getString(name());
 
         this.picture = picture;

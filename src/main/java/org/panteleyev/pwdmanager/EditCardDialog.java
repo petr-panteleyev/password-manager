@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,12 +73,12 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
     private void initialize() {
         setTitle(rb.getString("editCardDialog.title"));
 
-        MenuItem newFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.addField"));
+        var newFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.addField"));
         newFieldMenuItem.setOnAction(a -> onNewField());
-        MenuItem deleteFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.deleteField"));
+        var deleteFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.deleteField"));
         deleteFieldMenuItem.setOnAction(a -> onDeleteField());
 
-        ContextMenu contextMenu = new ContextMenu(newFieldMenuItem, new SeparatorMenuItem(), deleteFieldMenuItem);
+        var contextMenu = new ContextMenu(newFieldMenuItem, new SeparatorMenuItem(), deleteFieldMenuItem);
 
         fieldNameColumn.setSortable(false);
         fieldNameColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
@@ -88,32 +88,32 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         cardContentView.setContextMenu(contextMenu);
         cardContentView.setEditable(true);
 
-        GridPane grid1 = new GridPane();
+        var grid1 = new GridPane();
         grid1.getStyleClass().add(GRID_PANE);
         grid1.addRow(0, new Label(rb.getString("label.FieldName")), fieldNameEdit);
         grid1.addRow(1, new Label(rb.getString("label.FieldType")), fieldTypeCombo);
 
-        BorderPane pane = new BorderPane(cardContentView, null, null, grid1, null);
+        var pane = new BorderPane(cardContentView, null, null, grid1, null);
         BorderPane.setAlignment(grid1, Pos.CENTER);
         BorderPane.setMargin(grid1, new Insets(5, 0, 0, 0));
 
-        Tab tab1 = new Tab(rb.getString("editCardDialog.tab.fields"), pane);
+        var tab1 = new Tab(rb.getString("editCardDialog.tab.fields"), pane);
         tab1.setClosable(false);
 
-        Tab tab2 = new Tab(rb.getString("editCardDialog.tab.notes"), noteEditor);
+        var tab2 = new Tab(rb.getString("editCardDialog.tab.notes"), noteEditor);
         tab2.setClosable(false);
 
-        GridPane grid3 = new GridPane();
+        var grid3 = new GridPane();
         grid3.getStyleClass().add(GRID_PANE);
         grid3.setPadding(new Insets(5, 5, 5, 5));
         grid3.addRow(0, new Label(rb.getString("label.Name")), cardNameEdit);
         grid3.addRow(1, new Label(rb.getString("label.Icon")), pictureList);
         cardNameEdit.setPrefColumnCount(30);
 
-        Tab tab3 = new Tab(rb.getString("editCardDialog.tab.properties"), grid3);
+        var tab3 = new Tab(rb.getString("editCardDialog.tab.properties"), grid3);
         tab3.setClosable(false);
 
-        TabPane tabPane = new TabPane(tab1, tab2, tab3);
+        var tabPane = new TabPane(tab1, tab2, tab3);
 
         getDialogPane().setContent(tabPane);
         createDefaultButtons(rb);
@@ -167,21 +167,21 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
     }
 
     private void onNewField() {
-        Field f = new Field(FieldType.STRING, "New field", "");
+        var f = new Field(FieldType.STRING, "New field", "");
         cardContentView.getItems().add(f);
         cardContentView.getSelectionModel().select(f);
     }
 
     private void onDeleteField() {
         getSelectedField().ifPresent(sel -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
+            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> cardContentView.getItems().remove(sel));
         });
     }
 
     private void onFieldNameChanged() {
         getSelectedField().ifPresent((Field sel) -> {
-            String name = fieldNameEdit.getText();
+            var name = fieldNameEdit.getText();
             if (!name.equals(sel.getName())) {
                 sel.nameProperty().set(name);
             }
@@ -190,7 +190,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
 
     private void onFieldTypeComboChanged() {
         getSelectedField().ifPresent((Field sel) -> {
-            FieldType type = fieldTypeCombo.getValue();
+            var type = fieldTypeCombo.getValue();
             if (type != sel.getType()) {
                 sel.typeProperty().set(type);
             }

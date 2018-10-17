@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -79,8 +79,8 @@ public enum Picture {
     private final Image bigImage;
 
     Picture() {
-        String res = name().toLowerCase() + ".png";
-        String bigRes = name().toLowerCase() + "-48.png";
+        var res = name().toLowerCase() + ".png";
+        var bigRes = name().toLowerCase() + "-48.png";
 
         image = new Image(getClass().getResourceAsStream("/org/panteleyev/pwdmanager/res/" + res));
         bigImage = new Image(getClass().getResourceAsStream("/org/panteleyev/pwdmanager/res/" + bigRes));

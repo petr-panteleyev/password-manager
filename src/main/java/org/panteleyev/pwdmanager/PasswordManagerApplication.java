@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ public class PasswordManagerApplication extends Application {
 
         stage.setTitle(rb.getString("mainWindow.title"));
 
-        Scene scene = new Scene(new MainWindowController());
+        var scene = new Scene(new MainWindowController());
         scene.getStylesheets().add(MainWindowController.CSS_PATH);
         stage.setScene(scene);
 

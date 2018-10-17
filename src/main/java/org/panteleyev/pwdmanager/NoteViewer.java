@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,9 +42,9 @@ public class NoteViewer extends TextArea {
     }
 
     private ContextMenu createContextMenu() {
-        ContextMenu menu = new ContextMenu();
+        var menu = new ContextMenu();
 
-        MenuItem m1 = new MenuItem("Copy...");
+        var m1 = new MenuItem("Copy...");
         m1.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
         m1.setOnAction(x -> copy());
 
@@ -54,14 +54,14 @@ public class NoteViewer extends TextArea {
 
     @Override
     public void copy() {
-        String text = getSelectedText();
+        var text = getSelectedText();
         if (text.isEmpty()) {
             text = getText();
         }
 
         if (!text.isEmpty()) {
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent ct = new ClipboardContent();
+            var clipboard = Clipboard.getSystemClipboard();
+            var ct = new ClipboardContent();
             ct.putString(text);
             clipboard.setContent(ct);
         }

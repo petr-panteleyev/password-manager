@@ -1,5 +1,9 @@
 # Change Log
 
+## [18.1.0] - 2018-10-17
+
+* Migration to Java 11
+
 ## [1.0.2] - 2017-10-21
 
 * Migration to Java 9

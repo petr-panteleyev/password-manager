@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ public abstract class Record implements Cloneable {
     }
 
     final Record cloneWithNewId() {
-        Record newRecord = this.clone();
+        var newRecord = this.clone();
         newRecord.id = UUID.randomUUID().toString();
         return newRecord;
     }
@@ -99,7 +99,7 @@ public abstract class Record implements Cloneable {
         }
 
         if (o instanceof Record) {
-            Record that = (Record)o;
+            var that = (Record)o;
             return Objects.equals(this.id, that.id)
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.type, that.type)

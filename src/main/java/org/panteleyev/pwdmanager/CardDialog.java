@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
+
 import java.util.Objects;
 
 class CardDialog extends RecordDialog<Card> {
@@ -61,7 +62,7 @@ class CardDialog extends RecordDialog<Card> {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                RecordType type = getTypeList().getSelectionModel().getSelectedItem();
+                var type = getTypeList().getSelectionModel().getSelectedItem();
                 return new NewRecordDescriptor<>(isParentRoot(), new Card(
                         getNameEdit().getText(),
                         getPictureList().getSelectionModel().getSelectedItem(),

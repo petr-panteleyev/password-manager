@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@ import org.controlsfx.validation.Validator;
 import org.panteleyev.utilities.fx.BaseDialog;
 import java.io.File;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.UUID;
 
 class PasswordDialog extends BaseDialog<String> implements Styles {
@@ -47,11 +46,11 @@ class PasswordDialog extends BaseDialog<String> implements Styles {
     PasswordDialog(File file, boolean change) {
         super(MainWindowController.CSS_PATH);
 
-        ResourceBundle rb = PasswordManagerApplication.getBundle();
+        var rb = PasswordManagerApplication.getBundle();
 
         setTitle(rb.getString("passwordDialog.title"));
 
-        GridPane grid = new GridPane();
+        var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
         grid.addRow(0, new Label(rb.getString("label.File")), new Label(file.getAbsolutePath()));
@@ -75,7 +74,7 @@ class PasswordDialog extends BaseDialog<String> implements Styles {
     private void createValidationSupport() {
         Validator<String> v1 = (Control c, String value) -> {
             // Main password invalidates repeated password
-            String s = passwordEdit2.getText();
+            var s = passwordEdit2.getText();
             passwordEdit2.setText(UUID.randomUUID().toString());
             passwordEdit2.setText(s);
 

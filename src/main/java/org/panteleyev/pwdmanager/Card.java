@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -58,11 +58,11 @@ public class Card extends Record {
 
     @Override
     public Card clone() {
-        Card clone = (Card)super.clone();
+        var clone = (Card) super.clone();
 
         clone.fields = fields.stream()
-            .map(Field::clone)
-            .collect(Collectors.toList());
+                .map(Field::clone)
+                .collect(Collectors.toList());
 
         return clone;
     }
@@ -82,7 +82,7 @@ public class Card extends Record {
         }
 
         if (o instanceof Card) {
-            Card that = (Card)o;
+            var that = (Card) o;
             return super.equals(o)
                     && Objects.equals(this.fields, that.fields)
                     && Objects.equals(this.note, that.note);

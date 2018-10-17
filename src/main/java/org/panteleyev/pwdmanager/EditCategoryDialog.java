@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,9 +43,9 @@ class EditCategoryDialog extends BaseDialog<Category> implements Styles {
 
     private final Category category;
 
-    private final TextField            nameEdit = new TextField();
+    private final TextField nameEdit = new TextField();
     private final ComboBox<RecordType> typeList = new ComboBox<>();
-    private final ComboBox<Picture>    pictureList = new ComboBox<>();
+    private final ComboBox<Picture> pictureList = new ComboBox<>();
 
     EditCategoryDialog(Category category) {
         super(MainWindowController.CSS_PATH);
@@ -58,7 +58,7 @@ class EditCategoryDialog extends BaseDialog<Category> implements Styles {
     private void initialize() {
         setTitle(rb.getString("categoryDialog.title"));
 
-        GridPane grid = new GridPane();
+        var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
         grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);

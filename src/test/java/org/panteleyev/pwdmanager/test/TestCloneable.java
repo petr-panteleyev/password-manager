@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ public class TestCloneable {
 
     @Test(dataProvider="testCloneable")
     public void testCloneable(Record record) throws Exception {
-        Object clone = record.clone();
+        var clone = record.clone();
 
         Assert.assertEquals(clone, record);
         Assert.assertFalse(clone == record);

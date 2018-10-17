@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,20 +25,18 @@
  */
 package org.panteleyev.pwdmanager;
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import javafx.application.Platform;
-import javafx.geometry.Point2D;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 enum DnDDropPosition {
     ABOVE,
@@ -80,12 +78,12 @@ class CardTreeViewCell extends TreeCell<Record> {
         setOnDragDetected((MouseEvent event) -> {
             // Prohibit DND if tree shows search result
             if (mainWindow.searchTextProperty().get().isEmpty()) {
-                Record record = getItem();
+                var record = getItem();
                 if (record != null) {
-                    Dragboard db = (record instanceof Category || record instanceof Link) ?
+                    var db = (record instanceof Category || record instanceof Link) ?
                             startDragAndDrop(TransferMode.MOVE) : startDragAndDrop(TransferMode.ANY);
                     db.setDragView(snapshot(null, null));
-                    ClipboardContent cnt = new ClipboardContent();
+                    var cnt = new ClipboardContent();
                     cnt.put(Record.DATA_FORMAT, record.getId());
                     db.setContent(cnt);
                     sourceItem = getTreeItem();
@@ -102,11 +100,11 @@ class CardTreeViewCell extends TreeCell<Record> {
         });
 
         setOnDragOver((DragEvent event) -> {
-            TreeItem<Record> targetItem = getTreeItem();
+            var targetItem = getTreeItem();
 
             if (targetItem != null && !sourceItem.getChildren().isEmpty()) {
                 // source is a folder, check that we don't move it down to its subtree
-                TreeItem parent = targetItem.getParent();
+                var parent = targetItem.getParent();
                 while (parent != null) {
                     if (parent == sourceItem) {
                         event.consume();
@@ -116,11 +114,11 @@ class CardTreeViewCell extends TreeCell<Record> {
                 }
             }
 
-            Record record = getItem();
+            var record = getItem();
             if (record != null && targetItem != null) {
-                Dragboard db = event.getDragboard();
+                var db = event.getDragboard();
                 if (db.hasContent(Record.DATA_FORMAT)) {
-                    Point2D sceneCoordinates = localToScene(0d, 0d);
+                    var sceneCoordinates = localToScene(0d, 0d);
                     double height = getHeight();
                     double y = event.getSceneY() - (sceneCoordinates.getY());
 
@@ -163,10 +161,10 @@ class CardTreeViewCell extends TreeCell<Record> {
         });
 
         setOnDragDropped((DragEvent event) -> {
-            TreeItem<Record> targetItem = getTreeItem();
+            var targetItem = getTreeItem();
             if (targetItem != null && sourceItem != null) {
-                Record sourceRecord = sourceItem.getValue();
-                Record targetRecord = targetItem.getValue();
+                var sourceRecord = sourceItem.getValue();
+                var targetRecord = targetItem.getValue();
 
                 if (sourceRecord != null && targetRecord != null) {
                     if (targetItem == sourceItem && event.getTransferMode() == TransferMode.MOVE) {
@@ -195,7 +193,7 @@ class CardTreeViewCell extends TreeCell<Record> {
                             targetItem.getChildren().add(newItem);
                             targetItem.setExpanded(true);
                         } else {
-                            TreeItem<Record> parentItem = targetItem.getParent();
+                            var parentItem = targetItem.getParent();
                             int index = parentItem.getChildren().indexOf(targetItem);
                             if (dropPosition == DnDDropPosition.BELOW) {
                                 index++;
@@ -224,7 +222,7 @@ class CardTreeViewCell extends TreeCell<Record> {
             iv = new ImageView();
 
             if (item instanceof Link) {
-                Optional<TreeItem<Record>> targetItem = MainWindowController.findRecordById(((Link)item).getTargetId(), getTreeView().getRoot());
+                var targetItem = MainWindowController.findRecordById(((Link) item).getTargetId(), getTreeView().getRoot());
                 if (targetItem.isPresent()) {
                     text = targetItem.get().getValue().getName() + " - shortcut";
                     iv.setImage(targetItem.get().getValue().getPicture().getImage());

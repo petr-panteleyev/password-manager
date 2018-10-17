@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@ package org.panteleyev.pwdmanager;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -67,7 +66,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -140,18 +138,18 @@ public class MainWindowController extends BorderPane implements Styles {
 
     private void createMainMenu() {
         // File
-        MenuItem fileNewMenuItem = new MenuItem(rb.getString("menu.file.new"));
+        var fileNewMenuItem = new MenuItem(rb.getString("menu.file.new"));
         fileNewMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
         fileNewMenuItem.setOnAction(a -> onNewFile());
 
-        MenuItem fileOpenMenuitem = new MenuItem(rb.getString("menu.file.open"));
+        var fileOpenMenuitem = new MenuItem(rb.getString("menu.file.open"));
         fileOpenMenuitem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
         fileOpenMenuitem.setOnAction(a -> onOpenFile());
 
-        MenuItem fileExitMenuItem = new MenuItem(rb.getString("menu.file.exit"));
+        var fileExitMenuItem = new MenuItem(rb.getString("menu.file.exit"));
         fileExitMenuItem.setOnAction(a -> onExit());
 
-        Menu fileMenu = new Menu(rb.getString("menu.file"), null,
+        var fileMenu = new Menu(rb.getString("menu.file"), null,
                 fileNewMenuItem, fileOpenMenuitem, new SeparatorMenuItem(), fileExitMenuItem);
 
         // Edit
@@ -161,21 +159,21 @@ public class MainWindowController extends BorderPane implements Styles {
         newCardMenuItem.setOnAction(a -> onNewCard());
         newNoteMenuItem.setOnAction(a -> onNewNote());
 
-        Menu editMenu = new Menu(rb.getString("menu.edit"), null,
+        var editMenu = new Menu(rb.getString("menu.edit"), null,
                 newCategoryMenuItem, new SeparatorMenuItem(),
                 newCardMenuItem, newNoteMenuItem, new SeparatorMenuItem(),
                 deleteMenuItem);
 
         // Tools
         changePasswordMenuItem.setOnAction(a -> onChangePassword());
-        Menu toolsMenu = new Menu(rb.getString("menu.tools"), null, changePasswordMenuItem);
+        var toolsMenu = new Menu(rb.getString("menu.tools"), null, changePasswordMenuItem);
 
         // Help
-        MenuItem helpAboutMenuItem = new MenuItem(rb.getString("menu.help.about"));
+        var helpAboutMenuItem = new MenuItem(rb.getString("menu.help.about"));
         helpAboutMenuItem.setOnAction(a -> onAbout());
-        Menu helpMenu = new Menu(rb.getString("menu.help"), null, helpAboutMenuItem);
+        var helpMenu = new Menu(rb.getString("menu.help"), null, helpAboutMenuItem);
 
-        MenuBar menuBar = new MenuBar(fileMenu, editMenu, toolsMenu, helpMenu);
+        var menuBar = new MenuBar(fileMenu, editMenu, toolsMenu, helpMenu);
         menuBar.setUseSystemMenuBar(true);
 
         setTop(menuBar);
@@ -187,7 +185,7 @@ public class MainWindowController extends BorderPane implements Styles {
 
         cardEditButton.setOnAction(a -> onEditCard());
 
-        ButtonBar buttonBar = new ButtonBar();
+        var buttonBar = new ButtonBar();
         buttonBar.getButtons().setAll(cardEditButton);
 
         recordViewPane.setTop(cardContentTitleLabel);
@@ -202,7 +200,7 @@ public class MainWindowController extends BorderPane implements Styles {
         treeViewPane.setMaxHeight(Double.MAX_VALUE);
         treeViewPane.setMaxWidth(Double.MAX_VALUE);
 
-        SplitPane split = new SplitPane(treeViewPane, recordViewPane);
+        var split = new SplitPane(treeViewPane, recordViewPane);
         split.setDividerPositions(0.30);
 
         setCenter(split);
@@ -217,10 +215,10 @@ public class MainWindowController extends BorderPane implements Styles {
         ctxCardPasteMenuItem.setOnAction(a -> onCardPaste());
         ctxCardPasteLinkMenuItem.setOnAction(a -> onCardPasteLink());
 
-        MenuItem copyMenuItem = new MenuItem(rb.getString("menu.edit.copy"));
+        var copyMenuItem = new MenuItem(rb.getString("menu.edit.copy"));
         copyMenuItem.setOnAction(a -> onCardCopy());
 
-        ContextMenu menu = new ContextMenu(
+        var menu = new ContextMenu(
                 ctxNewCategoryMenuItem,
                 new SeparatorMenuItem(),
                 ctxNewCardMenuItem,
@@ -262,12 +260,12 @@ public class MainWindowController extends BorderPane implements Styles {
         BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
 
         // Cmd parameter overrides stored file but does not overwrite the setting.
-        Application.Parameters params = PasswordManagerApplication.getApplication().getParameters();
-        String fileName = params.getNamed().get("file");
+        var params = PasswordManagerApplication.getApplication().getParameters();
+        var fileName = params.getNamed().get("file");
         if (fileName != null && !fileName.isEmpty()) {
             loadDocument(new File(fileName), false);
         } else {
-            String currentFilePath = preferences.get(PREF_CURRENT_FILE, null);
+            var currentFilePath = preferences.get(PREF_CURRENT_FILE, null);
             if (currentFilePath != null) {
                 loadDocument(new File(currentFilePath), true);
             }
@@ -302,7 +300,7 @@ public class MainWindowController extends BorderPane implements Styles {
         if (newValue.isEmpty()) {
             cardTreeView.setRoot(rootTreeItem);
         } else {
-            TreeItem<Record> root = new TreeItem<>();
+            var root = new TreeItem<Record>();
             searchTree(rootTreeItem, newValue.toLowerCase())
                     .forEach(x -> root.getChildren().add(new TreeItem<>(x)));
             cardTreeView.setRoot(root);
@@ -310,10 +308,10 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private List<Record> getAll(TreeItem<Record> root) {
-        List<Record> result = new ArrayList<>();
+        var result = new ArrayList<Record>();
 
-        for (TreeItem<Record> child : root.getChildren()) {
-            Record r = child.getValue();
+        for (var child : root.getChildren()) {
+            var r = child.getValue();
             if (r instanceof Link) {
                 continue;
             }
@@ -329,10 +327,10 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private List<Record> searchTree(TreeItem<Record> root, String newValue) {
-        List<Record> result = new ArrayList<>();
+        var result = new ArrayList<Record>();
 
-        for (TreeItem<Record> child : root.getChildren()) {
-            Record r = child.getValue();
+        for (var child : root.getChildren()) {
+            var r = child.getValue();
             if (r instanceof Category) {
                 if (r.getName().toLowerCase().contains(newValue)) {
                     // Category name matched -> add entire subtree
@@ -368,7 +366,7 @@ public class MainWindowController extends BorderPane implements Styles {
             new PasswordDialog(file, false).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
-                try (InputStream in = new FileInputStream(file)) {
+                try (var in = new FileInputStream(file)) {
                     if (!currentPassword.isEmpty()) {
                         try (InputStream cin = AES.aes256().getInputStream(in, password)) {
                             rootTreeItem = Serializer.deserialize(cin);
@@ -396,16 +394,16 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void writeDocument(File file) {
-        try (ByteArrayOutputStream bOut = new ByteArrayOutputStream()) {
+        try (var bOut = new ByteArrayOutputStream()) {
             if (!currentPassword.isEmpty()) {
-                try (OutputStream cout = AES.aes256().getOutputStream(bOut, currentPassword)) {
+                try (var cout = AES.aes256().getOutputStream(bOut, currentPassword)) {
                     Serializer.serialize(cout, cardTreeView.getRoot());
                 }
             } else {
                 Serializer.serialize(bOut, cardTreeView.getRoot());
             }
 
-            try (OutputStream fOut = new FileOutputStream(file)) {
+            try (var fOut = new FileOutputStream(file)) {
                 fOut.write(bOut.toByteArray());
             }
         } catch (Exception ex) {
@@ -421,19 +419,19 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void onNewFile() {
-        FileChooser d = new FileChooser();
+        var d = new FileChooser();
         d.setTitle("New File");
         d.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
-        File file = d.showSaveDialog(null);
+        var file = d.showSaveDialog(null);
         if (file != null) {
             new PasswordDialog(file, true).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
                 rootRecord = new Category("root", RecordType.EMPTY, Picture.FOLDER);
 
-                TreeItem<Record> root = new TreeItem<>(rootRecord);
+                var root = new TreeItem<Record>(rootRecord);
                 cardTreeView.setRoot(root);
                 root.setExpanded(true);
 
@@ -445,12 +443,12 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void onOpenFile() {
-        FileChooser d = new FileChooser();
+        var d = new FileChooser();
         d.setTitle("Open File");
         d.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
-        File file = d.showOpenDialog(null);
+        var file = d.showOpenDialog(null);
         if (file != null) {
             loadDocument(file, true);
         }
@@ -476,11 +474,11 @@ public class MainWindowController extends BorderPane implements Styles {
 
     private void onDeleteRecord() {
         getSelectedItem().ifPresent((TreeItem<Record> item) -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
+            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> {
-                String id = item.getValue().getId();
+                var id = item.getValue().getId();
 
-                TreeItem<Record> parent = item.getParent();
+                var parent = item.getParent();
                 parent.getChildren().remove(item);
 
                 deleteBrokenLinks(id, cardTreeView.getRoot());
@@ -491,8 +489,8 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void onNewCard() {
-        TreeItem<Record> selected = cardTreeView.getSelectionModel().getSelectedItem();
-        RecordType defaultType = (selected != null && selected.getValue() instanceof Category) ?
+        var selected = cardTreeView.getSelectionModel().getSelectedItem();
+        var defaultType = selected != null && selected.getValue() instanceof Category ?
                 selected.getValue().getType() : RecordType.PASSWORD;
 
         new CardDialog(defaultType, null)
@@ -511,10 +509,10 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void setupRecordViewer(TreeItem<Record> item) {
-        Record record = item.getValue();
+        var record = item.getValue();
 
         if (record instanceof Link) {
-            Optional<TreeItem<Record>> target = findRecordById(((Link) record).getTargetId(), cardTreeView.getRoot());
+            var target = findRecordById(((Link) record).getTargetId(), cardTreeView.getRoot());
             target.ifPresent(this::setupRecordViewer);
         } else {
             cardContentTitleLabel.setText(item.getValue().getName());
@@ -527,7 +525,7 @@ public class MainWindowController extends BorderPane implements Styles {
                 if (record instanceof Card) {
                     recordViewPane.setCenter(cardContentView);
 
-                    List<FieldWrapper> wrappers = ((Card) record).getFields().stream()
+                    var wrappers = ((Card) record).getFields().stream()
                             .filter(f -> !f.getValue().isEmpty())
                             .map(FieldWrapper::new).collect(Collectors.toList());
                     cardContentView.setData(FXCollections.observableArrayList(wrappers), ((Card) record).getNote());
@@ -537,7 +535,7 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void onTreeViewSelected() {
-        TreeItem<Record> item = cardTreeView.getSelectionModel().getSelectedItem();
+        var item = cardTreeView.getSelectionModel().getSelectedItem();
 
         if (item == null || item.getValue() instanceof Category) {
             recordViewPane.setCenter(null);
@@ -555,7 +553,7 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     public void onEditCard() {
-        TreeItem<Record> item = cardTreeView.getSelectionModel().getSelectedItem();
+        var item = cardTreeView.getSelectionModel().getSelectedItem();
 
         if (item != null) {
             if (item.getValue() instanceof Card) {
@@ -588,14 +586,14 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     public void onImport() {
-        FileChooser d = new FileChooser();
+        var d = new FileChooser();
         d.setTitle("Open eWallet Text File");
         d.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("eWallet Text Files", "*.txt")
         );
-        File file = d.showOpenDialog(null);
+        var file = d.showOpenDialog(null);
         if (file != null) {
-            TreeItem<Record> root = ImportExport.eWalletImport(file);
+            var root = ImportExport.eWalletImport(file);
             if (root != null) {
                 cardTreeView.setRoot(root);
                 writeDocument();
@@ -604,14 +602,14 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     public void onExport() {
-        FileChooser d = new FileChooser();
+        var d = new FileChooser();
         d.setTitle("Password Manager XML");
         d.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Password Manager XML Files", "*.xml")
         );
-        File file = d.showSaveDialog(null);
+        var file = d.showSaveDialog(null);
         if (file != null) {
-            try (FileOutputStream out = new FileOutputStream(file)) {
+            try (var out = new FileOutputStream(file)) {
                 Serializer.serialize(out, cardTreeView.getRoot());
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
@@ -620,14 +618,14 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void onCardTreeContextMenuShowing() {
-        boolean pasteEnable = false;
+        var pasteEnable = false;
 
-        Clipboard cb = Clipboard.getSystemClipboard();
-        Optional<TreeItem<Record>> targetItem = getSelectedItem();
+        var cb = Clipboard.getSystemClipboard();
+        var targetItem = getSelectedItem();
 
         if (cb.hasContent(Record.DATA_FORMAT) && targetItem.isPresent()) {
-            String sourceId = (String) cb.getContent(Record.DATA_FORMAT);
-            Optional<TreeItem<Record>> sourceItem = findRecordById(sourceId, cardTreeView.getRoot());
+            var sourceId = (String) cb.getContent(Record.DATA_FORMAT);
+            var sourceItem = findRecordById(sourceId, cardTreeView.getRoot());
 
             if (sourceItem.isPresent()) {
                 pasteEnable = checkForParentCategory(sourceItem.get(), targetItem.get());
@@ -645,7 +643,7 @@ public class MainWindowController extends BorderPane implements Styles {
             return true;
         }
 
-        TreeItem parent = target.getParent();
+        var parent = target.getParent();
         while (parent != null) {
             if (parent == item) {
                 return false;
@@ -657,8 +655,8 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void putCardToClipboard(Record record) {
-        Clipboard cb = Clipboard.getSystemClipboard();
-        ClipboardContent content = new ClipboardContent();
+        var cb = Clipboard.getSystemClipboard();
+        var content = new ClipboardContent();
         content.put(Record.DATA_FORMAT, record.getId());
         cb.setContent(content);
     }
@@ -679,11 +677,11 @@ public class MainWindowController extends BorderPane implements Styles {
 
     private void genericPaste(Function<TreeItem<Record>, TreeItem<Record>> getNewItem) {
         getSelectedItem().ifPresent(targetItem -> {
-            Clipboard cb = Clipboard.getSystemClipboard();
-            String sourceId = (String) cb.getContent(Record.DATA_FORMAT);
+            var cb = Clipboard.getSystemClipboard();
+            var sourceId = (String) cb.getContent(Record.DATA_FORMAT);
 
             findRecordById(sourceId, cardTreeView.getRoot()).ifPresent(sourceItem -> {
-                TreeItem<Record> newItem = getNewItem.apply(sourceItem);
+                var newItem = getNewItem.apply(sourceItem);
 
                 if (targetItem.getValue() instanceof Category) {
                     if (sourceItem != targetItem) {
@@ -697,7 +695,7 @@ public class MainWindowController extends BorderPane implements Styles {
                     if (cut) {
                         sourceItem.getParent().getChildren().remove(sourceItem);
                     }
-                    TreeItem parentItem = targetItem.getParent();
+                    var parentItem = targetItem.getParent();
                     int index = parentItem.getChildren().indexOf(targetItem);
                     parentItem.getChildren().add(index + 1, newItem);
                 }
@@ -723,7 +721,7 @@ public class MainWindowController extends BorderPane implements Styles {
             return Optional.of(item);
         } else {
             for (TreeItem<Record> child : item.getChildren()) {
-                Optional<TreeItem<Record>> found = findRecordById(id, child);
+                var found = findRecordById(id, child);
                 if (found.isPresent()) {
                     return found;
                 }
@@ -736,7 +734,7 @@ public class MainWindowController extends BorderPane implements Styles {
         root.getChildren().stream()
                 .filter(x -> !x.getChildren().isEmpty()).forEach(x -> deleteBrokenLinks(id, x));
 
-        List<TreeItem> toDelete = root.getChildren().stream()
+        var toDelete = root.getChildren().stream()
                 .filter(x -> x.getValue() instanceof Link)
                 .filter(x -> ((Link) x.getValue()).getTargetId().equals(id))
                 .collect(Collectors.toList());
@@ -762,7 +760,7 @@ public class MainWindowController extends BorderPane implements Styles {
 
     private void dragScroll() {
         getVerticalScrollbar().ifPresent(sb -> {
-            double newValue = sb.getValue() + scrollDirection;
+            var newValue = sb.getValue() + scrollDirection;
             newValue = Math.min(newValue, 1.0);
             newValue = Math.max(newValue, 0.0);
             sb.setValue(newValue);
