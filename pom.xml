@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>18.1.0</version>
+    <version>19.1.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -11,18 +11,31 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <gson.version>2.8.5</gson.version>
+        <commons.version>19.1.2</commons.version>
+        <javafx-version>11.0.2</javafx-version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>utilities</artifactId>
-            <version>18.1.0</version>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>org-panteleyev-commons-fx</artifactId>
+            <version>${commons.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>crypto</artifactId>
             <version>18.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx-version}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import org.panteleyev.pwdmanager.model.Field;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,9 +49,9 @@ class CardViewer extends BorderPane implements Styles {
     private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
     private final GridPane grid = new GridPane();
-    private final Label    noteLabel =
-            new Label(rb.getString("label.notesNoSemicolon"), new ImageView(Picture.NOTE.getImage()));
-    private final Label    noteViewer = new Label();
+    private final Label noteLabel = new Label(rb.getString("label.notesNoSemicolon"),
+        new ImageView(Picture.NOTE.getImage()));
+    private final Label noteViewer = new Label();
 
     CardViewer() {
         initialize();
@@ -61,9 +62,9 @@ class CardViewer extends BorderPane implements Styles {
         grid.setAlignment(Pos.TOP_CENTER);
 
         var vBox = new VBox(
-                grid,
-                noteLabel,
-                noteViewer
+            grid,
+            noteLabel,
+            noteViewer
         );
 
         noteLabel.getStyleClass().add("noteLabel");
@@ -90,10 +91,10 @@ class CardViewer extends BorderPane implements Styles {
             Labeled valueLabel;
             if (field.getType() == FieldType.LINK) {
                 valueLabel = new Hyperlink(field.getValue());
-                ((Hyperlink)valueLabel).setOnAction(e -> onHyperlinkClick(field.getValue()));
+                ((Hyperlink) valueLabel).setOnAction(e -> onHyperlinkClick(field.getValue()));
             } else {
                 valueLabel = new Label(field.getType() == FieldType.HIDDEN ?
-                        "***" : field.getValue());
+                    "***" : field.getValue());
 
                 valueLabel.setOnMouseClicked(event -> {
                     if (event.getClickCount() > 1) {
@@ -125,13 +126,13 @@ class CardViewer extends BorderPane implements Styles {
         switch (field.getType()) {
             case HIDDEN:
                 field.toggleShow();
-                label.setText(field.getShow()? field.getValue() : "***");
+                label.setText(field.getShow() ? field.getValue() : "***");
                 break;
         }
     }
 
     private ContextMenu createContextMenu(FieldWrapper field) {
-        MenuItem copyMenuItem = new MenuItem("Copy " + field.getName());
+        var copyMenuItem = new MenuItem("Copy " + field.getName());
         copyMenuItem.setOnAction(x -> onCopy(field));
 
         return new ContextMenu(copyMenuItem);

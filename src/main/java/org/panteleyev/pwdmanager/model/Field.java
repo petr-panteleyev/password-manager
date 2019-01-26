@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,37 +23,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.model;
 
-import javafx.beans.property.SimpleBooleanProperty;
+import org.panteleyev.pwdmanager.FieldType;
 import java.util.Objects;
 
-public class Category extends Record {
-    private SimpleBooleanProperty expanded = new SimpleBooleanProperty();
+public class Field {
+    private final FieldType type;
+    private final String name;
+    private final String value;
 
-    public Category(String id, long modified, String name, RecordType type, Picture picture, boolean expanded) {
-        super(id, modified, name, type, picture);
-        this.expanded.set(expanded);
+    public Field(FieldType type, String name, String value) {
+        this.type = type;
+        this.name = name;
+        this.value = value;
     }
 
-    public Category(String name, RecordType type, Picture picture) {
-        super(name, type, picture);
+    /**
+     * Copy constructor.
+     *
+     * @param that copy from
+     */
+    public Field(Field that) {
+        this.type = that.getType();
+        this.name = that.getName();
+        this.value = that.getValue();
     }
 
-    @Override
-    public Category clone() {
-        try {
-            var clone = (Category) super.clone();
-            clone.expanded = new SimpleBooleanProperty(expanded.get());
-            return clone;
-        } catch (Exception ex) {
-            // not gonna happen
-            throw new RuntimeException(ex);
-        }
+    public FieldType getType() {
+        return type;
     }
 
-    SimpleBooleanProperty expandedProperty() {
-        return expanded;
+    public String getName() {
+        return name;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     @Override
@@ -62,10 +68,12 @@ public class Category extends Record {
             return true;
         }
 
-        if (o instanceof Category) {
-            var that = (Category) o;
-            return super.equals(o)
-                    && Objects.equals(this.expanded.get(), that.expanded.get());
+        if (o instanceof Field) {
+            var that = (Field) o;
+
+            return Objects.equals(this.type, that.type)
+                    && Objects.equals(this.name, that.name)
+                    && Objects.equals(this.value, that.value);
         } else {
             return false;
         }
@@ -73,6 +81,15 @@ public class Category extends Record {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), expanded.get());
+        return Objects.hash(type, name, value);
+    }
+
+    @Override
+    public String toString() {
+        return "[Field:"
+                + " type=" + type
+                + " name=" + name
+                + " value=" + value
+                + "]";
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,22 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import java.io.File;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class PasswordManagerApplication extends Application {
+    private final static Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
+    private final static String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
+    private final static String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
+    private static final String OPTIONS_DIRECTORY = ".password-manager";
+
     private static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
 
     private static PasswordManagerApplication application;
@@ -47,19 +56,21 @@ public class PasswordManagerApplication extends Application {
     public void start(Stage stage) throws Exception {
         application = this;
 
-        Thread.currentThread().setUncaughtExceptionHandler((Thread t, Throwable e) -> {
-            e.printStackTrace();
-            while (e.getCause() != null) {
-                e = e.getCause();
+        if (initLogDirectory()) {
+            String formatProperty = System.getProperty(FORMAT_PROP);
+            if (formatProperty == null) {
+                System.setProperty(FORMAT_PROP, FORMAT);
             }
-            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage(), ButtonType.OK);
-            alert.showAndWait();
-        });
+            LogManager.getLogManager()
+                .readConfiguration(PasswordManagerApplication.class.getResourceAsStream("logger.properties"));
+        }
 
-        stage.setTitle(rb.getString("mainWindow.title"));
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 
-        var scene = new Scene(new MainWindowController());
-        scene.getStylesheets().add(MainWindowController.CSS_PATH);
+        stage.setTitle(AboutDialog.APP_TITLE);
+
+        var scene = new Scene(new MainWindowController(stage));
+        scene.getStylesheets().add(MainWindowController.CSS_PATH.toString());
         stage.setScene(scene);
 
         stage.setHeight(542);
@@ -73,5 +84,34 @@ public class PasswordManagerApplication extends Application {
 
     static ResourceBundle getBundle() {
         return application.rb;
+    }
+
+    private static boolean initLogDirectory() {
+        File optionsDir = getSettingsDirectory();
+        File logDir = new File(optionsDir, "logs");
+
+        return logDir.exists() ? logDir.isDirectory() : logDir.mkdir();
+    }
+
+    private static File getSettingsDirectory() {
+        var dir = new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY);
+        if (!dir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            dir.mkdir();
+        } else {
+            if (!dir.isDirectory()) {
+                throw new RuntimeException("Options directory cannot be opened/created");
+            }
+        }
+
+        return dir;
+    }
+
+    private static void uncaughtException(Throwable e) {
+        LOGGER.log(Level.SEVERE, "Uncaught exception", e);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.toString());
+            alert.showAndWait();
+        });
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,20 +27,19 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.pwdmanager.model.Card;
 import java.util.ResourceBundle;
 
-class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Styles {
+class NoteDialog extends BaseDialog<Card> implements Styles {
     private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
     private final TextField nameEdit = new TextField();
-    private final CheckBox  createFromTop = new CheckBox(rb.getString("label.createFromRoot"));
 
     NoteDialog() {
         super(MainWindowController.CSS_PATH);
@@ -51,9 +50,6 @@ class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Styles
         grid.getStyleClass().add(GRID_PANE);
 
         grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);
-        grid.addRow(1, createFromTop);
-
-        GridPane.setColumnSpan(createFromTop, 2);
 
         getDialogPane().setContent(grid);
         createDefaultButtons(rb);
@@ -61,7 +57,7 @@ class NoteDialog extends BaseDialog<NewRecordDescriptor<Note>> implements Styles
         nameEdit.setPrefColumnCount(20);
 
         setResultConverter(b -> b == ButtonType.OK ?
-                new NewRecordDescriptor<>(createFromTop.isSelected(), new Note(nameEdit.getText(), "")) : null);
+                Card.newNote(nameEdit.getText(), "", false) : null);
 
         Platform.runLater(this::setupValidator);
     }

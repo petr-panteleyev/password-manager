@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,22 +24,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.filters;
 
-final class NewRecordDescriptor<R extends Record> {
-    private final boolean parentRoot;
-    private final R record;
+import org.panteleyev.pwdmanager.model.Card;
+import java.util.function.Predicate;
 
-    NewRecordDescriptor(boolean parentRoot, R record) {
-        this.parentRoot = parentRoot;
-        this.record = record;
+public class FieldContentFilter implements Predicate<Card> {
+    private final String value;
+
+    public FieldContentFilter(String value) {
+        this.value = value;
     }
 
-    boolean isParentRoot() {
-        return parentRoot;
-    }
+    @Override
+    public boolean test(Card card) {
+        for (var field : card.getFields()) {
+            if (field.getValue().contains(value)) {
+                return true;
+            }
+        }
 
-    R getRecord() {
-        return record;
+        return false;
     }
 }

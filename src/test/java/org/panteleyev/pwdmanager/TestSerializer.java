@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,18 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.pwdmanager.test;
+package org.panteleyev.pwdmanager;
 
-import javafx.scene.control.TreeItem;
-import org.panteleyev.pwdmanager.Card;
-import org.panteleyev.pwdmanager.Category;
-import org.panteleyev.pwdmanager.Field;
-import org.panteleyev.pwdmanager.FieldType;
-import org.panteleyev.pwdmanager.Link;
-import org.panteleyev.pwdmanager.Note;
-import org.panteleyev.pwdmanager.Picture;
-import org.panteleyev.pwdmanager.RecordType;
-import org.panteleyev.pwdmanager.Serializer;
+import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.Field;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -45,40 +37,28 @@ import java.util.Arrays;
 import java.util.UUID;
 
 public class TestSerializer {
-    private DocumentBuilderFactory docFactory;
     private DocumentBuilder docBuilder;
 
     @BeforeClass
     public void initFactory() throws Exception {
-        docFactory = DocumentBuilderFactory.newInstance();
+        var docFactory = DocumentBuilderFactory.newInstance();
         docBuilder = docFactory.newDocumentBuilder();
     }
 
     @Test
     public void testCardSerialization() throws Exception {
-        var card = new Card(UUID.randomUUID().toString(), Picture.AMEX, Arrays.asList(
+        var card = Card.newCard(UUID.randomUUID().toString(), Picture.AMEX, Arrays.asList(
                 new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
                 new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())
         ), UUID.randomUUID().toString());
 
         var doc = docBuilder.newDocument();
 
-        var e = Serializer.serializeTreeItem(doc, new TreeItem<>(card));
+        var e = Serializer.serializeRecord(doc, card);
 
         var restored = Serializer.deserializeCard(e);
 
-        Assert.assertEquals(restored.getValue(), card);
-    }
-
-    @Test
-    public void testCategorySerialization() throws Exception {
-        var category = new Category(UUID.randomUUID().toString(), RecordType.EMPTY, Picture.FOLDER);
-
-        var doc = docBuilder.newDocument();
-
-        var e = Serializer.serializeTreeItem(doc, new TreeItem<>(category));
-        var restored = Serializer.deserializeCategory(e);
-        Assert.assertEquals(restored.getValue(), category);
+        Assert.assertEquals(restored, card);
     }
 
     @DataProvider(name = "testFieldToFromJson")
@@ -102,23 +82,12 @@ public class TestSerializer {
 
     @Test
     public void testNoteSerialization() throws Exception {
-        var note = new Note(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        var note = Card.newNote(UUID.randomUUID().toString(), UUID.randomUUID().toString(), true);
 
         var doc = docBuilder.newDocument();
 
-        var e = Serializer.serializeTreeItem(doc, new TreeItem<>(note));
+        var e = Serializer.serializeRecord(doc, note);
         var restored = Serializer.deserializeNote(e);
-        Assert.assertEquals(restored.getValue(), note);
-    }
-
-    @Test
-    public void testLinkSerialization() throws Exception {
-        var link = new Link(UUID.randomUUID().toString());
-
-        var doc = docBuilder.newDocument();
-
-        var e = Serializer.serializeTreeItem(doc, new TreeItem<>(link));
-        var restored = Serializer.deserializeLink(e);
-        Assert.assertEquals(restored.getValue(), link);
+        Assert.assertEquals(restored, note);
     }
 }

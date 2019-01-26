@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.pwdmanager.model.Card;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -53,14 +54,14 @@ import java.util.stream.Collectors;
 class EditCardDialog extends BaseDialog<Card> implements Styles {
     private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    private final TableView<Field>          cardContentView = new TableView<>();
-    private final TableColumn<Field,String> fieldNameColumn = new TableColumn<>();
-    private final TableColumn<Field,String> fieldValueColumn = new TableColumn<>();
-    private final TextField                 fieldNameEdit = new TextField();
-    private final ComboBox<FieldType>       fieldTypeCombo = new ComboBox<>();
-    private final TextField                 cardNameEdit = new TextField();
-    private final ComboBox<Picture>         pictureList = new ComboBox<>();
-    private final TextArea                  noteEditor = new TextArea();
+    private final TableView<EditableField> cardContentView = new TableView<>();
+    private final TableColumn<EditableField, String> fieldNameColumn = new TableColumn<>();
+    private final TableColumn<EditableField, String> fieldValueColumn = new TableColumn<>();
+    private final TextField fieldNameEdit = new TextField();
+    private final ComboBox<FieldType> fieldTypeCombo = new ComboBox<>();
+    private final TextField cardNameEdit = new TextField();
+    private final ComboBox<Picture> pictureList = new ComboBox<>();
+    private final TextArea noteEditor = new TextArea();
 
     private Card card;
 
@@ -127,7 +128,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         fieldValueColumn.prefWidthProperty().bind(cardContentView.widthProperty().divide(2).subtract(1));
 
         cardContentView.setItems(FXCollections.observableArrayList(
-                card.getFields().stream().map(Field::new).collect(Collectors.toList())
+                card.getFields().stream().map(EditableField::new).collect(Collectors.toList())
         ));
 
         cardContentView.getSelectionModel()
@@ -146,16 +147,22 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return new Card(card.getId(), cardNameEdit.getText(),
+                return Card.newCard(
+                        card.getUuid(),
+                        System.currentTimeMillis(),
+                        cardNameEdit.getText(),
                         pictureList.getSelectionModel().getSelectedItem(),
-                        new ArrayList<>(cardContentView.getItems()), noteEditor.getText());
+                        new ArrayList<>(cardContentView.getItems().stream()
+                                .map(EditableField::toField).collect(Collectors.toList())),
+                        noteEditor.getText(),
+                        card.isFavorite());
             } else {
                 return null;
             }
         });
     }
 
-    private Optional<Field> getSelectedField() {
+    private Optional<EditableField> getSelectedField() {
         return Optional.ofNullable(cardContentView.getSelectionModel().getSelectedItem());
     }
 
@@ -167,7 +174,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
     }
 
     private void onNewField() {
-        var f = new Field(FieldType.STRING, "New field", "");
+        var f = new EditableField(FieldType.STRING, "New field", "");
         cardContentView.getItems().add(f);
         cardContentView.getSelectionModel().select(f);
     }
@@ -180,7 +187,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
     }
 
     private void onFieldNameChanged() {
-        getSelectedField().ifPresent((Field sel) -> {
+        getSelectedField().ifPresent(sel -> {
             var name = fieldNameEdit.getText();
             if (!name.equals(sel.getName())) {
                 sel.nameProperty().set(name);
@@ -189,7 +196,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
     }
 
     private void onFieldTypeComboChanged() {
-        getSelectedField().ifPresent((Field sel) -> {
+        getSelectedField().ifPresent(sel -> {
             var type = fieldTypeCombo.getValue();
             if (type != sel.getType()) {
                 sel.typeProperty().set(type);

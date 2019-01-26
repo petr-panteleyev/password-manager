@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,13 +25,15 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.application.Platform;
-import javafx.scene.control.TreeItem;
+import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.Field;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -40,17 +42,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-public class Serializer {
+class Serializer {
     // Attributes
-    private static final String ID_ATTR = "id";
+    private static final String CLASS_ATTR = "recordClass";
+    private static final String UUID_ATTR = "uuid";
     private static final String NAME_ATTR = "name";
     private static final String TYPE_ATTR = "type";
     private static final String MODIFIED_ATTR = "modified";
     private static final String VALUE_ATTR = "value";
     private static final String PICTURE_ATTR = "picture";
-    private static final String EXPANDED_ATTR = "expanded";
-    private static final String TARGET_ID_ATTR = "targetId";
+    private static final String FAVORITE_ATTR = "favorite";
 
     // Tags
     private static final String FIELD = "field";
@@ -59,64 +63,56 @@ public class Serializer {
 
     private static final DocumentBuilderFactory DOC_FACTORY;
 
-    public static void serialize(OutputStream out, TreeItem<Record> rootItem) throws ParserConfigurationException, TransformerException {
+    static void serialize(OutputStream out, List<Card> records) throws ParserConfigurationException,
+        TransformerException
+    {
         var docBuilder = DOC_FACTORY.newDocumentBuilder();
 
         var doc = docBuilder.newDocument();
-        var rootElement = doc.createElement("root");
+        var rootElement = doc.createElement("wallet");
 
         doc.appendChild(rootElement);
 
-        var e = serializeTreeItem(doc, rootItem);
-        rootElement.appendChild(e);
+        var recordsElement = doc.createElement(RECORDS);
+        rootElement.appendChild(recordsElement);
+
+        for (var r : records) {
+            var recordXml = serializeRecord(doc, r);
+            recordsElement.appendChild(recordXml);
+        }
 
         var transformerFactory = TransformerFactory.newInstance();
         var transformer = transformerFactory.newTransformer();
-        var source = new DOMSource(doc);
-        var result = new StreamResult(out);
-        transformer.transform(source, result);
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        transformer.transform(new DOMSource(doc), new StreamResult(out));
     }
 
-    public static TreeItem<Record> deserialize(InputStream in) throws ParserConfigurationException, SAXException, IOException {
+    static void deserialize(InputStream in, List<Card> list) throws ParserConfigurationException,
+        SAXException, IOException
+    {
         var docBuilder = DOC_FACTORY.newDocumentBuilder();
 
         var doc = docBuilder.parse(in);
 
         var rootElement = doc.getDocumentElement();
-        var nodes = rootElement.getChildNodes();
-
-        for (int i = 0; i < nodes.getLength(); i++) {
-            var n = nodes.item(i);
-            if (n instanceof Element && ((Element) n).getTagName().equals("Category")) {
-                return deserializeCategory((Element) n);
-            }
-        }
-
-        return null;
+        var records = rootElement.getElementsByTagName("record");
+        deserializeRecords(records, list);
     }
 
-    public static Element serializeTreeItem(Document doc, TreeItem<Record> treeItem) {
-        var r = treeItem.getValue();
-
-        var xmlRecord = doc.createElement(r.getClass().getSimpleName());
-        xmlRecord.setAttribute(ID_ATTR, r.getId());
+    static Element serializeRecord(Document doc, Card r) {
+        var xmlRecord = doc.createElement("record");
+        xmlRecord.setAttribute(CLASS_ATTR, r.getCardClass().name());
+        xmlRecord.setAttribute(UUID_ATTR, r.getUuid());
         xmlRecord.setAttribute(NAME_ATTR, r.getName());
         xmlRecord.setAttribute(TYPE_ATTR, r.getType().name());
         xmlRecord.setAttribute(MODIFIED_ATTR, Long.toString(r.getModified()));
         xmlRecord.setAttribute(PICTURE_ATTR, r.getPicture().name());
-
-        // Category
-        if (r instanceof Category) {
-            xmlRecord.setAttribute(EXPANDED_ATTR, Boolean.toString(((Category) r).expandedProperty().get()));
-        }
-
-        if (r instanceof Link) {
-            xmlRecord.setAttribute(TARGET_ID_ATTR, ((Link) r).getTargetId());
-        }
+        xmlRecord.setAttribute(FAVORITE_ATTR, Boolean.toString(r.isFavorite()));
 
         // Card - serialize fields
-        if (r instanceof Card) {
-            var fields = ((Card) r).getFields();
+        if (r.isCard()) {
+            var fields = r.getFields();
             if (!fields.isEmpty()) {
                 var fieldsElement = doc.createElement(FIELDS);
                 xmlRecord.appendChild(fieldsElement);
@@ -127,31 +123,20 @@ public class Serializer {
                 });
             }
 
-            var note = ((Card) r).getNote();
+            var note = r.getNote();
             var noteElement = doc.createElement("note");
             noteElement.setTextContent(note);
             xmlRecord.appendChild(noteElement);
         }
 
-        if (r instanceof Note) {
-            xmlRecord.appendChild(doc.createTextNode(((Note) r).getText()));
-        }
-
-        // Children if any
-        if (!treeItem.getChildren().isEmpty()) {
-            var children = doc.createElement(RECORDS);
-            xmlRecord.appendChild(children);
-
-            treeItem.getChildren().forEach((child) -> {
-                var e = serializeTreeItem(doc, child);
-                children.appendChild(e);
-            });
+        if (r.isNote()) {
+            xmlRecord.appendChild(doc.createTextNode(r.getNote()));
         }
 
         return xmlRecord;
     }
 
-    public static Element serializeField(Document doc, Field f) {
+    static Element serializeField(Document doc, Field f) {
         var e = doc.createElement(FIELD);
         e.setAttribute(NAME_ATTR, f.getName());
         e.setAttribute(TYPE_ATTR, f.getType().name());
@@ -159,7 +144,7 @@ public class Serializer {
         return e;
     }
 
-    public static Field deserializeField(Element e) {
+    static Field deserializeField(Element e) {
         var name = e.getAttribute(NAME_ATTR);
         var type = FieldType.valueOf(e.getAttribute(TYPE_ATTR));
         var value = e.getAttribute(VALUE_ATTR);
@@ -167,94 +152,57 @@ public class Serializer {
         return new Field(type, name, value);
     }
 
-    public static TreeItem<Record> deserializeNote(Element element) {
-        var id = element.getAttribute(ID_ATTR);
+    static Card deserializeNote(Element element) {
+        var uuid = element.getAttribute(UUID_ATTR);
+        if (uuid == null || uuid.isEmpty()) {
+            uuid = UUID.randomUUID().toString();
+        }
         var name = element.getAttribute(NAME_ATTR);
         long modified = Long.valueOf(element.getAttribute(MODIFIED_ATTR));
         var text = element.getTextContent();
+        boolean favorite = Boolean.valueOf(element.getAttribute(FAVORITE_ATTR));
 
-        return new TreeItem<>(new Note(id, modified, name, text));
+        return Card.newNote(uuid, modified, name, text, favorite);
     }
 
-    public static TreeItem<Record> deserializeLink(Element element) {
-        var targetId = element.getAttribute(TARGET_ID_ATTR);
-        return new TreeItem<>(new Link(targetId));
-    }
-
-    public static TreeItem<Record> deserializeCategory(Element element) {
-        var id = element.getAttribute(ID_ATTR);
-        var name = element.getAttribute(NAME_ATTR);
-        var type = RecordType.valueOf(element.getAttribute(TYPE_ATTR));
-        var picture = Picture.valueOf(element.getAttribute(PICTURE_ATTR));
-        long modified = Long.valueOf(element.getAttribute(MODIFIED_ATTR));
-
-        var expandedString = element.getAttribute(EXPANDED_ATTR);
-        if (expandedString.isEmpty()) {
-            expandedString = "false";
-        }
-        boolean expanded = Boolean.valueOf(expandedString);
-
-        var category = new Category(id, modified, name, type, picture, expanded);
-        var result = new TreeItem<Record>(category);
-        result.setExpanded(expanded);
-
-        category.expandedProperty().bind(result.expandedProperty());
-
-        result.expandedProperty().addListener((x, oldValue, newValue) -> {
-            if (oldValue != newValue) {
-                Platform.runLater(() -> MainWindowController.getMainWindow().writeDocument());
-            }
-        });
-
+    private static void deserializeRecords(NodeList records, List<Card> list) {
         // children
-        var childNodes = element.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            var n = childNodes.item(i);
+        for (int j = 0; j < records.getLength(); j++) {
+            var r = records.item(j);
 
-            if (n instanceof Element && ((Element) n).getTagName().equals(RECORDS)) {
-                var records = n.getChildNodes();
-                for (int j = 0; j < records.getLength(); j++) {
-                    var r = records.item(j);
+            if (r instanceof Element) {
+                var re = (Element) r;
 
-                    if (r instanceof Element) {
-                        var re = (Element) r;
+                Card record = null;
 
-                        TreeItem<Record> recordItem = null;
-                        switch (re.getTagName()) {
-                            case "Category":
-                                recordItem = deserializeCategory(re);
-                                break;
-                            case "Card":
-                                recordItem = deserializeCard(re);
-                                break;
-                            case "Note":
-                                recordItem = deserializeNote(re);
-                                break;
-                            case "Link":
-                                recordItem = deserializeLink(re);
-                                break;
-                        }
-
-                        if (recordItem == null) {
-                            throw new IllegalStateException("Illegal file format");
-                        }
-
-                        result.getChildren().add(recordItem);
+                var recordClass = re.getAttribute(CLASS_ATTR);
+                if (recordClass != null) {
+                    switch (recordClass) {
+                        case "CARD":
+                            record = deserializeCard(re);
+                            break;
+                        case "NOTE":
+                            record = deserializeNote(re);
+                            break;
                     }
                 }
 
-                break;
+                if (record != null) {
+                    list.add(record);
+                }
             }
         }
-
-        return result;
     }
 
-    public static TreeItem<Record> deserializeCard(Element element) {
-        var id = element.getAttribute(ID_ATTR);
+    static Card deserializeCard(Element element) {
+        var uuid = element.getAttribute(UUID_ATTR);
+        if (uuid == null || uuid.isEmpty()) {
+            uuid = UUID.randomUUID().toString();
+        }
         var name = element.getAttribute(NAME_ATTR);
         var picture = Picture.valueOf(element.getAttribute(PICTURE_ATTR));
         long modified = Long.valueOf(element.getAttribute(MODIFIED_ATTR));
+        boolean favorite = Boolean.valueOf(element.getAttribute(FAVORITE_ATTR));
 
         // fields
         var fList = element.getElementsByTagName(FIELD);
@@ -272,7 +220,7 @@ public class Serializer {
             note = noteElement.getTextContent();
         }
 
-        return new TreeItem<>(new Card(id, modified, name, picture, fields, note));
+        return Card.newCard(uuid, modified, name, picture, fields, note, favorite);
     }
 
     static {

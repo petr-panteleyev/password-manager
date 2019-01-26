@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,30 +23,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.pwdmanager;
 
-import java.util.Objects;
+package org.panteleyev.pwdmanager.filters;
 
-public class Link extends Record {
-    private final String targetId;
+import org.panteleyev.pwdmanager.model.Card;
+import java.util.function.Predicate;
 
-    public Link(String targetId) {
-        super("", RecordType.EMPTY, Picture.FOLDER);
-        this.targetId = targetId;
-    }
+public class RecordNameFilter implements Predicate<Card> {
+    private final String name;
 
-    public String getTargetId() {
-        return targetId;
+    public RecordNameFilter(String name) {
+        this.name = name;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return this == obj ||
-                (obj instanceof Link && Objects.equals(this.targetId, ((Link) obj).targetId));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(targetId);
+    public boolean test(Card record) {
+        return record.getName().toLowerCase().contains(name.toLowerCase());
     }
 }

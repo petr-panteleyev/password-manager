@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,44 +23,56 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.panteleyev.pwdmanager;
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import org.panteleyev.commons.fx.BaseDialog;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import org.panteleyev.pwdmanager.model.Field;
 
-import java.util.ResourceBundle;
+class EditableField {
+    private final SimpleObjectProperty<FieldType> type = new SimpleObjectProperty<>();
+    private final SimpleStringProperty name = new SimpleStringProperty();
+    private final SimpleStringProperty value = new SimpleStringProperty();
 
-class AboutDialog extends BaseDialog implements Styles {
-    static final String APP_TITLE = "Password Manager";
-    private static final String BUILD_INFO = "org.panteleyev.pwdmanager.buildInfo";
+    EditableField(FieldType type, String name, String value) {
+        this.type.set(type);
+        this.name.set(name);
+        this.value.set(value);
+    }
 
-    AboutDialog() {
-        super(MainWindowController.CSS_PATH);
+    EditableField(Field field) {
+        type.set(field.getType());
+        name.set(field.getName());
+        value.set(field.getValue());
+    }
 
-        var buildInfo = ResourceBundle.getBundle(BUILD_INFO);
+    Field toField() {
+        return new Field(type.get(), name.get(), value.get());
+    }
 
+    SimpleObjectProperty<FieldType> typeProperty() {
+        return type;
+    }
 
-        setTitle("About Password Manager");
+    StringProperty nameProperty() {
+        return name;
+    }
 
-        var grid = new GridPane();
-        grid.getStyleClass().add(GRID_PANE);
+    StringProperty valueProperty() {
+        return value;
+    }
 
-        var l0 = new Label("Password Manager");
-        l0.getStyleClass().add(ABOUT_LABEL);
+    FieldType getType() {
+        return type.get();
+    }
 
-        var l1 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
+    String getName() {
+        return name.get();
+    }
 
-        grid.addRow(0, l0);
-        grid.addRow(1, l1);
-        grid.addRow(2, new Label("Version:"), new Label(buildInfo.getString("version")));
-        grid.addRow(3, new Label("Encryption:"), new Label("256-bit AES"));
-
-        GridPane.setColumnSpan(l0, 2);
-        GridPane.setColumnSpan(l1, 2);
-
-        getDialogPane().setContent(grid);
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+    String getValue() {
+        return value.get();
     }
 }

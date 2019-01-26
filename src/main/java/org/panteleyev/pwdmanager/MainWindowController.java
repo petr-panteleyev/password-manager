@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,32 +25,29 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -59,81 +56,81 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
+import javafx.stage.Stage;
 import org.panteleyev.crypto.AES;
+import org.panteleyev.pwdmanager.comparators.ByFavorite;
+import org.panteleyev.pwdmanager.comparators.ByName;
+import org.panteleyev.pwdmanager.filters.FieldContentFilter;
+import org.panteleyev.pwdmanager.filters.RecordNameFilter;
+import org.panteleyev.pwdmanager.model.Card;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
-public class MainWindowController extends BorderPane implements Styles {
+class MainWindowController extends BorderPane implements Styles {
     private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
-    static final String CSS_PATH = "/org/panteleyev/pwdmanager/PasswordManager.css";
+    static final URL CSS_PATH = MainWindowController.class
+        .getResource("/org/panteleyev/pwdmanager/PasswordManager.css");
 
-    private static final String PREF_CURRENT_FILE = "currentFile";
+    // Preferences
+    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
+    private static final String PREF_CURRENT_FILE = "current_file";
 
-    static final String CSS_DROP_TARGET = "dropTarget";
-    static final String CSS_DROP_BELOW = "dropBelow";
-    static final String CSS_DROP_ABOVE = "dropAbove";
+    private final ObservableList<Card> recordList = FXCollections.observableArrayList();
+    private final SortedList<Card> sortedList = new SortedList<>(recordList);
+    private final ListView<Card> cardListView = new ListView<>(sortedList);
 
-    static final String[] CSS_DND_STYLES = {CSS_DROP_TARGET, CSS_DROP_BELOW, CSS_DROP_ABOVE};
-
-    // TreeView clipboard
-    private boolean cut = false;
-
-    private final TreeView<Record> cardTreeView = new TreeView<>();
-    private final BorderPane leftPane = new BorderPane(cardTreeView);
+    private final BorderPane leftPane = new BorderPane(cardListView);
     private final TitledPane treeViewPane = new TitledPane("", leftPane);
 
     private final MenuItem ctxNewCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
     private final MenuItem ctxNewNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
-    private final MenuItem ctxNewCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
-    private final MenuItem ctxCutMenuItem = new MenuItem(rb.getString("menu.edit.cut"));
     private final MenuItem ctxDeleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
     private final MenuItem ctxCardPasteMenuItem = new MenuItem(rb.getString("menu.edit.paste"));
-    private final MenuItem ctxCardPasteLinkMenuItem = new MenuItem(rb.getString("menu.edit.pasteLink"));
+    private final CheckMenuItem ctxFavoriteMenuItem = new CheckMenuItem(rb.getString("menu.edit.favorite"));
 
-    private TextField searchTextField;
+    private final TextField searchTextField = new TextField();
     private final Label cardContentTitleLabel = new Label();
     private final Button cardEditButton = new Button("Edit...");
     private final BorderPane recordViewPane = new BorderPane();
 
     // Menu items
     private final MenuItem newCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
-    private final MenuItem newCategoryMenuItem = new MenuItem(rb.getString("menu.edit.newCategory"));
     private final MenuItem newNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
-    private final MenuItem changePasswordMenuItem = new MenuItem(rb.getString("menu.tools.changePassword"));
     private final MenuItem deleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
+    private final MenuItem changePasswordMenuItem = new MenuItem(rb.getString("menu.tools.changePassword"));
 
     private final NoteViewer noteViewer = new NoteViewer();
     private final CardViewer cardContentView = new CardViewer();
 
-    private Record rootRecord;
-    private TreeItem<Record> rootTreeItem;       // store root item for full tree
+    private final Stage stage;
 
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private String currentPassword;
 
-    private final Preferences preferences = Preferences.userNodeForPackage(MainWindowController.class);
+    MainWindowController(Stage stage) {
+        this.stage = stage;
 
-    private static MainWindowController mainWindowController;
+        sortedList.setComparator(new ByFavorite().thenComparing(new ByName()));
 
-    public MainWindowController() {
         createMainMenu();
         createControls();
         createCardTreeContextMenu();
         initialize();
-        setupScrolling();
     }
 
     private void createMainMenu() {
@@ -150,23 +147,38 @@ public class MainWindowController extends BorderPane implements Styles {
         fileExitMenuItem.setOnAction(a -> onExit());
 
         var fileMenu = new Menu(rb.getString("menu.file"), null,
-                fileNewMenuItem, fileOpenMenuitem, new SeparatorMenuItem(), fileExitMenuItem);
+            fileNewMenuItem, fileOpenMenuitem, new SeparatorMenuItem(), fileExitMenuItem);
 
         // Edit
-        newCategoryMenuItem.setOnAction(a -> onNewCategory());
-        newCategoryMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.SHORTCUT_DOWN));
-
         newCardMenuItem.setOnAction(a -> onNewCard());
         newNoteMenuItem.setOnAction(a -> onNewNote());
 
-        var editMenu = new Menu(rb.getString("menu.edit"), null,
-                newCategoryMenuItem, new SeparatorMenuItem(),
-                newCardMenuItem, newNoteMenuItem, new SeparatorMenuItem(),
-                deleteMenuItem);
+        var filterMenuItem = new MenuItem(rb.getString("menu.Edit.Filter"));
+        filterMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN));
+        filterMenuItem.setOnAction(a -> onFilter());
 
-        // Tools
+        var editMenu = new Menu(rb.getString("menu.edit"), null,
+            newCardMenuItem, newNoteMenuItem,
+            new SeparatorMenuItem(),
+            filterMenuItem,
+            new SeparatorMenuItem(),
+            deleteMenuItem);
+
+        var importMenuItem = new MenuItem(rb.getString("menu.tools.import"));
+        importMenuItem.setOnAction(a -> onImportFile());
+
+        var exportMenuItem = new MenuItem(rb.getString("menu.tools.export"));
+        exportMenuItem.setOnAction(a -> onExportFile());
+        exportMenuItem.disableProperty().bind(currentFile.isNull());
+
         changePasswordMenuItem.setOnAction(a -> onChangePassword());
-        var toolsMenu = new Menu(rb.getString("menu.tools"), null, changePasswordMenuItem);
+
+        var toolsMenu = new Menu(rb.getString("menu.tools"), null,
+            importMenuItem,
+            exportMenuItem,
+            new SeparatorMenuItem(),
+            changePasswordMenuItem
+        );
 
         // Help
         var helpAboutMenuItem = new MenuItem(rb.getString("menu.help.about"));
@@ -180,10 +192,10 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void createControls() {
-        cardTreeView.setShowRoot(false);
-        BorderPane.setAlignment(cardTreeView, Pos.CENTER);
-
+        BorderPane.setAlignment(cardListView, Pos.CENTER);
         cardEditButton.setOnAction(a -> onEditCard());
+
+        cardListView.setCellFactory(x -> new RecordListCell());
 
         var buttonBar = new ButtonBar();
         buttonBar.getButtons().setAll(cardEditButton);
@@ -207,50 +219,50 @@ public class MainWindowController extends BorderPane implements Styles {
     }
 
     private void createCardTreeContextMenu() {
-        ctxNewCategoryMenuItem.setOnAction(a -> onNewCategory());
         ctxNewCardMenuItem.setOnAction(a -> onNewCard());
         ctxNewNoteMenuItem.setOnAction(a -> onNewNote());
         ctxDeleteMenuItem.setOnAction(a -> onDeleteRecord());
-        ctxCutMenuItem.setOnAction(a -> onCardCut());
         ctxCardPasteMenuItem.setOnAction(a -> onCardPaste());
-        ctxCardPasteLinkMenuItem.setOnAction(a -> onCardPasteLink());
+        ctxFavoriteMenuItem.setOnAction(a -> onFavorite());
 
         var copyMenuItem = new MenuItem(rb.getString("menu.edit.copy"));
         copyMenuItem.setOnAction(a -> onCardCopy());
 
         var menu = new ContextMenu(
-                ctxNewCategoryMenuItem,
-                new SeparatorMenuItem(),
-                ctxNewCardMenuItem,
-                ctxNewNoteMenuItem,
-                new SeparatorMenuItem(),
-                ctxDeleteMenuItem,
-                new SeparatorMenuItem(),
-                ctxCutMenuItem,
-                copyMenuItem,
-                ctxCardPasteMenuItem,
-                ctxCardPasteLinkMenuItem
+            ctxFavoriteMenuItem,
+            new SeparatorMenuItem(),
+            ctxNewCardMenuItem,
+            ctxNewNoteMenuItem,
+            new SeparatorMenuItem(),
+            ctxDeleteMenuItem,
+            new SeparatorMenuItem(),
+            copyMenuItem,
+            ctxCardPasteMenuItem
         );
 
         menu.setOnShowing(e -> onCardTreeContextMenuShowing());
 
-        cardTreeView.setContextMenu(menu);
+        // Main menu items
+        newCardMenuItem.disableProperty().bind(currentFile.isNull()
+            .or(searchTextField.textProperty().isEmpty().not()));
+        newNoteMenuItem.disableProperty().bind(currentFile.isNull()
+            .or(searchTextField.textProperty().isEmpty().not()));
+        deleteMenuItem.disableProperty().bind(currentFile.isNull());
+
+        // Context menu items
+        ctxNewCardMenuItem.disableProperty().bind(newCardMenuItem.disableProperty());
+        ctxNewNoteMenuItem.disableProperty().bind(newNoteMenuItem.disableProperty());
+        ctxDeleteMenuItem.disableProperty().bind(currentFile.isNull());
+        ctxDeleteMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+
+        cardListView.setContextMenu(menu);
     }
 
     private void initialize() {
-        mainWindowController = this;
+        cardListView.getSelectionModel().selectedItemProperty().addListener(x -> onListViewSelected());
 
-        cardTreeView.setCellFactory((TreeView<Record> p) -> new CardTreeViewCell(this));
-        cardTreeView.setShowRoot(false);
-        cardTreeView.getSelectionModel().selectedItemProperty().addListener(x -> onTreeViewSelected());
+        cardEditButton.disableProperty().bind(cardListView.getSelectionModel().selectedItemProperty().isNull());
 
-        cardEditButton.disableProperty().bind(cardTreeView.getSelectionModel().selectedItemProperty().isNull());
-
-        currentFile.addListener((ObservableValue<? extends File> observable, File oldValue, File newValue) -> {
-            treeViewPane.setText(newValue != null ? newValue.getName() : "");
-        });
-
-        searchTextField = new TextField();
         searchTextField.textProperty().addListener((x, oldValue, newValue) -> {
             if (!Objects.equals(oldValue, newValue)) {
                 doSearch(newValue);
@@ -265,122 +277,54 @@ public class MainWindowController extends BorderPane implements Styles {
         if (fileName != null && !fileName.isEmpty()) {
             loadDocument(new File(fileName), false);
         } else {
-            var currentFilePath = preferences.get(PREF_CURRENT_FILE, null);
+            var currentFilePath = PREFERENCES.get(PREF_CURRENT_FILE, null);
             if (currentFilePath != null) {
                 loadDocument(new File(currentFilePath), true);
             }
         }
-
-        Platform.runLater(cardTreeView::requestFocus);
-
-        // Main menu items
-        newCardMenuItem.disableProperty().bind(currentFile.isNull()
-                .or(searchTextField.textProperty().isEmpty().not()));
-        newCategoryMenuItem.disableProperty().bind(currentFile.isNull()
-                .or(searchTextField.textProperty().isEmpty().not()));
-        newNoteMenuItem.disableProperty().bind(currentFile.isNull()
-                .or(searchTextField.textProperty().isEmpty().not()));
-        changePasswordMenuItem.disableProperty().bind(currentFile.isNull());
-        deleteMenuItem.disableProperty().bind(currentFile.isNull());
-
-        // Context menu items
-        ctxNewCardMenuItem.disableProperty().bind(newCardMenuItem.disableProperty());
-        ctxNewNoteMenuItem.disableProperty().bind(newNoteMenuItem.disableProperty());
-        ctxNewCategoryMenuItem.disableProperty().bind(newCategoryMenuItem.disableProperty());
-        ctxCutMenuItem.disableProperty().bind(searchTextField.textProperty().isEmpty().not());
-        ctxDeleteMenuItem.disableProperty().bind(currentFile.isNull());
-        ctxDeleteMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-    }
-
-    ReadOnlyStringProperty searchTextProperty() {
-        return searchTextField.textProperty();
+        Platform.runLater(cardListView::requestFocus);
     }
 
     private void doSearch(String newValue) {
         if (newValue.isEmpty()) {
-            cardTreeView.setRoot(rootTreeItem);
+            cardListView.setItems(sortedList);
         } else {
-            var root = new TreeItem<Record>();
-            searchTree(rootTreeItem, newValue.toLowerCase())
-                    .forEach(x -> root.getChildren().add(new TreeItem<>(x)));
-            cardTreeView.setRoot(root);
+            cardListView.setItems(sortedList.filtered(
+                new RecordNameFilter(newValue).or(new FieldContentFilter(newValue))));
         }
     }
 
-    private List<Record> getAll(TreeItem<Record> root) {
-        var result = new ArrayList<Record>();
+    private Optional<Card> getSelectedItem() {
+        return Optional.ofNullable(cardListView.getSelectionModel().getSelectedItem());
+    }
 
-        for (var child : root.getChildren()) {
-            var r = child.getValue();
-            if (r instanceof Link) {
-                continue;
-            }
-
-            if (r instanceof Category) {
-                result.addAll(getAll(child));
-            } else {
-                result.add(r);
-            }
+    private void onExit() {
+        if (currentFile.get() != null) {
+            writeDocument();
         }
-
-        return result;
+        System.exit(0);
     }
 
-    private List<Record> searchTree(TreeItem<Record> root, String newValue) {
-        var result = new ArrayList<Record>();
-
-        for (var child : root.getChildren()) {
-            var r = child.getValue();
-            if (r instanceof Category) {
-                if (r.getName().toLowerCase().contains(newValue)) {
-                    // Category name matched -> add entire subtree
-                    result.addAll(getAll(child));
-                } else {
-                    result.addAll(searchTree(child, newValue));
-                }
-            } else {
-                if (!(r instanceof Link) && r.getName().toLowerCase().contains(newValue)) {
-                    result.add(r);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    static MainWindowController getMainWindow() {
-        return mainWindowController;
-    }
-
-    private Optional<TreeItem<Record>> getSelectedItem() {
-        return Optional.ofNullable(cardTreeView.getSelectionModel().getSelectedItem());
-    }
-
-    private void loadDocument(File file, boolean changeSettings) {
-        if (!file.exists()) {
-            currentFile.set(null);
-            if (changeSettings) {
-                preferences.put(PREF_CURRENT_FILE, "");
-            }
-        } else {
+    private void onImportFile() {
+        var d = new FileChooser();
+        d.setTitle("Open File");
+        d.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
+        );
+        var file = d.showOpenDialog(null);
+        if (file != null && file.exists()) {
             new PasswordDialog(file, false).showAndWait().ifPresent(password -> {
-                currentPassword = password;
-
                 try (var in = new FileInputStream(file)) {
-                    if (!currentPassword.isEmpty()) {
-                        try (InputStream cin = AES.aes256().getInputStream(in, password)) {
-                            rootTreeItem = Serializer.deserialize(cin);
+                    var list = new ArrayList<Card>();
+                    if (!password.isEmpty()) {
+                        try (var cin = AES.aes256().getInputStream(in, password)) {
+                            Serializer.deserialize(cin, list);
                         }
                     } else {
-                        rootTreeItem = Serializer.deserialize(in);
+                        Serializer.deserialize(in, list);
                     }
 
-                    cardTreeView.setRoot(rootTreeItem);
-
-                    currentFile.set(file);
-                    if (changeSettings) {
-                        preferences.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
-                    }
+                    importCards(list);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -388,19 +332,294 @@ public class MainWindowController extends BorderPane implements Styles {
         }
     }
 
-    void writeDocument() {
-        Objects.requireNonNull(currentFile);
-        writeDocument(currentFile.get());
+    private void onExportFile() {
+        var d = new FileChooser();
+        d.setTitle("Save File");
+        d.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
+        );
+        var file = d.showSaveDialog(null);
+        if (file != null) {
+            new PasswordDialog(file, false)
+                .showAndWait()
+                .ifPresent(password -> writeDocument(file, password));
+        }
     }
 
-    private void writeDocument(File file) {
+    private void processNewRecord(Card newRecord) {
+        recordList.add(newRecord);
+        cardListView.getSelectionModel().select(newRecord);
+        cardListView.scrollTo(newRecord);
+        writeDocument();
+    }
+
+    private void onDeleteRecord() {
+        getSelectedItem().ifPresent((Card item) -> {
+            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
+            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> recordList.remove(item));
+        });
+    }
+
+    private void onNewCard() {
+        new CardDialog(RecordType.PASSWORD, null)
+            .showAndWait()
+            .ifPresent(this::processNewRecord);
+    }
+
+    private void onNewNote() {
+        new NoteDialog().showAndWait().ifPresent(this::processNewRecord);
+    }
+
+    private void onFilter() {
+        searchTextField.requestFocus();
+    }
+
+    private void setupRecordViewer(Card record) {
+        cardContentTitleLabel.setText(record.getName());
+        cardContentTitleLabel.setGraphic(new ImageView(record.getPicture().getBigImage()));
+
+        if (record.isNote()) {
+            noteViewer.setText(record.getNote());
+            recordViewPane.setCenter(noteViewer);
+        } else {
+            if (record.isCard()) {
+                recordViewPane.setCenter(cardContentView);
+
+                var wrappers = record.getFields().stream()
+                    .filter(f -> !f.getValue().isEmpty())
+                    .map(FieldWrapper::new).collect(Collectors.toList());
+                cardContentView.setData(FXCollections.observableArrayList(wrappers), record.getNote());
+            }
+        }
+    }
+
+    private void onListViewSelected() {
+        var item = cardListView.getSelectionModel().getSelectedItem();
+
+        if (item == null) {
+            recordViewPane.setCenter(null);
+            cardContentTitleLabel.setText(null);
+            cardContentTitleLabel.setGraphic(null);
+        } else {
+            setupRecordViewer(item);
+        }
+    }
+
+    private Optional<Card> findByUuid(String uuid) {
+        return recordList.stream().filter(x -> x.getUuid().equals(uuid)).findFirst();
+    }
+
+
+    private void processEditedRecord(Card r) {
+        var index = getIndexByUUID(r.getUuid());
+        if (index != -1) {
+            recordList.set(index, r);
+        }
+
+        cardListView.scrollTo(r);
+        cardListView.getSelectionModel().select(r);
+
+        writeDocument();
+    }
+
+    private void onEditCard() {
+        getSelectedItem().ifPresent(card -> {
+            switch (card.getCardClass()) {
+                case CARD:
+                    new EditCardDialog(card)
+                        .showAndWait().ifPresent(this::processEditedRecord);
+                    break;
+                case NOTE:
+                    new EditNoteDialog(card)
+                        .showAndWait().ifPresent(this::processEditedRecord);
+                    break;
+            }
+        });
+    }
+
+    private void onAbout() {
+        new AboutDialog().showAndWait();
+    }
+
+    private void onCardTreeContextMenuShowing() {
+        var pasteEnable = false;
+
+        var cb = Clipboard.getSystemClipboard();
+        var targetItem = getSelectedItem();
+
+        ctxFavoriteMenuItem.setDisable(targetItem.isEmpty());
+        ctxFavoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().isFavorite());
+
+        if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
+            var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
+            var sourceItem = findRecordById(sourceId);
+            pasteEnable = sourceItem.isPresent();
+        }
+
+        ctxCardPasteMenuItem.setDisable(!pasteEnable);
+    }
+
+    private void putCardToClipboard(Card record) {
+        var cb = Clipboard.getSystemClipboard();
+        var content = new ClipboardContent();
+        content.put(Card.DATA_FORMAT, record.getUuid());
+        cb.setContent(content);
+    }
+
+    private void onCardCopy() {
+        getSelectedItem().ifPresent(this::putCardToClipboard);
+    }
+
+    private void onCardPaste() {
+        var cb = Clipboard.getSystemClipboard();
+        var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
+
+        findByUuid(sourceId).ifPresent(sourceRecord -> {
+            var newRecord = sourceRecord.copyWithNewUuid();
+            recordList.add(newRecord);
+            cardListView.getSelectionModel().select(newRecord);
+            cardListView.scrollTo(newRecord);
+            writeDocument();
+        });
+    }
+
+    private int getIndexByUUID(String uuid) {
+        for (int index = 0; index < recordList.size(); index++) {
+            if (recordList.get(index).getUuid().equals(uuid)) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    private void updateListItem(Card card) {
+        var index = getIndexByUUID(card.getUuid());
+        if (index != -1) {
+            recordList.set(index, card);
+        }
+    }
+
+    private void onFavorite() {
+        getSelectedItem().ifPresent(card -> {
+            var newCard = card.setFavorite(!card.isFavorite());
+            updateListItem(newCard);
+            cardListView.getSelectionModel().select(newCard);
+            cardListView.scrollTo(newCard);
+            writeDocument();
+        });
+    }
+
+    private Optional<Card> findRecordById(String uuid) {
+        return sortedList.stream().filter(x -> x.getUuid().equals(uuid)).findFirst();
+    }
+
+    private void setTitle() {
+        if (currentFile.get() == null) {
+            stage.setTitle(AboutDialog.APP_TITLE);
+        } else {
+            stage.setTitle(AboutDialog.APP_TITLE + " -- " + currentFile.get().getAbsolutePath());
+        }
+    }
+
+    private void onNewFile() {
+        var d = new FileChooser();
+        d.setTitle("New File");
+        d.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
+        );
+        var file = d.showSaveDialog(null);
+        if (file != null) {
+            new PasswordDialog(file, true).showAndWait().ifPresent(password -> {
+                currentPassword = password;
+                recordList.clear();
+
+                currentFile.set(file);
+                PREFERENCES.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
+
+                setTitle();
+                writeDocument();
+            });
+        }
+    }
+
+    private void onOpenFile() {
+        var d = new FileChooser();
+        d.setTitle("Open File");
+        d.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
+        );
+
+        var file = d.showOpenDialog(null);
+        if (file != null) {
+            loadDocument(file, true);
+        }
+    }
+
+    private void loadDocument(File file, boolean changeSettings) {
+        if (!file.exists()) {
+            currentFile.set(null);
+            if (changeSettings) {
+                PREFERENCES.put(PREF_CURRENT_FILE, "");
+            }
+            setTitle();
+        } else {
+            new PasswordDialog(file, false).showAndWait().ifPresent(password -> {
+                currentPassword = password;
+
+                try (InputStream in = new FileInputStream(file)) {
+                    var list = new ArrayList<Card>();
+                    if (!currentPassword.isEmpty()) {
+                        try (var cin = AES.aes256().getInputStream(in, password)) {
+                            Serializer.deserialize(cin, list);
+                        }
+                    } else {
+                        Serializer.deserialize(in, list);
+                    }
+
+                    recordList.setAll(list);
+
+                    currentFile.set(file);
+                    if (changeSettings) {
+                        PREFERENCES.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
+                    }
+
+                    setTitle();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        }
+    }
+
+    private Optional<Card> find(Predicate<Card> filter) {
+        return recordList.stream().filter(filter).findFirst();
+    }
+
+    private void importCards(Collection<Card> toImport) {
+        for (var card : toImport) {
+            find(c -> card.getUuid().equals(c.getUuid()))
+                .ifPresentOrElse(found -> {
+                    if (found.getModified() < card.getModified()) {
+                        recordList.removeAll(found);
+                        recordList.add(card);
+                    }
+                }, () -> recordList.add(card));
+        }
+    }
+
+    private void writeDocument() {
+        Objects.requireNonNull(currentFile);
+        writeDocument(currentFile.get(), currentPassword);
+    }
+
+    private void writeDocument(File file, String password) {
         try (var bOut = new ByteArrayOutputStream()) {
-            if (!currentPassword.isEmpty()) {
-                try (var cout = AES.aes256().getOutputStream(bOut, currentPassword)) {
-                    Serializer.serialize(cout, cardTreeView.getRoot());
+            if (!password.isEmpty()) {
+                try (var cout = AES.aes256().getOutputStream(bOut, password)) {
+                    Serializer.serialize(cout, recordList);
                 }
             } else {
-                Serializer.serialize(bOut, cardTreeView.getRoot());
+                Serializer.serialize(bOut, recordList);
             }
 
             try (var fOut = new FileOutputStream(file)) {
@@ -411,374 +630,10 @@ public class MainWindowController extends BorderPane implements Styles {
         }
     }
 
-    private void onExit() {
-        if (currentFile.get() != null) {
-            writeDocument();
-        }
-        System.exit(0);
-    }
-
-    private void onNewFile() {
-        var d = new FileChooser();
-        d.setTitle("New File");
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
-        );
-        var file = d.showSaveDialog(null);
-        if (file != null) {
-            new PasswordDialog(file, true).showAndWait().ifPresent(password -> {
-                currentPassword = password;
-
-                rootRecord = new Category("root", RecordType.EMPTY, Picture.FOLDER);
-
-                var root = new TreeItem<Record>(rootRecord);
-                cardTreeView.setRoot(root);
-                root.setExpanded(true);
-
-                writeDocument(file);
-                currentFile.set(file);
-                preferences.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
-            });
-        }
-    }
-
-    private void onOpenFile() {
-        var d = new FileChooser();
-        d.setTitle("Open File");
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
-        );
-        var file = d.showOpenDialog(null);
-        if (file != null) {
-            loadDocument(file, true);
-        }
-    }
-
-    private void processNewRecord(NewRecordDescriptor<? extends Record> recordDescriptor) {
-        TreeItem<Record> parentItem;
-
-        if (recordDescriptor.isParentRoot()) {
-            parentItem = cardTreeView.getRoot();
-        } else {
-            parentItem = cardTreeView.getSelectionModel().getSelectedItem();
-            if (parentItem == null || !(parentItem.getValue() instanceof Category)) {
-                parentItem = cardTreeView.getRoot();
-            }
-        }
-
-        parentItem.getChildren().add(new TreeItem<>(recordDescriptor.getRecord()));
-        parentItem.setExpanded(true);
-
-        writeDocument();
-    }
-
-    private void onDeleteRecord() {
-        getSelectedItem().ifPresent((TreeItem<Record> item) -> {
-            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> {
-                var id = item.getValue().getId();
-
-                var parent = item.getParent();
-                parent.getChildren().remove(item);
-
-                deleteBrokenLinks(id, cardTreeView.getRoot());
-
-                writeDocument();
-            });
-        });
-    }
-
-    private void onNewCard() {
-        var selected = cardTreeView.getSelectionModel().getSelectedItem();
-        var defaultType = selected != null && selected.getValue() instanceof Category ?
-                selected.getValue().getType() : RecordType.PASSWORD;
-
-        new CardDialog(defaultType, null)
-                .showAndWait()
-                .ifPresent(this::processNewRecord);
-    }
-
-    private void onNewCategory() {
-        new CategoryDialog(null)
-                .showAndWait()
-                .ifPresent(this::processNewRecord);
-    }
-
-    private void onNewNote() {
-        new NoteDialog().showAndWait().ifPresent(this::processNewRecord);
-    }
-
-    private void setupRecordViewer(TreeItem<Record> item) {
-        var record = item.getValue();
-
-        if (record instanceof Link) {
-            var target = findRecordById(((Link) record).getTargetId(), cardTreeView.getRoot());
-            target.ifPresent(this::setupRecordViewer);
-        } else {
-            cardContentTitleLabel.setText(item.getValue().getName());
-            cardContentTitleLabel.setGraphic(new ImageView(item.getValue().getPicture().getBigImage()));
-
-            if (record instanceof Note) {
-                noteViewer.setText(((Note) record).getText());
-                recordViewPane.setCenter(noteViewer);
-            } else {
-                if (record instanceof Card) {
-                    recordViewPane.setCenter(cardContentView);
-
-                    var wrappers = ((Card) record).getFields().stream()
-                            .filter(f -> !f.getValue().isEmpty())
-                            .map(FieldWrapper::new).collect(Collectors.toList());
-                    cardContentView.setData(FXCollections.observableArrayList(wrappers), ((Card) record).getNote());
-                }
-            }
-        }
-    }
-
-    private void onTreeViewSelected() {
-        var item = cardTreeView.getSelectionModel().getSelectedItem();
-
-        if (item == null || item.getValue() instanceof Category) {
-            recordViewPane.setCenter(null);
-            cardContentTitleLabel.setText(null);
-            cardContentTitleLabel.setGraphic(null);
-        } else {
-            setupRecordViewer(item);
-        }
-    }
-
-    private void processEditedRecord(TreeItem<Record> item, Record r) {
-        item.setValue(r);
-        onTreeViewSelected();
-        writeDocument();
-    }
-
-    public void onEditCard() {
-        var item = cardTreeView.getSelectionModel().getSelectedItem();
-
-        if (item != null) {
-            if (item.getValue() instanceof Card) {
-                new EditCardDialog((Card) item.getValue())
-                        .showAndWait().ifPresent(result -> processEditedRecord(item, result));
-            } else {
-                if (item.getValue() instanceof Note) {
-                    new EditNoteDialog((Note) item.getValue())
-                            .showAndWait().ifPresent(result -> processEditedRecord(item, result));
-                } else {
-                    if (item.getValue() instanceof Category) {
-                        new EditCategoryDialog((Category) item.getValue())
-                                .showAndWait().ifPresent(result -> processEditedRecord(item, result));
-                    }
-                }
-
-            }
-        }
-    }
-
     private void onChangePassword() {
         new PasswordDialog(currentFile.get(), true).showAndWait().ifPresent(password -> {
             currentPassword = password;
-            writeDocument(currentFile.get());
+            writeDocument();
         });
-    }
-
-    private void onAbout() {
-        new AboutDialog().showAndWait();
-    }
-
-    public void onImport() {
-        var d = new FileChooser();
-        d.setTitle("Open eWallet Text File");
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("eWallet Text Files", "*.txt")
-        );
-        var file = d.showOpenDialog(null);
-        if (file != null) {
-            var root = ImportExport.eWalletImport(file);
-            if (root != null) {
-                cardTreeView.setRoot(root);
-                writeDocument();
-            }
-        }
-    }
-
-    public void onExport() {
-        var d = new FileChooser();
-        d.setTitle("Password Manager XML");
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager XML Files", "*.xml")
-        );
-        var file = d.showSaveDialog(null);
-        if (file != null) {
-            try (var out = new FileOutputStream(file)) {
-                Serializer.serialize(out, cardTreeView.getRoot());
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-
-    private void onCardTreeContextMenuShowing() {
-        var pasteEnable = false;
-
-        var cb = Clipboard.getSystemClipboard();
-        var targetItem = getSelectedItem();
-
-        if (cb.hasContent(Record.DATA_FORMAT) && targetItem.isPresent()) {
-            var sourceId = (String) cb.getContent(Record.DATA_FORMAT);
-            var sourceItem = findRecordById(sourceId, cardTreeView.getRoot());
-
-            if (sourceItem.isPresent()) {
-                pasteEnable = checkForParentCategory(sourceItem.get(), targetItem.get());
-            }
-        }
-
-
-        ctxCardPasteMenuItem.setDisable(!pasteEnable || !searchTextField.getText().isEmpty());
-        ctxCardPasteLinkMenuItem.setDisable(!pasteEnable || cut || searchTextField.getText().isEmpty());
-    }
-
-    private boolean checkForParentCategory(TreeItem item, TreeItem target) {
-        // Leaf node, can be moved anywhere
-        if (item.getChildren().isEmpty()) {
-            return true;
-        }
-
-        var parent = target.getParent();
-        while (parent != null) {
-            if (parent == item) {
-                return false;
-            }
-            parent = parent.getParent();
-        }
-
-        return true;
-    }
-
-    private void putCardToClipboard(Record record) {
-        var cb = Clipboard.getSystemClipboard();
-        var content = new ClipboardContent();
-        content.put(Record.DATA_FORMAT, record.getId());
-        cb.setContent(content);
-    }
-
-    private void onCardCut() {
-        getSelectedItem().ifPresent(item -> {
-            putCardToClipboard(item.getValue());
-            cut = true;
-        });
-    }
-
-    private void onCardCopy() {
-        getSelectedItem().ifPresent(item -> {
-            putCardToClipboard(item.getValue());
-            cut = false;
-        });
-    }
-
-    private void genericPaste(Function<TreeItem<Record>, TreeItem<Record>> getNewItem) {
-        getSelectedItem().ifPresent(targetItem -> {
-            var cb = Clipboard.getSystemClipboard();
-            var sourceId = (String) cb.getContent(Record.DATA_FORMAT);
-
-            findRecordById(sourceId, cardTreeView.getRoot()).ifPresent(sourceItem -> {
-                var newItem = getNewItem.apply(sourceItem);
-
-                if (targetItem.getValue() instanceof Category) {
-                    if (sourceItem != targetItem) {
-                        if (cut) {
-                            sourceItem.getParent().getChildren().remove(sourceItem);
-                        }
-                        targetItem.getChildren().add(newItem);
-                        targetItem.setExpanded(true);
-                    }
-                } else {
-                    if (cut) {
-                        sourceItem.getParent().getChildren().remove(sourceItem);
-                    }
-                    var parentItem = targetItem.getParent();
-                    int index = parentItem.getChildren().indexOf(targetItem);
-                    parentItem.getChildren().add(index + 1, newItem);
-                }
-
-            });
-        });
-    }
-
-    private void onCardPaste() {
-        genericPaste(sourceItem -> cut ? sourceItem : new TreeItem<>(sourceItem.getValue().cloneWithNewId()));
-    }
-
-    private void onCardPasteLink() {
-        genericPaste(sourceItem -> new TreeItem<>(new Link(sourceItem.getValue().getId())));
-    }
-
-    static Optional<TreeItem<Record>> findRecordById(String id, TreeItem<Record> item) {
-        if (id == null) {
-            return Optional.empty();
-        }
-
-        if (item.getValue().getId().equals(id)) {
-            return Optional.of(item);
-        } else {
-            for (TreeItem<Record> child : item.getChildren()) {
-                var found = findRecordById(id, child);
-                if (found.isPresent()) {
-                    return found;
-                }
-            }
-            return Optional.empty();
-        }
-    }
-
-    private static void deleteBrokenLinks(String id, TreeItem<Record> root) {
-        root.getChildren().stream()
-                .filter(x -> !x.getChildren().isEmpty()).forEach(x -> deleteBrokenLinks(id, x));
-
-        var toDelete = root.getChildren().stream()
-                .filter(x -> x.getValue() instanceof Link)
-                .filter(x -> ((Link) x.getValue()).getTargetId().equals(id))
-                .collect(Collectors.toList());
-
-        toDelete.forEach(x -> root.getChildren().remove(x));
-    }
-
-    /*
-        Autoscroll implementation, based on:
-        http://programmingtipsandtraps.blogspot.ru/2015/10/drag-and-drop-in-treetableview-with.html
-     */
-
-    private double scrollDirection = 0;
-    private final Timeline scrollTimeline = new Timeline();
-
-    private Optional<ScrollBar> getVerticalScrollbar() {
-        return cardTreeView.lookupAll(".scroll-bar").stream()
-                .filter(n -> n instanceof ScrollBar)
-                .map(n -> (ScrollBar) n)
-                .filter(n -> n.getOrientation().equals(Orientation.VERTICAL))
-                .findFirst();
-    }
-
-    private void dragScroll() {
-        getVerticalScrollbar().ifPresent(sb -> {
-            var newValue = sb.getValue() + scrollDirection;
-            newValue = Math.min(newValue, 1.0);
-            newValue = Math.max(newValue, 0.0);
-            sb.setValue(newValue);
-        });
-    }
-
-    private void setupScrolling() {
-        scrollTimeline.setCycleCount(Timeline.INDEFINITE);
-        scrollTimeline.getKeyFrames().add(new KeyFrame(Duration.millis(20), "Scroll", (ActionEvent) -> dragScroll()));
-        cardTreeView.setOnDragExited(event -> {
-            if (event.getY() > 0) {
-                scrollDirection = 1.0 / cardTreeView.getExpandedItemCount();
-            } else {
-                scrollDirection = -1.0 / cardTreeView.getExpandedItemCount();
-            }
-            scrollTimeline.play();
-        });
-        cardTreeView.setOnDragEntered(event -> scrollTimeline.stop());
-        cardTreeView.setOnDragDone(event -> scrollTimeline.stop());
     }
 }

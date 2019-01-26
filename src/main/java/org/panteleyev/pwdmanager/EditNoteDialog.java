@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,19 +41,20 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-class EditNoteDialog extends BaseDialog<Note> {
+class EditNoteDialog extends BaseDialog<Card> {
     private final ResourceBundle rb = PasswordManagerApplication.getBundle();
 
     private final TextField nameEdit = new TextField();
     private final TextArea noteEdit = new TextArea();
 
-    private final Note note;
+    private final Card note;
 
-    EditNoteDialog(Note note) {
+    EditNoteDialog(Card note) {
         super(null);
 
         Objects.requireNonNull(note);
@@ -79,10 +80,10 @@ class EditNoteDialog extends BaseDialog<Note> {
         createDefaultButtons(rb);
 
         nameEdit.setText(note.getName());
-        noteEdit.setText(note.getText());
+        noteEdit.setText(note.getNote());
 
         setResultConverter((ButtonType b) -> (b == ButtonType.OK) ?
-                new Note(note.getId(), nameEdit.getText(), noteEdit.getText())
+                Card.newNote(note.getUuid(), nameEdit.getText(), noteEdit.getText(), note.isFavorite())
                 : null);
 
         Platform.runLater(this::setupValidator);

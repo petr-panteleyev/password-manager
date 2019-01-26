@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,44 +23,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.pwdmanager;
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import org.panteleyev.commons.fx.BaseDialog;
+package org.panteleyev.pwdmanager.model;
 
-import java.util.ResourceBundle;
+public enum CardClass {
+    CARD("Card"),
+    NOTE("Note");
 
-class AboutDialog extends BaseDialog implements Styles {
-    static final String APP_TITLE = "Password Manager";
-    private static final String BUILD_INFO = "org.panteleyev.pwdmanager.buildInfo";
+    private final String className;
 
-    AboutDialog() {
-        super(MainWindowController.CSS_PATH);
+    CardClass(String className) {
+        this.className = className;
+    }
 
-        var buildInfo = ResourceBundle.getBundle(BUILD_INFO);
-
-
-        setTitle("About Password Manager");
-
-        var grid = new GridPane();
-        grid.getStyleClass().add(GRID_PANE);
-
-        var l0 = new Label("Password Manager");
-        l0.getStyleClass().add(ABOUT_LABEL);
-
-        var l1 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
-
-        grid.addRow(0, l0);
-        grid.addRow(1, l1);
-        grid.addRow(2, new Label("Version:"), new Label(buildInfo.getString("version")));
-        grid.addRow(3, new Label("Encryption:"), new Label("256-bit AES"));
-
-        GridPane.setColumnSpan(l0, 2);
-        GridPane.setColumnSpan(l1, 2);
-
-        getDialogPane().setContent(grid);
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+    public String toString() {
+        return className;
     }
 }

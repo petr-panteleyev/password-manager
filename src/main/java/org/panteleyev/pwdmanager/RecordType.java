@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.image.Image;
+import org.panteleyev.pwdmanager.model.Field;
 
 public enum RecordType {
     EMPTY(Picture.GENERIC, Collections.EMPTY_LIST),
@@ -41,7 +42,7 @@ public enum RecordType {
         new Field(FieldType.HIDDEN, "PIN", ""),
         new Field(FieldType.STRING, "Name on Card", ""),
         new Field(FieldType.STRING, "Phone Number", ""),
-        new Field(FieldType.STRING, "CVC#", ""),
+        new Field(FieldType.HIDDEN, "CVC#", ""),
         new Field(FieldType.STRING, "User Name", ""),
         new Field(FieldType.HIDDEN, "Password", "")
     )),

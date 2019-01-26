@@ -26,6 +26,8 @@
 
 package org.panteleyev.pwdmanager;
 
+import org.panteleyev.pwdmanager.model.Field;
+
 final class FieldWrapper extends Field {
     private boolean show;
 

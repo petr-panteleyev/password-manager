@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,49 +23,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.pwdmanager;
 
-import java.util.Objects;
+package org.panteleyev.pwdmanager.comparators;
 
-public class Note extends Record {
-    private final String text;
+import org.panteleyev.pwdmanager.model.Card;
+import java.util.Comparator;
 
-    public Note(String name, String text) {
-        super(name, RecordType.EMPTY, Picture.NOTE);
-        this.text = text;
-    }
-
-    public Note(String id, String name, String text) {
-        super(id, System.currentTimeMillis(), name, RecordType.EMPTY, Picture.NOTE);
-        this.text = text;
-    }
-
-    public Note(String id, long modified, String name, String text) {
-        super(id, modified, name, RecordType.EMPTY, Picture.NOTE);
-        this.text = text;
-    }
-
-    public String getText() {
-        return text;
-    }
-
+public class ByFavorite implements Comparator<Card> {
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o instanceof Note) {
-            var that = (Note) o;
-            return super.equals(that)
-                    && Objects.equals(this.text, that.text);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), text);
+    public int compare(Card o1, Card o2) {
+        return Boolean.compare(o2.isFavorite(), o1.isFavorite());
     }
 }

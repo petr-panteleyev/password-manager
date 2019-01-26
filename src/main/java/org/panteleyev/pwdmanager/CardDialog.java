@@ -27,10 +27,10 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
-
+import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
 
-class CardDialog extends RecordDialog<Card> {
+class CardDialog extends RecordDialog {
     private final RecordType defaultType;
     private final Card card;
 
@@ -63,11 +63,11 @@ class CardDialog extends RecordDialog<Card> {
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 var type = getTypeList().getSelectionModel().getSelectedItem();
-                return new NewRecordDescriptor<>(isParentRoot(), new Card(
+                return Card.newCard(
                         getNameEdit().getText(),
                         getPictureList().getSelectionModel().getSelectedItem(),
                         type.getFieldSet()
-                ));
+                );
             } else {
                 return null;
             }
