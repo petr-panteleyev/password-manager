@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,98 +26,89 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import org.panteleyev.commons.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newTab;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditCardDialog extends BaseDialog<Card> implements Styles {
-    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
+    private final ObservableList<EditableField> editableFields;
 
     private final TableView<EditableField> cardContentView = new TableView<>();
-    private final TableColumn<EditableField, String> fieldNameColumn = new TableColumn<>();
-    private final TableColumn<EditableField, String> fieldValueColumn = new TableColumn<>();
     private final TextField fieldNameEdit = new TextField();
     private final ComboBox<FieldType> fieldTypeCombo = new ComboBox<>();
     private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
-    private final TextArea noteEditor = new TextArea();
-
-    private Card card;
 
     EditCardDialog(Card card) {
         super(MainWindowController.CSS_PATH);
-        this.card = card;
-        initialize();
-    }
 
-    private void initialize() {
-        setTitle(rb.getString("editCardDialog.title"));
+        editableFields = FXCollections.observableArrayList(
+            card.getFields().stream().map(EditableField::new).collect(Collectors.toList()));
 
-        var newFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.addField"));
-        newFieldMenuItem.setOnAction(a -> onNewField());
-        var deleteFieldMenuItem = new MenuItem(rb.getString("editCardDialog.menu.deleteField"));
-        deleteFieldMenuItem.setOnAction(a -> onDeleteField());
+        setTitle(RB.getString("editCardDialog.title"));
 
-        var contextMenu = new ContextMenu(newFieldMenuItem, new SeparatorMenuItem(), deleteFieldMenuItem);
-
+        var fieldNameColumn = new TableColumn<EditableField, String>();
         fieldNameColumn.setSortable(false);
         fieldNameColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
+
+        var fieldValueColumn = new TableColumn<EditableField, String>();
         fieldValueColumn.setSortable(false);
         fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
+
         cardContentView.getColumns().setAll(fieldNameColumn, fieldValueColumn);
-        cardContentView.setContextMenu(contextMenu);
+        cardContentView.setContextMenu(createContextMenu());
         cardContentView.setEditable(true);
 
         var grid1 = new GridPane();
         grid1.getStyleClass().add(GRID_PANE);
-        grid1.addRow(0, new Label(rb.getString("label.FieldName")), fieldNameEdit);
-        grid1.addRow(1, new Label(rb.getString("label.FieldType")), fieldTypeCombo);
+        grid1.addRow(0, newLabel(RB, "label.FieldName"), fieldNameEdit);
+        grid1.addRow(1, newLabel(RB, "label.FieldType"), fieldTypeCombo);
 
         var pane = new BorderPane(cardContentView, null, null, grid1, null);
         BorderPane.setAlignment(grid1, Pos.CENTER);
         BorderPane.setMargin(grid1, new Insets(5, 0, 0, 0));
 
-        var tab1 = new Tab(rb.getString("editCardDialog.tab.fields"), pane);
-        tab1.setClosable(false);
-
-        var tab2 = new Tab(rb.getString("editCardDialog.tab.notes"), noteEditor);
-        tab2.setClosable(false);
-
         var grid3 = new GridPane();
         grid3.getStyleClass().add(GRID_PANE);
         grid3.setPadding(new Insets(5, 5, 5, 5));
-        grid3.addRow(0, new Label(rb.getString("label.Name")), cardNameEdit);
-        grid3.addRow(1, new Label(rb.getString("label.Icon")), pictureList);
+        grid3.addRow(0, newLabel(RB, "label.Name"), cardNameEdit);
+        grid3.addRow(1, newLabel(RB, "label.Icon"), pictureList);
         cardNameEdit.setPrefColumnCount(30);
 
-        var tab3 = new Tab(rb.getString("editCardDialog.tab.properties"), grid3);
-        tab3.setClosable(false);
+        var noteEditor = new TextArea();
 
-        var tabPane = new TabPane(tab1, tab2, tab3);
+        var tabPane = new TabPane(
+            newTab(RB, "editCardDialog.tab.fields", false, pane),
+            newTab(RB, "editCardDialog.tab.notes", false, noteEditor),
+            newTab(RB, "editCardDialog.tab.properties", false, grid3));
 
         getDialogPane().setContent(tabPane);
-        createDefaultButtons(rb);
+        createDefaultButtons(RB);
 
         fieldValueColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -127,12 +118,10 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         fieldNameColumn.prefWidthProperty().bind(cardContentView.widthProperty().divide(2).subtract(1));
         fieldValueColumn.prefWidthProperty().bind(cardContentView.widthProperty().divide(2).subtract(1));
 
-        cardContentView.setItems(FXCollections.observableArrayList(
-                card.getFields().stream().map(EditableField::new).collect(Collectors.toList())
-        ));
+        cardContentView.setItems(editableFields);
 
         cardContentView.getSelectionModel()
-                .selectedIndexProperty().addListener(x -> onFieldSelected());
+            .selectedIndexProperty().addListener(x -> onFieldSelected());
 
         fieldNameEdit.setOnAction(x -> onFieldNameChanged());
 
@@ -148,18 +137,33 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 return Card.newCard(
-                        card.getUuid(),
-                        System.currentTimeMillis(),
-                        cardNameEdit.getText(),
-                        pictureList.getSelectionModel().getSelectedItem(),
-                        new ArrayList<>(cardContentView.getItems().stream()
-                                .map(EditableField::toField).collect(Collectors.toList())),
-                        noteEditor.getText(),
-                        card.isFavorite());
+                    card.getUuid(),
+                    System.currentTimeMillis(),
+                    cardNameEdit.getText(),
+                    pictureList.getSelectionModel().getSelectedItem(),
+                    new ArrayList<>(editableFields.stream()
+                        .map(EditableField::toField).collect(Collectors.toList())),
+                    noteEditor.getText(),
+                    card.isFavorite());
             } else {
                 return null;
             }
         });
+    }
+
+    private ContextMenu createContextMenu() {
+        return new ContextMenu(
+            newMenuItem(RB, "editCardDialog.menu.addField",
+                new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), a -> onNewField()),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "editCardDialog.menu.deleteField",
+                new KeyCodeCombination(KeyCode.DELETE), a -> onDeleteField()),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.item.up",
+                new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN), a -> onFieldUp()),
+            newMenuItem(RB, "menu.item.down",
+                new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), a -> onFieldDown())
+        );
     }
 
     private Optional<EditableField> getSelectedField() {
@@ -175,14 +179,14 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
 
     private void onNewField() {
         var f = new EditableField(FieldType.STRING, "New field", "");
-        cardContentView.getItems().add(f);
+        editableFields.add(f);
         cardContentView.getSelectionModel().select(f);
     }
 
     private void onDeleteField() {
         getSelectedField().ifPresent(sel -> {
             var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> cardContentView.getItems().remove(sel));
+            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> editableFields.remove(sel));
         });
     }
 
@@ -201,6 +205,27 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
             if (type != sel.getType()) {
                 sel.typeProperty().set(type);
             }
+        });
+    }
+
+    private void onFieldUp() {
+        move(0, -1);
+    }
+
+    private void onFieldDown() {
+        move(editableFields.size() - 1, 1);
+    }
+
+    private void move(int stopPosition, int add) {
+        getSelectedField().ifPresent(sel -> {
+            var index = editableFields.indexOf(sel);
+            if (index == stopPosition) {
+                return;
+            }
+
+            editableFields.remove(sel);
+            editableFields.add(index + add, sel);
+            cardContentView.getSelectionModel().select(sel);
         });
     }
 }

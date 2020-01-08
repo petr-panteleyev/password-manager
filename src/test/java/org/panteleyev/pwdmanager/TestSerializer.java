@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,10 +46,10 @@ public class TestSerializer {
     }
 
     @Test
-    public void testCardSerialization() throws Exception {
+    public void testCardSerialization() {
         var card = Card.newCard(UUID.randomUUID().toString(), Picture.AMEX, Arrays.asList(
-                new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-                new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+            new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())
         ), UUID.randomUUID().toString());
 
         var doc = docBuilder.newDocument();
@@ -64,14 +64,14 @@ public class TestSerializer {
     @DataProvider(name = "testFieldToFromJson")
     public Object[][] testFieldToFromJsonDataProvider() {
         return new Object[][]{
-                {new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
-                {new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
-                {new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")},
+            {new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
+            {new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
+            {new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")},
         };
     }
 
     @Test(dataProvider = "testFieldToFromJson")
-    public void testFieldSerialization(Field field) throws Exception {
+    public void testFieldSerialization(Field field) {
         var doc = docBuilder.newDocument();
 
         var e = Serializer.serializeField(doc, field);
@@ -81,7 +81,7 @@ public class TestSerializer {
     }
 
     @Test
-    public void testNoteSerialization() throws Exception {
+    public void testNoteSerialization() {
         var note = Card.newNote(UUID.randomUUID().toString(), UUID.randomUUID().toString(), true);
 
         var doc = docBuilder.newDocument();

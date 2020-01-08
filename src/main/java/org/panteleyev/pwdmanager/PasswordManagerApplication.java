@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.io.File;
@@ -37,16 +36,16 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class PasswordManagerApplication extends Application {
-    private final static Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
-    private final static String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
-    private final static String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
+    private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
+    private static final String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
+    private static final String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
     private static final String OPTIONS_DIRECTORY = ".password-manager";
 
     private static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
 
     private static PasswordManagerApplication application;
 
-    private final ResourceBundle rb = ResourceBundle.getBundle(UI_BUNDLE_PATH);
+    public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
     public static void main(String[] args) {
         launch(args);
@@ -69,21 +68,12 @@ public class PasswordManagerApplication extends Application {
 
         stage.setTitle(AboutDialog.APP_TITLE);
 
-        var scene = new Scene(new MainWindowController(stage));
-        scene.getStylesheets().add(MainWindowController.CSS_PATH.toString());
-        stage.setScene(scene);
-
-        stage.setHeight(542);
-        stage.setWidth(800);
+        new MainWindowController(stage);
         stage.show();
     }
 
     static PasswordManagerApplication getApplication() {
         return application;
-    }
-
-    static ResourceBundle getBundle() {
-        return application.rb;
     }
 
     private static boolean initLogDirectory() {

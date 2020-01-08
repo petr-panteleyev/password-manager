@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,45 +23,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.panteleyev.pwdmanager;
 
+import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import static org.testng.Assert.assertEquals;
 
-public class TestCloneable {
+@Test
+public class TestFieldContentFilter {
 
-    @DataProvider(name="testCloneable")
-    public Object[][] testCloneableDataProvider() {
-        return new Object[][] {
-            { Card.newCard(UUID.randomUUID().toString(), Picture.AMEX, List.of(), UUID.randomUUID().toString())},
-            { Card.newCard(UUID.randomUUID().toString(), Picture.GLASSES,
-                Arrays.asList(
-                    new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-                    new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-                    new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                ),
-                UUID.randomUUID().toString())
-            },
-            { Card.newNote(UUID.randomUUID().toString(), UUID.randomUUID().toString(), false) },
+    private static final Card CARD =
+        Card.newCard(UUID.randomUUID().toString(), null, List.of(
+            new Field(FieldType.STRING, UUID.randomUUID().toString(), "value1"),
+            new Field(FieldType.STRING, UUID.randomUUID().toString(), "Value1"),
+            new Field(FieldType.STRING, UUID.randomUUID().toString(), "Value2"))
+        );
+
+    @DataProvider
+    public Object[][] dataProvider() {
+        return new Object[][]{
+            {CARD, "value", true},
+            {CARD, "value1", true},
+            {CARD, "ValUe", true},
+            {CARD, "ValUe3", false},
         };
     }
 
-    @Test(dataProvider="testCloneable")
-    public void testCloneable(Card record) throws Exception {
-        var clone = new Card(record);
-
-        Assert.assertEquals(clone, record);
-        Assert.assertFalse(clone == record);
-
-        if (record.isCard()) {
-
-        }
-
+    @Test(dataProvider = "dataProvider")
+    public void test(Card card, String value, boolean expected) {
+        assertEquals(new FieldContentFilter(value).test(card), expected);
     }
 }

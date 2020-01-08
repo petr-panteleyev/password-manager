@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,43 +28,41 @@ package org.panteleyev.pwdmanager;
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.commons.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
-import java.util.ResourceBundle;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class NoteDialog extends BaseDialog<Card> implements Styles {
-    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
-
     private final TextField nameEdit = new TextField();
 
     NoteDialog() {
         super(MainWindowController.CSS_PATH);
 
-        setTitle(rb.getString("noteDialog.title"));
+        setTitle(RB.getString("noteDialog.title"));
 
         var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
-        grid.addRow(0, new Label(rb.getString("label.Name")), nameEdit);
+        grid.addRow(0, newLabel(RB, "label.Name"), nameEdit);
 
         getDialogPane().setContent(grid);
-        createDefaultButtons(rb);
+        createDefaultButtons(RB);
 
         nameEdit.setPrefColumnCount(20);
 
         setResultConverter(b -> b == ButtonType.OK ?
-                Card.newNote(nameEdit.getText(), "", false) : null);
+            Card.newNote(nameEdit.getText(), "", false) : null);
 
         Platform.runLater(this::setupValidator);
     }
 
     private void setupValidator() {
         validation.registerValidator(nameEdit, (Control c, String value) ->
-                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+            ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }
 }

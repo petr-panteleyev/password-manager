@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,31 +37,30 @@ import org.panteleyev.commons.fx.BaseDialog;
 import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class PasswordDialog extends BaseDialog<String> implements Styles {
-
     private final PasswordField passwordEdit = new PasswordField();
     private final PasswordField passwordEdit2 = new PasswordField();
 
     PasswordDialog(File file, boolean change) {
         super(MainWindowController.CSS_PATH);
 
-        var rb = PasswordManagerApplication.getBundle();
-
-        setTitle(rb.getString("passwordDialog.title"));
+        setTitle(RB.getString("passwordDialog.title"));
 
         var grid = new GridPane();
         grid.getStyleClass().add(GRID_PANE);
 
-        grid.addRow(0, new Label(rb.getString("label.File")), new Label(file.getAbsolutePath()));
-        grid.addRow(1, new Label(rb.getString("label.Password")), passwordEdit);
+        grid.addRow(0, newLabel(RB, "label.File"), new Label(file.getAbsolutePath()));
+        grid.addRow(1, newLabel(RB, "label.Password"), passwordEdit);
         if (change) {
-            grid.addRow(2, new Label(rb.getString("label.Repeat")), passwordEdit2);
+            grid.addRow(2, newLabel(RB, "label.Repeat"), passwordEdit2);
         }
         passwordEdit.setPrefColumnCount(32);
 
         getDialogPane().setContent(grid);
-        createDefaultButtons(rb);
+        createDefaultButtons(RB);
 
         setResultConverter(b -> b == ButtonType.OK ? passwordEdit.getText() : null);
 

@@ -50,7 +50,7 @@ class AboutDialog extends BaseDialog implements Styles {
         var l0 = new Label("Password Manager");
         l0.getStyleClass().add(ABOUT_LABEL);
 
-        var l1 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
+        var l1 = new Label("Copyright (c) 2016, 2020, Petr Panteleyev");
 
         grid.addRow(0, l0);
         grid.addRow(1, l1);

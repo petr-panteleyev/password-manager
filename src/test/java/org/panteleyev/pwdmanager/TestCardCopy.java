@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,22 +23,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
-package org.panteleyev.pwdmanager.filters;
+package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
-import java.util.function.Predicate;
+import org.panteleyev.pwdmanager.model.Field;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
-public class FieldContentFilter implements Predicate<Card> {
-    private final String value;
+public class TestCardCopy {
 
-    public FieldContentFilter(String value) {
-        this.value = value;
+    @DataProvider
+    public Object[][] dataProvider() {
+        return new Object[][]{
+            {Card.newCard(UUID.randomUUID().toString(), Picture.AMEX, List.of(), UUID.randomUUID().toString())},
+            {Card.newCard(UUID.randomUUID().toString(), Picture.GLASSES,
+                Arrays.asList(
+                    new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+                    new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+                    new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                ),
+                UUID.randomUUID().toString())
+            },
+            {Card.newNote(UUID.randomUUID().toString(), UUID.randomUUID().toString(), false)},
+        };
     }
 
-    @Override
-    public boolean test(Card card) {
-        return card.getFields().stream()
-            .anyMatch(f -> f.getValue().toLowerCase().contains(value.toLowerCase()));
+    @Test(dataProvider = "dataProvider")
+    public void testCloneable(Card record) throws Exception {
+        var copy = new Card(record);
+
+        Assert.assertEquals(copy, record);
+        Assert.assertNotSame(copy, record);
     }
 }

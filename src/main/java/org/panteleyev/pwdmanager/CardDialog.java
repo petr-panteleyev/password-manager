@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@ import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class CardDialog extends RecordDialog {
     private final RecordType defaultType;
@@ -44,11 +45,11 @@ class CardDialog extends RecordDialog {
     }
 
     private void initialize() {
-        setTitle(rb.getString("cardDialog.title"));
-        createDefaultButtons(rb);
+        setTitle(RB.getString("cardDialog.title"));
+        createDefaultButtons(RB);
 
         initLists();
-        setTypeLabelText(rb.getString("label.type"));
+        setTypeLabelText(RB.getString("label.type"));
 
         if (card != null) {
             getNameEdit().setText(card.getName());

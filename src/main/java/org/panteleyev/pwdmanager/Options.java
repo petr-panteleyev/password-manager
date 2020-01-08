@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,21 +24,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.pwdmanager.filters;
+package org.panteleyev.pwdmanager;
 
-import org.panteleyev.pwdmanager.model.Card;
-import java.util.function.Predicate;
+import javafx.stage.Stage;
+import java.util.prefs.Preferences;
 
-public class FieldContentFilter implements Predicate<Card> {
-    private final String value;
+final class Options {
+    private static final double DEFAULT_WIDTH = 800;
+    private static final double DEFAULT_HEIGHT = 542;
 
-    public FieldContentFilter(String value) {
-        this.value = value;
+    private Options() {
     }
 
-    @Override
-    public boolean test(Card card) {
-        return card.getFields().stream()
-            .anyMatch(f -> f.getValue().toLowerCase().contains(value.toLowerCase()));
+    private enum Option {
+        WINDOW_HEIGHT("windowHeight"),
+        WINDOW_WIDTH("windowWidth");
+
+        private String s;
+
+        Option(String s) {
+            this.s = s;
+        }
+
+        @Override
+        public String toString() {
+            return s;
+        }
+    }
+
+    private static final Preferences PREFS = Preferences.userNodeForPackage(PasswordManagerApplication.class);
+
+    static void saveWindowDimensions(Stage stage) {
+        PREFS.putDouble(Option.WINDOW_WIDTH.toString(), stage.widthProperty().doubleValue());
+        PREFS.putDouble(Option.WINDOW_HEIGHT.toString(), stage.heightProperty().doubleValue());
+    }
+
+    static void loadWindowDimensions(Stage stage) {
+        stage.setWidth(PREFS.getDouble(Option.WINDOW_WIDTH.toString(), DEFAULT_WIDTH));
+        stage.setHeight(PREFS.getDouble(Option.WINDOW_HEIGHT.toString(), DEFAULT_HEIGHT));
     }
 }

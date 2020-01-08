@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,6 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -37,13 +36,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
@@ -57,7 +54,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.panteleyev.crypto.AES;
+import org.panteleyev.commons.crypto.AES;
+import org.panteleyev.commons.fx.Controller;
 import org.panteleyev.pwdmanager.comparators.ByFavorite;
 import org.panteleyev.pwdmanager.comparators.ByName;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
@@ -68,20 +66,26 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newButton;
+import static org.panteleyev.commons.fx.FXFactory.newCheckMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newSearchField;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
-class MainWindowController extends BorderPane implements Styles {
-    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
+class MainWindowController extends Controller implements Styles {
+    private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
 
     static final URL CSS_PATH = MainWindowController.class
         .getResource("/org/panteleyev/pwdmanager/PasswordManager.css");
@@ -90,6 +94,9 @@ class MainWindowController extends BorderPane implements Styles {
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
     private static final String PREF_CURRENT_FILE = "current_file";
 
+    private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
+    private String currentPassword;
+
     private final ObservableList<Card> recordList = FXCollections.observableArrayList();
     private final SortedList<Card> sortedList = new SortedList<>(recordList);
     private final ListView<Card> cardListView = new ListView<>(sortedList);
@@ -97,105 +104,67 @@ class MainWindowController extends BorderPane implements Styles {
     private final BorderPane leftPane = new BorderPane(cardListView);
     private final TitledPane treeViewPane = new TitledPane("", leftPane);
 
-    private final MenuItem ctxNewCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
-    private final MenuItem ctxNewNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
-    private final MenuItem ctxDeleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
-    private final MenuItem ctxCardPasteMenuItem = new MenuItem(rb.getString("menu.edit.paste"));
-    private final CheckMenuItem ctxFavoriteMenuItem = new CheckMenuItem(rb.getString("menu.edit.favorite"));
+    private final TextField searchTextField = newSearchField(this::doSearch);
 
-    private final TextField searchTextField = new TextField();
     private final Label cardContentTitleLabel = new Label();
-    private final Button cardEditButton = new Button("Edit...");
+    private final Button cardEditButton = newButton(RB, "button.edit", a -> onEditCard());
     private final BorderPane recordViewPane = new BorderPane();
-
-    // Menu items
-    private final MenuItem newCardMenuItem = new MenuItem(rb.getString("menu.edit.newCard"));
-    private final MenuItem newNoteMenuItem = new MenuItem(rb.getString("menu.edit.newNote"));
-    private final MenuItem deleteMenuItem = new MenuItem(rb.getString("menu.edit.delete"));
-    private final MenuItem changePasswordMenuItem = new MenuItem(rb.getString("menu.tools.changePassword"));
 
     private final NoteViewer noteViewer = new NoteViewer();
     private final CardViewer cardContentView = new CardViewer();
 
-    private final Stage stage;
-
-    private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
-    private String currentPassword;
-
     MainWindowController(Stage stage) {
-        this.stage = stage;
+        super(stage, CSS_PATH.toString());
 
         sortedList.setComparator(new ByFavorite().thenComparing(new ByName()));
 
-        createMainMenu();
-        createControls();
-        createCardTreeContextMenu();
+        setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
+        getStage().setOnHiding(event -> onWindowClosing());
+        Options.loadWindowDimensions(getStage());
+
         initialize();
     }
 
-    private void createMainMenu() {
-        // File
-        var fileNewMenuItem = new MenuItem(rb.getString("menu.file.new"));
-        fileNewMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN));
-        fileNewMenuItem.setOnAction(a -> onNewFile());
-
-        var fileOpenMenuitem = new MenuItem(rb.getString("menu.file.open"));
-        fileOpenMenuitem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
-        fileOpenMenuitem.setOnAction(a -> onOpenFile());
-
-        var fileExitMenuItem = new MenuItem(rb.getString("menu.file.exit"));
-        fileExitMenuItem.setOnAction(a -> onExit());
-
-        var fileMenu = new Menu(rb.getString("menu.file"), null,
-            fileNewMenuItem, fileOpenMenuitem, new SeparatorMenuItem(), fileExitMenuItem);
-
-        // Edit
-        newCardMenuItem.setOnAction(a -> onNewCard());
-        newNoteMenuItem.setOnAction(a -> onNewNote());
-
-        var filterMenuItem = new MenuItem(rb.getString("menu.Edit.Filter"));
-        filterMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN));
-        filterMenuItem.setOnAction(a -> onFilter());
-
-        var editMenu = new Menu(rb.getString("menu.edit"), null,
-            newCardMenuItem, newNoteMenuItem,
-            new SeparatorMenuItem(),
-            filterMenuItem,
-            new SeparatorMenuItem(),
-            deleteMenuItem);
-
-        var importMenuItem = new MenuItem(rb.getString("menu.tools.import"));
-        importMenuItem.setOnAction(a -> onImportFile());
-
-        var exportMenuItem = new MenuItem(rb.getString("menu.tools.export"));
-        exportMenuItem.setOnAction(a -> onExportFile());
-        exportMenuItem.disableProperty().bind(currentFile.isNull());
-
-        changePasswordMenuItem.setOnAction(a -> onChangePassword());
-
-        var toolsMenu = new Menu(rb.getString("menu.tools"), null,
-            importMenuItem,
-            exportMenuItem,
-            new SeparatorMenuItem(),
-            changePasswordMenuItem
+    private MenuBar createMainMenu() {
+        return newMenuBar(
+            newMenu(RB, "menu.file",
+                newMenuItem(RB, "menu.file.new",
+                    new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), a -> onNewFile()),
+                newMenuItem(RB, "menu.file.open",
+                    new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN), a -> onOpenFile()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.file.exit", a -> onExit())
+            ),
+            // Edit
+            newMenu(RB, "menu.edit",
+                newMenuItem(RB, "menu.edit.newCard", a -> onNewCard(),
+                    currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                newMenuItem(RB, "menu.edit.newNote", a -> onNewNote(),
+                    currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.Edit.Filter",
+                    new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN), a -> onFilter()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.edit.delete", a -> onDeleteRecord(), currentFile.isNull())),
+            // Tools
+            newMenu(RB, "menu.tools",
+                newMenuItem(RB, "menu.tools.import", a -> onImportFile()),
+                newMenuItem(RB, "menu.tools.export", a -> onExportFile(), currentFile.isNull()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.tools.changePassword",
+                    a -> onChangePassword(), currentFile.isNull())
+            ),
+            // Help
+            newMenu(RB, "menu.help",
+                newMenuItem(RB, "menu.help.about", a -> onAbout()))
         );
-
-        // Help
-        var helpAboutMenuItem = new MenuItem(rb.getString("menu.help.about"));
-        helpAboutMenuItem.setOnAction(a -> onAbout());
-        var helpMenu = new Menu(rb.getString("menu.help"), null, helpAboutMenuItem);
-
-        var menuBar = new MenuBar(fileMenu, editMenu, toolsMenu, helpMenu);
-        menuBar.setUseSystemMenuBar(true);
-
-        setTop(menuBar);
     }
 
-    private void createControls() {
+    private Control createControls() {
         BorderPane.setAlignment(cardListView, Pos.CENTER);
-        cardEditButton.setOnAction(a -> onEditCard());
 
         cardListView.setCellFactory(x -> new RecordListCell());
+        cardListView.setContextMenu(createContextMenu());
 
         var buttonBar = new ButtonBar();
         buttonBar.getButtons().setAll(cardEditButton);
@@ -215,47 +184,48 @@ class MainWindowController extends BorderPane implements Styles {
         var split = new SplitPane(treeViewPane, recordViewPane);
         split.setDividerPositions(0.30);
 
-        setCenter(split);
+        return split;
     }
 
-    private void createCardTreeContextMenu() {
-        ctxNewCardMenuItem.setOnAction(a -> onNewCard());
-        ctxNewNoteMenuItem.setOnAction(a -> onNewNote());
-        ctxDeleteMenuItem.setOnAction(a -> onDeleteRecord());
-        ctxCardPasteMenuItem.setOnAction(a -> onCardPaste());
-        ctxFavoriteMenuItem.setOnAction(a -> onFavorite());
-
-        var copyMenuItem = new MenuItem(rb.getString("menu.edit.copy"));
-        copyMenuItem.setOnAction(a -> onCardCopy());
+    private ContextMenu createContextMenu() {
+        var ctxCardPasteMenuItem = newMenuItem(RB, "menu.edit.paste", a -> onCardPaste());
+        var ctxFavoriteMenuItem = newCheckMenuItem(RB, "menu.edit.favorite", false,
+            a -> onFavorite());
 
         var menu = new ContextMenu(
             ctxFavoriteMenuItem,
             new SeparatorMenuItem(),
-            ctxNewCardMenuItem,
-            ctxNewNoteMenuItem,
+            newMenuItem(RB, "menu.edit.newCard", a -> onNewCard(),
+                currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+            newMenuItem(RB, "menu.edit.newNote", a -> onNewNote(),
+                currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
-            ctxDeleteMenuItem,
+            newMenuItem(RB, "menu.edit.delete", new KeyCodeCombination(KeyCode.DELETE), a -> onDeleteRecord(),
+                currentFile.isNull()),
             new SeparatorMenuItem(),
-            copyMenuItem,
+            newMenuItem(RB, "menu.edit.copy", a -> onCardCopy()),
             ctxCardPasteMenuItem
         );
 
-        menu.setOnShowing(e -> onCardTreeContextMenuShowing());
+        menu.setOnShowing(e -> {
+            var pasteEnable = false;
 
-        // Main menu items
-        newCardMenuItem.disableProperty().bind(currentFile.isNull()
-            .or(searchTextField.textProperty().isEmpty().not()));
-        newNoteMenuItem.disableProperty().bind(currentFile.isNull()
-            .or(searchTextField.textProperty().isEmpty().not()));
-        deleteMenuItem.disableProperty().bind(currentFile.isNull());
+            var cb = Clipboard.getSystemClipboard();
+            var targetItem = getSelectedItem();
 
-        // Context menu items
-        ctxNewCardMenuItem.disableProperty().bind(newCardMenuItem.disableProperty());
-        ctxNewNoteMenuItem.disableProperty().bind(newNoteMenuItem.disableProperty());
-        ctxDeleteMenuItem.disableProperty().bind(currentFile.isNull());
-        ctxDeleteMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
+            ctxFavoriteMenuItem.setDisable(targetItem.isEmpty());
+            ctxFavoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().isFavorite());
 
-        cardListView.setContextMenu(menu);
+            if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
+                var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
+                var sourceItem = findRecordById(sourceId);
+                pasteEnable = sourceItem.isPresent();
+            }
+
+            ctxCardPasteMenuItem.setDisable(!pasteEnable);
+        });
+
+        return menu;
     }
 
     private void initialize() {
@@ -263,11 +233,6 @@ class MainWindowController extends BorderPane implements Styles {
 
         cardEditButton.disableProperty().bind(cardListView.getSelectionModel().selectedItemProperty().isNull());
 
-        searchTextField.textProperty().addListener((x, oldValue, newValue) -> {
-            if (!Objects.equals(oldValue, newValue)) {
-                doSearch(newValue);
-            }
-        });
         leftPane.setTop(searchTextField);
         BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
 
@@ -441,24 +406,6 @@ class MainWindowController extends BorderPane implements Styles {
         new AboutDialog().showAndWait();
     }
 
-    private void onCardTreeContextMenuShowing() {
-        var pasteEnable = false;
-
-        var cb = Clipboard.getSystemClipboard();
-        var targetItem = getSelectedItem();
-
-        ctxFavoriteMenuItem.setDisable(targetItem.isEmpty());
-        ctxFavoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().isFavorite());
-
-        if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
-            var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
-            var sourceItem = findRecordById(sourceId);
-            pasteEnable = sourceItem.isPresent();
-        }
-
-        ctxCardPasteMenuItem.setDisable(!pasteEnable);
-    }
-
     private void putCardToClipboard(Card record) {
         var cb = Clipboard.getSystemClipboard();
         var content = new ClipboardContent();
@@ -515,9 +462,9 @@ class MainWindowController extends BorderPane implements Styles {
 
     private void setTitle() {
         if (currentFile.get() == null) {
-            stage.setTitle(AboutDialog.APP_TITLE);
+            getStage().setTitle(AboutDialog.APP_TITLE);
         } else {
-            stage.setTitle(AboutDialog.APP_TITLE + " -- " + currentFile.get().getAbsolutePath());
+            getStage().setTitle(AboutDialog.APP_TITLE + " -- " + currentFile.get().getAbsolutePath());
         }
     }
 
@@ -585,7 +532,9 @@ class MainWindowController extends BorderPane implements Styles {
 
                     setTitle();
                 } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                    new Alert(Alert.AlertType.ERROR, "Exception while reading file "
+                        + file.getAbsolutePath()).showAndWait();
+                    LOGGER.log(Level.SEVERE, "Exception while reading file", ex);
                 }
             });
         }
@@ -635,5 +584,9 @@ class MainWindowController extends BorderPane implements Styles {
             currentPassword = password;
             writeDocument();
         });
+    }
+
+    private void onWindowClosing() {
+        Options.saveWindowDimensions(getStage());
     }
 }

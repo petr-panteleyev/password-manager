@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -44,18 +43,17 @@ import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.commons.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
-import java.util.ResourceBundle;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditNoteDialog extends BaseDialog<Card> {
-    private final ResourceBundle rb = PasswordManagerApplication.getBundle();
-
     private final TextField nameEdit = new TextField();
     private final TextArea noteEdit = new TextArea();
 
     private final Card note;
 
     EditNoteDialog(Card note) {
-        super(null);
+        super(MainWindowController.CSS_PATH);
 
         Objects.requireNonNull(note);
 
@@ -65,9 +63,9 @@ class EditNoteDialog extends BaseDialog<Card> {
     }
 
     private void initialize() {
-        setTitle(rb.getString("editNoteDialog.title"));
+        setTitle(RB.getString("editNoteDialog.title"));
 
-        var box = new HBox(5, new Label(rb.getString("label.Name")), nameEdit);
+        var box = new HBox(5, newLabel(RB, "label.Name"), nameEdit);
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 0, 5, 0));
         nameEdit.setPrefColumnCount(25);
@@ -77,14 +75,14 @@ class EditNoteDialog extends BaseDialog<Card> {
         BorderPane.setAlignment(box, Pos.CENTER_LEFT);
 
         getDialogPane().setContent(pane);
-        createDefaultButtons(rb);
+        createDefaultButtons(RB);
 
         nameEdit.setText(note.getName());
         noteEdit.setText(note.getNote());
 
         setResultConverter((ButtonType b) -> (b == ButtonType.OK) ?
-                Card.newNote(note.getUuid(), nameEdit.getText(), noteEdit.getText(), note.isFavorite())
-                : null);
+            Card.newNote(note.getUuid(), nameEdit.getText(), noteEdit.getText(), note.isFavorite())
+            : null);
 
         Platform.runLater(this::setupValidator);
         Platform.runLater(nameEdit::requestFocus);
@@ -122,7 +120,7 @@ class EditNoteDialog extends BaseDialog<Card> {
 
     private void setupValidator() {
         validation.registerValidator(nameEdit, (Control c, String value) ->
-                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+            ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }
 }

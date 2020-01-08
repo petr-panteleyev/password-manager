@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,21 +24,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.pwdmanager.filters;
+package org.panteleyev.pwdmanager;
 
+import org.panteleyev.pwdmanager.filters.RecordNameFilter;
 import org.panteleyev.pwdmanager.model.Card;
-import java.util.function.Predicate;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import java.util.List;
+import static org.testng.Assert.assertEquals;
 
-public class FieldContentFilter implements Predicate<Card> {
-    private final String value;
+@Test
+public class TestRecordNameFilter {
+    private static final Card CARD =
+        Card.newCard("Card Name", null, List.of());
 
-    public FieldContentFilter(String value) {
-        this.value = value;
+    @DataProvider
+    public Object[][] dataProvider() {
+        return new Object[][]{
+            {CARD, "Card", true},
+            {CARD, "Name", true},
+            {CARD, "card name", true},
+            {CARD, "D n", true},
+            {CARD, "ValUe3", false},
+        };
     }
 
-    @Override
-    public boolean test(Card card) {
-        return card.getFields().stream()
-            .anyMatch(f -> f.getValue().toLowerCase().contains(value.toLowerCase()));
+    @Test(dataProvider = "dataProvider")
+    public void test(Card card, String value, boolean expected) {
+        assertEquals(new RecordNameFilter(value).test(card), expected);
     }
 }
