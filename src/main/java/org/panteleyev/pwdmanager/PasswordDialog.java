@@ -33,11 +33,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.fx.BaseDialog;
 import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newLabel;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class PasswordDialog extends BaseDialog<String> implements Styles {

@@ -6,8 +6,7 @@ open module password.manager {
     requires javafx.controls;
     requires javafx.graphics;
 
-    requires org.panteleyev.commons.fx;
-    requires org.panteleyev.commons.crypto;
+    requires org.panteleyev.fx;
 
     requires org.controlsfx.controls;
 }

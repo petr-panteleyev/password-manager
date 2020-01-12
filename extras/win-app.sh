@@ -11,7 +11,7 @@ $JPACKAGE_HOME/bin/jpackage \
     --java-options "-Dfile.encoding=UTF-8" \
     --icon icons/icons.ico \
     --name "Password Manager" \
-    --app-version 20.1.0 \
+    --app-version 20.1.1 \
     --vendor panteleyev.org \
     --win-menu \
     --win-dir-chooser \
