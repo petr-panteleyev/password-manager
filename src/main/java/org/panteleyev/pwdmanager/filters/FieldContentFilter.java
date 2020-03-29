@@ -17,7 +17,7 @@ public class FieldContentFilter implements Predicate<Card> {
 
     @Override
     public boolean test(Card card) {
-        return card.getFields().stream()
-            .anyMatch(f -> f.getValue().toLowerCase().contains(value.toLowerCase()));
+        return card.fields().stream()
+            .anyMatch(f -> f.value().toLowerCase().contains(value.toLowerCase()));
     }
 }

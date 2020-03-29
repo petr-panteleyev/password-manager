@@ -82,17 +82,17 @@ class Serializer {
 
     static Element serializeRecord(Document doc, Card r) {
         var xmlRecord = doc.createElement("record");
-        xmlRecord.setAttribute(CLASS_ATTR, r.getCardClass().name());
-        xmlRecord.setAttribute(UUID_ATTR, r.getUuid());
-        xmlRecord.setAttribute(NAME_ATTR, r.getName());
-        xmlRecord.setAttribute(TYPE_ATTR, r.getType().name());
-        xmlRecord.setAttribute(MODIFIED_ATTR, Long.toString(r.getModified()));
-        xmlRecord.setAttribute(PICTURE_ATTR, r.getPicture().name());
-        xmlRecord.setAttribute(FAVORITE_ATTR, Boolean.toString(r.isFavorite()));
+        xmlRecord.setAttribute(CLASS_ATTR, r.cardClass().name());
+        xmlRecord.setAttribute(UUID_ATTR, r.uuid());
+        xmlRecord.setAttribute(NAME_ATTR, r.name());
+        xmlRecord.setAttribute(TYPE_ATTR, r.type().name());
+        xmlRecord.setAttribute(MODIFIED_ATTR, Long.toString(r.modified()));
+        xmlRecord.setAttribute(PICTURE_ATTR, r.picture().name());
+        xmlRecord.setAttribute(FAVORITE_ATTR, Boolean.toString(r.favorite()));
 
         // Card - serialize fields
         if (r.isCard()) {
-            var fields = r.getFields();
+            var fields = r.fields();
             if (!fields.isEmpty()) {
                 var fieldsElement = doc.createElement(FIELDS);
                 xmlRecord.appendChild(fieldsElement);
@@ -103,14 +103,14 @@ class Serializer {
                 });
             }
 
-            var note = r.getNote();
+            var note = r.note();
             var noteElement = doc.createElement("note");
             noteElement.setTextContent(note);
             xmlRecord.appendChild(noteElement);
         }
 
         if (r.isNote()) {
-            xmlRecord.appendChild(doc.createTextNode(r.getNote()));
+            xmlRecord.appendChild(doc.createTextNode(r.note()));
         }
 
         return xmlRecord;
@@ -118,9 +118,9 @@ class Serializer {
 
     static Element serializeField(Document doc, Field f) {
         var e = doc.createElement(FIELD);
-        e.setAttribute(NAME_ATTR, f.getName());
-        e.setAttribute(TYPE_ATTR, f.getType().name());
-        e.setAttribute(VALUE_ATTR, f.getValue());
+        e.setAttribute(NAME_ATTR, f.name());
+        e.setAttribute(TYPE_ATTR, f.type().name());
+        e.setAttribute(VALUE_ATTR, f.value());
         return e;
     }
 
@@ -147,28 +147,20 @@ class Serializer {
 
     private static void deserializeRecords(NodeList records, List<Card> list) {
         // children
-        for (int j = 0; j < records.getLength(); j++) {
-            var r = records.item(j);
+        for (int i = 0; i < records.getLength(); i++) {
+            var item = records.item(i);
 
-            if (r instanceof Element) {
-                var re = (Element) r;
-
-                Card record = null;
-
-                var recordClass = re.getAttribute(CLASS_ATTR);
+            if (item instanceof Element element) {
+                var recordClass = element.getAttribute(CLASS_ATTR);
                 if (recordClass != null) {
-                    switch (recordClass) {
-                        case "CARD":
-                            record = deserializeCard(re);
-                            break;
-                        case "NOTE":
-                            record = deserializeNote(re);
-                            break;
+                    var record = switch (recordClass) {
+                        case "CARD" -> deserializeCard(element);
+                        case "NOTE" -> deserializeNote(element);
+                        default -> null;
+                    };
+                    if (record != null) {
+                        list.add(record);
                     }
-                }
-
-                if (record != null) {
-                    list.add(record);
                 }
             }
         }

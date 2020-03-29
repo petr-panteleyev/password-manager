@@ -48,7 +48,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         super(MainWindowController.CSS_PATH);
 
         editableFields = FXCollections.observableArrayList(
-            card.getFields().stream().map(EditableField::new).collect(Collectors.toList()));
+            card.fields().stream().map(EditableField::new).collect(Collectors.toList()));
 
         setTitle(RB.getString("editCardDialog.title"));
 
@@ -108,23 +108,23 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         fieldTypeCombo.setItems(FXCollections.observableArrayList(FieldType.values()));
         fieldTypeCombo.setOnAction(x -> onFieldTypeComboChanged());
 
-        noteEditor.setText(card.getNote());
+        noteEditor.setText(card.note());
 
         Picture.setupComboBox(pictureList);
-        cardNameEdit.setText(card.getName());
-        pictureList.getSelectionModel().select(card.getPicture());
+        cardNameEdit.setText(card.name());
+        pictureList.getSelectionModel().select(card.picture());
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 return Card.newCard(
-                    card.getUuid(),
+                    card.uuid(),
                     System.currentTimeMillis(),
                     cardNameEdit.getText(),
                     pictureList.getSelectionModel().getSelectedItem(),
                     new ArrayList<>(editableFields.stream()
                         .map(EditableField::toField).collect(Collectors.toList())),
                     noteEditor.getText(),
-                    card.isFavorite());
+                    card.favorite());
             } else {
                 return null;
             }

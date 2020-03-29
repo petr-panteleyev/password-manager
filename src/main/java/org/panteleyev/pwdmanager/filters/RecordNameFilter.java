@@ -17,6 +17,6 @@ public class RecordNameFilter implements Predicate<Card> {
 
     @Override
     public boolean test(Card record) {
-        return record.getName().toLowerCase().contains(name.toLowerCase());
+        return record.name().toLowerCase().contains(name.toLowerCase());
     }
 }

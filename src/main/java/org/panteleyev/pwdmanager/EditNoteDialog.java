@@ -57,11 +57,11 @@ class EditNoteDialog extends BaseDialog<Card> {
         getDialogPane().setContent(pane);
         createDefaultButtons(RB);
 
-        nameEdit.setText(note.getName());
-        noteEdit.setText(note.getNote());
+        nameEdit.setText(note.name());
+        noteEdit.setText(note.note());
 
         setResultConverter((ButtonType b) -> (b == ButtonType.OK) ?
-            Card.newNote(note.getUuid(), nameEdit.getText(), noteEdit.getText(), note.isFavorite())
+            Card.newNote(note.uuid(), nameEdit.getText(), noteEdit.getText(), note.favorite())
             : null);
 
         Platform.runLater(this::setupValidator);

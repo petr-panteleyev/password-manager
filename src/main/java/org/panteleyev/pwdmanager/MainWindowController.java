@@ -194,7 +194,7 @@ class MainWindowController extends Controller implements Styles {
             var targetItem = getSelectedItem();
 
             ctxFavoriteMenuItem.setDisable(targetItem.isEmpty());
-            ctxFavoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().isFavorite());
+            ctxFavoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().favorite());
 
             if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
                 var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
@@ -320,20 +320,20 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private void setupRecordViewer(Card record) {
-        cardContentTitleLabel.setText(record.getName());
-        cardContentTitleLabel.setGraphic(new ImageView(record.getPicture().getBigImage()));
+        cardContentTitleLabel.setText(record.name());
+        cardContentTitleLabel.setGraphic(new ImageView(record.picture().getBigImage()));
 
         if (record.isNote()) {
-            noteViewer.setText(record.getNote());
+            noteViewer.setText(record.note());
             recordViewPane.setCenter(noteViewer);
         } else {
             if (record.isCard()) {
                 recordViewPane.setCenter(cardContentView);
 
-                var wrappers = record.getFields().stream()
-                    .filter(f -> !f.getValue().isEmpty())
+                var wrappers = record.fields().stream()
+                    .filter(f -> !f.value().isEmpty())
                     .map(FieldWrapper::new).collect(Collectors.toList());
-                cardContentView.setData(FXCollections.observableArrayList(wrappers), record.getNote());
+                cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
             }
         }
     }
@@ -351,12 +351,12 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private Optional<Card> findByUuid(String uuid) {
-        return recordList.stream().filter(x -> x.getUuid().equals(uuid)).findFirst();
+        return recordList.stream().filter(x -> x.uuid().equals(uuid)).findFirst();
     }
 
 
     private void processEditedRecord(Card r) {
-        var index = getIndexByUUID(r.getUuid());
+        var index = getIndexByUUID(r.uuid());
         if (index != -1) {
             recordList.set(index, r);
         }
@@ -369,7 +369,7 @@ class MainWindowController extends Controller implements Styles {
 
     private void onEditCard() {
         getSelectedItem().ifPresent(card -> {
-            switch (card.getCardClass()) {
+            switch (card.cardClass()) {
                 case CARD:
                     new EditCardDialog(card)
                         .showAndWait().ifPresent(this::processEditedRecord);
@@ -389,7 +389,7 @@ class MainWindowController extends Controller implements Styles {
     private void putCardToClipboard(Card record) {
         var cb = Clipboard.getSystemClipboard();
         var content = new ClipboardContent();
-        content.put(Card.DATA_FORMAT, record.getUuid());
+        content.put(Card.DATA_FORMAT, record.uuid());
         cb.setContent(content);
     }
 
@@ -412,7 +412,7 @@ class MainWindowController extends Controller implements Styles {
 
     private int getIndexByUUID(String uuid) {
         for (int index = 0; index < recordList.size(); index++) {
-            if (recordList.get(index).getUuid().equals(uuid)) {
+            if (recordList.get(index).uuid().equals(uuid)) {
                 return index;
             }
         }
@@ -420,7 +420,7 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private void updateListItem(Card card) {
-        var index = getIndexByUUID(card.getUuid());
+        var index = getIndexByUUID(card.uuid());
         if (index != -1) {
             recordList.set(index, card);
         }
@@ -428,7 +428,7 @@ class MainWindowController extends Controller implements Styles {
 
     private void onFavorite() {
         getSelectedItem().ifPresent(card -> {
-            var newCard = card.setFavorite(!card.isFavorite());
+            var newCard = card.setFavorite(!card.favorite());
             updateListItem(newCard);
             cardListView.getSelectionModel().select(newCard);
             cardListView.scrollTo(newCard);
@@ -437,7 +437,7 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private Optional<Card> findRecordById(String uuid) {
-        return sortedList.stream().filter(x -> x.getUuid().equals(uuid)).findFirst();
+        return sortedList.stream().filter(x -> x.uuid().equals(uuid)).findFirst();
     }
 
     private void setTitle() {
@@ -526,9 +526,9 @@ class MainWindowController extends Controller implements Styles {
 
     private void importCards(Collection<Card> toImport) {
         for (var card : toImport) {
-            find(c -> card.getUuid().equals(c.getUuid()))
+            find(c -> card.uuid().equals(c.uuid()))
                 .ifPresentOrElse(found -> {
-                    if (found.getModified() < card.getModified()) {
+                    if (found.modified() < card.modified()) {
                         recordList.removeAll(found);
                         recordList.add(card);
                     }

@@ -11,6 +11,6 @@ import java.util.Comparator;
 public class ByName implements Comparator<Card> {
     @Override
     public int compare(Card o1, Card o2) {
-        return o1.getName().compareTo(o2.getName());
+        return o1.name().compareTo(o2.name());
     }
 }

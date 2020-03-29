@@ -7,11 +7,16 @@ package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Field;
 
-final class FieldWrapper extends Field {
+final class FieldWrapper {
+    private final Field field;
     private boolean show;
 
-    FieldWrapper(Field that) {
-        super(that);
+    FieldWrapper(Field field) {
+        this.field = field;
+    }
+
+    Field getField() {
+        return field;
     }
 
     void toggleShow() {
@@ -20,5 +25,17 @@ final class FieldWrapper extends Field {
 
     boolean getShow() {
         return show;
+    }
+
+    String getName() {
+        return field.name();
+    }
+
+    FieldType getType() {
+        return field.type();
+    }
+
+    public String getValue() {
+        return field.value();
     }
 }

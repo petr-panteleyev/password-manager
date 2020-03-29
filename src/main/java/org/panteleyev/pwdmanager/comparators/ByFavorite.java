@@ -11,6 +11,6 @@ import java.util.Comparator;
 public class ByFavorite implements Comparator<Card> {
     @Override
     public int compare(Card o1, Card o2) {
-        return Boolean.compare(o2.isFavorite(), o1.isFavorite());
+        return Boolean.compare(o2.favorite(), o1.favorite());
     }
 }

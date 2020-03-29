@@ -18,13 +18,13 @@ class RecordListCell extends ListCell<Card> {
             setText("");
             setGraphic(null);
         } else {
-            if (record.isFavorite()) {
+            if (record.favorite()) {
                 getStyleClass().add("favorite");
             } else {
                 getStyleClass().remove("favorite");
             }
-            setText(record.getName());
-            setGraphic(new ImageView(record.getPicture().getImage()));
+            setText(record.name());
+            setGraphic(new ImageView(record.picture().getImage()));
         }
     }
 }

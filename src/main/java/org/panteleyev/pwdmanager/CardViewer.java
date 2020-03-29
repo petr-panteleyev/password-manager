@@ -133,7 +133,7 @@ class CardViewer extends BorderPane implements Styles {
 
     private ContextMenu createContextMenu(FieldWrapper field) {
         var copyMenuItem = new MenuItem(RB.getString("menu.ctx.copy") + " '" + field.getName() + "'");
-        copyMenuItem.setOnAction(x -> onCopy(field));
+        copyMenuItem.setOnAction(x -> onCopy(field.getField()));
 
         return new ContextMenu(copyMenuItem);
     }
@@ -142,8 +142,8 @@ class CardViewer extends BorderPane implements Styles {
         var cb = Clipboard.getSystemClipboard();
         var content = new ClipboardContent();
 
-        var value = field.getValue();
-        if (field.getType() == FieldType.CREDIT_CARD_NUMBER) {
+        var value = field.value();
+        if (field.type() == FieldType.CREDIT_CARD_NUMBER) {
             // remove all spaces from credit card number
             value = value.trim().replaceAll(" ", "");
         }

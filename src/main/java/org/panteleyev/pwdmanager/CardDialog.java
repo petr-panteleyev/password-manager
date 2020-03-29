@@ -32,9 +32,9 @@ class CardDialog extends RecordDialog {
         setTypeLabelText(RB.getString("label.type"));
 
         if (card != null) {
-            getNameEdit().setText(card.getName());
-            getTypeList().getSelectionModel().select(card.getType());
-            getPictureList().getSelectionModel().select(card.getPicture());
+            getNameEdit().setText(card.name());
+            getTypeList().getSelectionModel().select(card.type());
+            getPictureList().getSelectionModel().select(card.picture());
         } else {
             getNameEdit().setText("");
             getTypeList().getSelectionModel().select(defaultType);

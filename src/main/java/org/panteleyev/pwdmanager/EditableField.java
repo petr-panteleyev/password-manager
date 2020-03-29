@@ -22,9 +22,9 @@ class EditableField {
     }
 
     EditableField(Field field) {
-        type.set(field.getType());
-        name.set(field.getName());
-        value.set(field.getValue());
+        type.set(field.type());
+        name.set(field.name());
+        value.set(field.value());
     }
 
     Field toField() {

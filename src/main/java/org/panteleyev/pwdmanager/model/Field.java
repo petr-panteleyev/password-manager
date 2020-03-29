@@ -6,70 +6,10 @@ package org.panteleyev.pwdmanager.model;
  */
 
 import org.panteleyev.pwdmanager.FieldType;
-import java.util.Objects;
 
-public class Field {
-    private final FieldType type;
-    private final String name;
-    private final String value;
+public record Field(FieldType type, String name, String value) {
 
-    public Field(FieldType type, String name, String value) {
-        this.type = type;
-        this.name = name;
-        this.value = value;
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param that copy from
-     */
-    public Field(Field that) {
-        this.type = that.getType();
-        this.name = that.getName();
-        this.value = that.getValue();
-    }
-
-    public FieldType getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o instanceof Field) {
-            var that = (Field) o;
-
-            return Objects.equals(this.type, that.type)
-                    && Objects.equals(this.name, that.name)
-                    && Objects.equals(this.value, that.value);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, name, value);
-    }
-
-    @Override
-    public String toString() {
-        return "[Field:"
-                + " type=" + type
-                + " name=" + name
-                + " value=" + value
-                + "]";
+    public Field(Field field) {
+        this(field.type, field.name, field.value);
     }
 }
