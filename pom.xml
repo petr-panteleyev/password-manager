@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>20.2.1</version>
+    <version>20.2.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -13,9 +13,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
-        <commons-version>20.1.1</commons-version>
-        <javafx-version>14.0.1</javafx-version>
-        <testng-version>6.14.3</testng-version>
+        <!-- Dependencies -->
+        <javaFxVersion>14.0.1</javaFxVersion>
+        <javaFxHelpersVersion>1.2.1</javaFxHelpersVersion>
+        <testngVersion>6.14.3</testngVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
@@ -26,46 +27,46 @@
         <execMavenPluginVersion>1.6.0</execMavenPluginVersion>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-swing</artifactId>
-                <version>${javafx-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-web</artifactId>
-                <version>${javafx-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-media</artifactId>
-                <version>${javafx-version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
-        <dependency>
-            <groupId>org.panteleyev</groupId>
-            <artifactId>java-fx-helpers</artifactId>
-            <version>1.0.0</version>
-        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>${javafx-version}</version>
+            <version>${javaFxVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javaFxVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javaFxVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>${javaFxVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javafx-version}</version>
+            <version>${javaFxVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>java-fx-helpers</artifactId>
+            <version>${javaFxHelpersVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>${testng-version}</version>
+            <version>${testngVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -168,6 +169,44 @@
                     <longModulepath>false</longModulepath>
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>dist-win</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${java.home}/bin/jpackage
+                            </executable>
+                            <arguments>
+                                <argument>--module</argument>
+                                <argument>${appModule}/${appMainClass}</argument>
+                                <argument>--runtime-image</argument>
+                                <argument>${java.home}</argument>
+                                <argument>--dest</argument>
+                                <argument>target/dist</argument>
+                                <argument>-p</argument>
+                                <argument>target/jmods</argument>
+                                <argument>--java-options</argument>
+                                <argument>-Dfile.encoding=UTF-8 --enable-preview</argument>
+                                <argument>--icon</argument>
+                                <argument>icons/icons.ico</argument>
+                                <argument>--name</argument>
+                                <argument>Password Manager</argument>
+                                <argument>--app-version</argument>
+                                <argument>${project.version}</argument>
+                                <argument>--vendor</argument>
+                                <argument>panteleyev.org</argument>
+                                <argument>--win-menu</argument>
+                                <argument>--win-dir-chooser</argument>
+                                <argument>--win-upgrade-uuid</argument>
+                                <argument>4a8438d2-f56f-4a5a-bfbe-5cf74ea70685</argument>
+                                <argument>--win-menu-group</argument>
+                                <argument>panteleyev.org</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>dist-mac</id>
                         <phase>none</phase>

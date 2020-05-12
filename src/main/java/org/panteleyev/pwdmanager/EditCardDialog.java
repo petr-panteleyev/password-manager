@@ -30,9 +30,9 @@ import org.panteleyev.pwdmanager.model.Card;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newLabel;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditCardDialog extends BaseDialog<Card> implements Styles {

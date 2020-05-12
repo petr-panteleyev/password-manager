@@ -23,7 +23,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditNoteDialog extends BaseDialog<Card> {

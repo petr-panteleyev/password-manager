@@ -3,6 +3,7 @@ open module password.manager {
     requires java.xml;
     requires java.logging;
     requires java.desktop;
+
     requires javafx.controls;
     requires javafx.graphics;
 

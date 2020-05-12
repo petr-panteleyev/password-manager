@@ -56,12 +56,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newButton;
-import static org.panteleyev.fx.FxFactory.newCheckMenuItem;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuBar;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.ButtonFactory.newButton;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.MenuFactory.newCheckMenuItem;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuBar;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class MainWindowController extends Controller implements Styles {

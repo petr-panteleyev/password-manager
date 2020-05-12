@@ -17,7 +17,7 @@ import org.panteleyev.fx.BaseDialog;
 import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class PasswordDialog extends BaseDialog<String> implements Styles {

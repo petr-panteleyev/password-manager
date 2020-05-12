@@ -44,12 +44,16 @@ $ mvn javafx:run
 
 ### Binary Packages
 
-To build a binary installer for OS X execute the following commands:
+To build binary installers perform the following steps:
+* On Microsoft Windows: install [WiX Toolset](https://wixtoolset.org/releases/), add its binary directory to ```PATH``` 
+environment variable
+* Execute the following commands:
 ```shell script
 $ mvn clean package
 $ mvn exec:exec@dist-mac
+  or
+$ mvn exec:exec@dist-win
 ```
-
 Installation packages will be found in ```target/dist``` directory.
 
 ## Support
