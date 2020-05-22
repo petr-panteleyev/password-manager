@@ -50,9 +50,9 @@ environment variable
 * Execute the following commands:
 ```shell script
 $ mvn clean package
-$ mvn exec:exec@dist-mac
+$ mvn jpackage:jpackage@mac
   or
-$ mvn exec:exec@dist-win
+$ mvn jpackage:jpackage@win
 ```
 Installation packages will be found in ```target/dist``` directory.
 

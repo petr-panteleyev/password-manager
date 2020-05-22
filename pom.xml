@@ -24,7 +24,7 @@
         <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
-        <execMavenPluginVersion>1.6.0</execMavenPluginVersion>
+        <jpackageMavenPluginVersion>0.0.1</jpackageMavenPluginVersion>
     </properties>
 
     <dependencies>
@@ -149,6 +149,45 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>${jpackageMavenPluginVersion}</version>
+
+                <configuration>
+                    <name>Password Manager</name>
+                    <appVersion>${project.version}</appVersion>
+                    <vendor>panteleyev.org</vendor>
+                    <runtimeImage>${java.home}</runtimeImage>
+                    <module>${appModule}/${appMainClass}</module>
+                    <modulePath>target/jmods</modulePath>
+                    <destination>target/dist</destination>
+                    <javaOptions>
+                        <option>--enable-preview</option>
+                        <option>-Dfile.encoding=UTF-8</option>
+                    </javaOptions>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>mac</id>
+                        <configuration>
+                            <icon>icons/icons.icns</icon>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>win</id>
+                        <configuration>
+                            <icon>icons/icons.ico</icon>
+                            <winMenu>true</winMenu>
+                            <winDirChooser>true</winDirChooser>
+                            <winUpgradeUuid>4a8438d2-f56f-4a5a-bfbe-5cf74ea70685</winUpgradeUuid>
+                            <winMenuGroup>panteleyev.org</winMenuGroup>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -160,86 +199,6 @@
                         <option>-Dfile.encoding=UTF-8</option>
                     </options>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>${execMavenPluginVersion}</version>
-                <configuration>
-                    <longModulepath>false</longModulepath>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>dist-win</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>
-                                ${java.home}/bin/jpackage
-                            </executable>
-                            <arguments>
-                                <argument>--module</argument>
-                                <argument>${appModule}/${appMainClass}</argument>
-                                <argument>--runtime-image</argument>
-                                <argument>${java.home}</argument>
-                                <argument>--dest</argument>
-                                <argument>target/dist</argument>
-                                <argument>-p</argument>
-                                <argument>target/jmods</argument>
-                                <argument>--java-options</argument>
-                                <argument>-Dfile.encoding=UTF-8 --enable-preview</argument>
-                                <argument>--icon</argument>
-                                <argument>icons/icons.ico</argument>
-                                <argument>--name</argument>
-                                <argument>Password Manager</argument>
-                                <argument>--app-version</argument>
-                                <argument>${project.version}</argument>
-                                <argument>--vendor</argument>
-                                <argument>panteleyev.org</argument>
-                                <argument>--win-menu</argument>
-                                <argument>--win-dir-chooser</argument>
-                                <argument>--win-upgrade-uuid</argument>
-                                <argument>4a8438d2-f56f-4a5a-bfbe-5cf74ea70685</argument>
-                                <argument>--win-menu-group</argument>
-                                <argument>panteleyev.org</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>dist-mac</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>
-                                ${java.home}/bin/jpackage
-                            </executable>
-                            <arguments>
-                                <argument>--module</argument>
-                                <argument>${appModule}/${appMainClass}</argument>
-                                <argument>--runtime-image</argument>
-                                <argument>${java.home}</argument>
-                                <argument>--dest</argument>
-                                <argument>target/dist</argument>
-                                <argument>-p</argument>
-                                <argument>target/jmods</argument>
-                                <argument>--java-options</argument>
-                                <argument>-Dfile.encoding=UTF-8 --enable-preview</argument>
-                                <argument>--icon</argument>
-                                <argument>icons/icons.icns</argument>
-                                <argument>--name</argument>
-                                <argument>Password Manager</argument>
-                                <argument>--app-version</argument>
-                                <argument>${project.version}</argument>
-                                <argument>--vendor</argument>
-                                <argument>panteleyev.org</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
