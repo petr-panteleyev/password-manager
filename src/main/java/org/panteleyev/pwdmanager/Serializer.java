@@ -1,9 +1,8 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
@@ -138,9 +137,9 @@ class Serializer {
             uuid = UUID.randomUUID().toString();
         }
         var name = element.getAttribute(NAME_ATTR);
-        long modified = Long.valueOf(element.getAttribute(MODIFIED_ATTR));
+        var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
         var text = element.getTextContent();
-        boolean favorite = Boolean.valueOf(element.getAttribute(FAVORITE_ATTR));
+        var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
 
         return Card.newNote(uuid, modified, name, text, favorite);
     }
@@ -173,8 +172,8 @@ class Serializer {
         }
         var name = element.getAttribute(NAME_ATTR);
         var picture = Picture.valueOf(element.getAttribute(PICTURE_ATTR));
-        long modified = Long.valueOf(element.getAttribute(MODIFIED_ATTR));
-        boolean favorite = Boolean.valueOf(element.getAttribute(FAVORITE_ATTR));
+        var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
+        var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
 
         // fields
         var fList = element.getElementsByTagName(FIELD);

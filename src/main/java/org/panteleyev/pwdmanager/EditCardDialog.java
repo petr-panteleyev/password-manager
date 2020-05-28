@@ -1,9 +1,8 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,13 +23,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
@@ -64,20 +64,20 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         cardContentView.setContextMenu(createContextMenu());
         cardContentView.setEditable(true);
 
-        var grid1 = new GridPane();
-        grid1.getStyleClass().add(GRID_PANE);
-        grid1.addRow(0, newLabel(RB, "label.FieldName"), fieldNameEdit);
-        grid1.addRow(1, newLabel(RB, "label.FieldType"), fieldTypeCombo);
+        var grid1 = newGridPane(GRID_PANE,
+            List.of(newLabel(RB, "label.FieldName"), fieldNameEdit),
+            List.of(newLabel(RB, "label.FieldType"), fieldTypeCombo)
+        );
 
         var pane = new BorderPane(cardContentView, null, null, grid1, null);
         BorderPane.setAlignment(grid1, Pos.CENTER);
         BorderPane.setMargin(grid1, new Insets(5, 0, 0, 0));
 
-        var grid3 = new GridPane();
-        grid3.getStyleClass().add(GRID_PANE);
+        var grid3 = newGridPane(GRID_PANE,
+            List.of(newLabel(RB, "label.Name"), cardNameEdit),
+            List.of(newLabel(RB, "label.Icon"), pictureList)
+        );
         grid3.setPadding(new Insets(5, 5, 5, 5));
-        grid3.addRow(0, newLabel(RB, "label.Name"), cardNameEdit);
-        grid3.addRow(1, newLabel(RB, "label.Icon"), pictureList);
         cardNameEdit.setPrefColumnCount(30);
 
         var noteEditor = new TextArea();

@@ -1,9 +1,8 @@
-package org.panteleyev.crypto;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.crypto;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -58,8 +57,8 @@ class AESImpl implements AES {
         return IMPLS.computeIfAbsent(keyGen, k -> new AESImpl(keyGen));
     }
 
-    private static byte[] generateIV(int len) {
-        var res = new byte[len];
+    private static byte[] generateIV() {
+        var res = new byte[IV_LENGTH];
         var sr = new SecureRandom();
         sr.nextBytes(res);
         return res;
@@ -72,7 +71,7 @@ class AESImpl implements AES {
     @Override
     public byte[] encrypt(byte[] src, String password) {
         try {
-            var iv = generateIV(IV_LENGTH);
+            var iv = generateIV();
             var cipher = getCipher(Cipher.ENCRYPT_MODE, password, iv);
             var encrypted = cipher.doFinal(src);
             var res = Arrays.copyOf(iv, iv.length + encrypted.length);
@@ -102,7 +101,7 @@ class AESImpl implements AES {
         try {
             var c = getCipher(Cipher.DECRYPT_MODE, password, Arrays.copyOf(bytes, IV_LENGTH));
             return c.doFinal(bytes, IV_LENGTH, bytes.length - IV_LENGTH);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(CLASS_NAME).log(Level.SEVERE, null, ex);
             return null;
         }
@@ -120,7 +119,7 @@ class AESImpl implements AES {
             throw new IllegalArgumentException("CipherInputStream must be used directly");
         }
 
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (var out = new ByteArrayOutputStream()) {
             try (var cin = getInputStream(in, password)) {
                 var buf = new byte[FILE_BUF_SIZE];
                 int nRead;
@@ -157,7 +156,7 @@ class AESImpl implements AES {
     @Override
     public OutputStream getOutputStream(OutputStream out, String password) throws IOException {
         try {
-            var iv = generateIV(IV_LENGTH);
+            var iv = generateIV();
             var cipher = getCipher(Cipher.ENCRYPT_MODE, password, iv);
             out.write(iv);
             return new CipherOutputStream(out, cipher);

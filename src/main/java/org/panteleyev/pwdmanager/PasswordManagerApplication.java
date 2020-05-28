@@ -1,9 +1,8 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -23,8 +22,6 @@ public class PasswordManagerApplication extends Application {
 
     private static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
 
-    private static PasswordManagerApplication application;
-
     public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
     public static void main(String[] args) {
@@ -33,10 +30,8 @@ public class PasswordManagerApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        application = this;
-
         if (initLogDirectory()) {
-            String formatProperty = System.getProperty(FORMAT_PROP);
+            var formatProperty = System.getProperty(FORMAT_PROP);
             if (formatProperty == null) {
                 System.setProperty(FORMAT_PROP, FORMAT);
             }
@@ -50,10 +45,6 @@ public class PasswordManagerApplication extends Application {
 
         new MainWindowController(stage);
         stage.show();
-    }
-
-    static PasswordManagerApplication getApplication() {
-        return application;
     }
 
     private static boolean initLogDirectory() {

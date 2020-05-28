@@ -1,9 +1,8 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -34,6 +33,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.comparators.ByFavorite;
@@ -84,7 +84,7 @@ class MainWindowController extends Controller implements Styles {
     private final BorderPane leftPane = new BorderPane(cardListView);
     private final TitledPane treeViewPane = new TitledPane("", leftPane);
 
-    private final TextField searchTextField = newSearchField(this::doSearch);
+    private final TextField searchTextField = newSearchField(TextFields::createClearableTextField, this::doSearch);
 
     private final Label cardContentTitleLabel = new Label();
     private final Button cardEditButton = newButton(RB, "button.edit", a -> onEditCard());
@@ -217,8 +217,7 @@ class MainWindowController extends Controller implements Styles {
         BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
 
         // Cmd parameter overrides stored file but does not overwrite the setting.
-        var params = PasswordManagerApplication.getApplication().getParameters();
-        var fileName = params.getNamed().get("file");
+        var fileName = System.getProperty("password.file");
         if (fileName != null && !fileName.isEmpty()) {
             loadDocument(new File(fileName), false);
         } else {
@@ -370,14 +369,8 @@ class MainWindowController extends Controller implements Styles {
     private void onEditCard() {
         getSelectedItem().ifPresent(card -> {
             switch (card.cardClass()) {
-                case CARD:
-                    new EditCardDialog(card)
-                        .showAndWait().ifPresent(this::processEditedRecord);
-                    break;
-                case NOTE:
-                    new EditNoteDialog(card)
-                        .showAndWait().ifPresent(this::processEditedRecord);
-                    break;
+                case CARD -> new EditCardDialog(card).showAndWait().ifPresent(this::processEditedRecord);
+                case NOTE -> new EditNoteDialog(card).showAndWait().ifPresent(this::processEditedRecord);
             }
         });
     }

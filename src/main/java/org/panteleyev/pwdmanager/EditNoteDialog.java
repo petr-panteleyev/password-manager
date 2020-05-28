@@ -1,9 +1,8 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -20,6 +19,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
@@ -27,6 +27,8 @@ import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditNoteDialog extends BaseDialog<Card> {
+    private final ValidationSupport validation = new ValidationSupport();
+
     private final TextField nameEdit = new TextField();
     private final TextArea noteEdit = new TextArea();
 

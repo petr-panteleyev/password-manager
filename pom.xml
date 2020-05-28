@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) Petr Panteleyev. All rights reserved.
+  Licensed under the BSD license. See LICENSE file in the project root for full license information.
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>20.2.2</version>
+    <version>20.2.3</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -15,7 +19,8 @@
         <maven.compiler.target>14</maven.compiler.target>
         <!-- Dependencies -->
         <javaFxVersion>14.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.2.1</javaFxHelpersVersion>
+        <javaFxHelpersVersion>1.3.1</javaFxHelpersVersion>
+        <controlsFxVersion>11.0.1</controlsFxVersion>
         <testngVersion>6.14.3</testngVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
@@ -62,6 +67,11 @@
             <groupId>org.panteleyev</groupId>
             <artifactId>java-fx-helpers</artifactId>
             <version>${javaFxHelpersVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>${controlsFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -194,11 +204,30 @@
                 <version>${javaFxPluginVersion}</version>
                 <configuration>
                     <mainClass>${appModule}/${appMainClass}</mainClass>
-                    <options>
-                        <option>--enable-preview</option>
-                        <option>-Dfile.encoding=UTF-8</option>
-                    </options>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <configuration>
+                            <options>
+                                <option>--enable-preview</option>
+                                <option>-Dfile.encoding=UTF-8</option>
+                                <option>-Dpassword.file=${password.file}</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>--enable-preview</option>
+                                <option>-Dfile.encoding=UTF-8</option>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
+                                <option>-Dpassword.file=${password.file}</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
