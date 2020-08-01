@@ -28,6 +28,7 @@ class AboutDialog extends BaseDialog<Object> implements Styles {
             List.of(colSpan(l0, 2)),
             List.of(colSpan(new Label("Copyright (c) 2016, 2020, Petr Panteleyev"), 2)),
             List.of(new Label("Version:"), newLabel(BUILD_INFO, "version")),
+            List.of(new Label("Build:"), newLabel(BUILD_INFO, "timestamp")),
             List.of(new Label("Encryption:"), new Label("256-bit AES"))
         );
 

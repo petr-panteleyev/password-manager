@@ -8,6 +8,7 @@ package org.panteleyev.pwdmanager;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
+import org.panteleyev.pwdmanager.model.FieldType;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.util.List;

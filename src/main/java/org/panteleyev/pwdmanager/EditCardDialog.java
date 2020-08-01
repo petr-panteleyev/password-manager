@@ -25,6 +25,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.FieldType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

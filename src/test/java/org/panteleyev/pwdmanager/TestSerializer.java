@@ -7,6 +7,7 @@ package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
+import org.panteleyev.pwdmanager.model.FieldType;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;

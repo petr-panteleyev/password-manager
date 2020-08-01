@@ -41,6 +41,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ```shell script
 $ mvn javafx:run
 ```
+To open specific file add ```-Dpassword.file=<file>``` to the command line.
 
 ### Binary Packages
 

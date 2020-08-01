@@ -1,14 +1,14 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.panteleyev.pwdmanager.model.Field;
+import org.panteleyev.pwdmanager.model.FieldType;
 
 class EditableField {
     private final SimpleObjectProperty<FieldType> type = new SimpleObjectProperty<>();

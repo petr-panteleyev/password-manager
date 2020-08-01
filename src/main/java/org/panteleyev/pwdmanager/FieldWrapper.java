@@ -1,11 +1,11 @@
+/*
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ */
 package org.panteleyev.pwdmanager;
 
-/*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
- */
-
 import org.panteleyev.pwdmanager.model.Field;
+import org.panteleyev.pwdmanager.model.FieldType;
 
 final class FieldWrapper {
     private final Field field;

@@ -6,6 +6,7 @@ package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
+import org.panteleyev.pwdmanager.model.FieldType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -158,7 +159,7 @@ class Serializer {
                         default -> null;
                     };
                     if (record != null) {
-                        list.add(record);
+                        list.add((Card) record);
                     }
                 }
             }
