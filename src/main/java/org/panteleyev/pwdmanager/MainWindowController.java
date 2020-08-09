@@ -15,11 +15,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
@@ -27,9 +29,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -63,6 +62,15 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.MenuFactory.newMenuBar;
 import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
 
 class MainWindowController extends Controller implements Styles {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
@@ -106,26 +114,36 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private MenuBar createMainMenu() {
+        var pasteMenuItem = newMenuItem(RB, "menu.edit.paste", SHORTCUT_V, a -> onCardPaste());
+        var favoriteMenuItem = newCheckMenuItem(RB, "menu.edit.favorite", false, SHORTCUT_I,
+            a -> onFavorite());
+
+        var editMenu = newMenu(RB, "menu.edit",
+            newMenuItem(RB, "menu.edit.newCard", SHORTCUT_D, a -> onNewCard(),
+                currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+            newMenuItem(RB, "menu.edit.newNote", SHORTCUT_T, a -> onNewNote(),
+                currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.Edit.Filter", SHORTCUT_F, a -> onFilter()),
+            new SeparatorMenuItem(),
+            favoriteMenuItem,
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.edit.copy", SHORTCUT_C, a -> onCardCopy()),
+            pasteMenuItem,
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.edit.delete", SHIFT_DELETE, a -> onDeleteRecord(), currentFile.isNull())
+        );
+        editMenu.setOnShowing(e -> setupEditMenuItems(favoriteMenuItem, pasteMenuItem));
+
         return newMenuBar(
             newMenu(RB, "menu.file",
-                newMenuItem(RB, "menu.file.new",
-                    new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), a -> onNewFile()),
-                newMenuItem(RB, "menu.file.open",
-                    new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN), a -> onOpenFile()),
+                newMenuItem(RB, "menu.file.new", SHORTCUT_N, a -> onNewFile()),
+                newMenuItem(RB, "menu.file.open", SHORTCUT_O, a -> onOpenFile()),
                 new SeparatorMenuItem(),
                 newMenuItem(RB, "menu.file.exit", a -> onExit())
             ),
             // Edit
-            newMenu(RB, "menu.edit",
-                newMenuItem(RB, "menu.edit.newCard", a -> onNewCard(),
-                    currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
-                newMenuItem(RB, "menu.edit.newNote", a -> onNewNote(),
-                    currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
-                new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.Edit.Filter",
-                    new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN), a -> onFilter()),
-                new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.edit.delete", a -> onDeleteRecord(), currentFile.isNull())),
+            editMenu,
             // Tools
             newMenu(RB, "menu.tools",
                 newMenuItem(RB, "menu.tools.import", a -> onImportFile()),
@@ -180,32 +198,33 @@ class MainWindowController extends Controller implements Styles {
             newMenuItem(RB, "menu.edit.newNote", a -> onNewNote(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.edit.delete", new KeyCodeCombination(KeyCode.DELETE), a -> onDeleteRecord(),
+            newMenuItem(RB, "menu.edit.delete", a -> onDeleteRecord(),
                 currentFile.isNull()),
             new SeparatorMenuItem(),
             newMenuItem(RB, "menu.edit.copy", a -> onCardCopy()),
             ctxCardPasteMenuItem
         );
 
-        menu.setOnShowing(e -> {
-            var pasteEnable = false;
-
-            var cb = Clipboard.getSystemClipboard();
-            var targetItem = getSelectedItem();
-
-            ctxFavoriteMenuItem.setDisable(targetItem.isEmpty());
-            ctxFavoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().favorite());
-
-            if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
-                var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
-                var sourceItem = findRecordById(sourceId);
-                pasteEnable = sourceItem.isPresent();
-            }
-
-            ctxCardPasteMenuItem.setDisable(!pasteEnable);
-        });
-
+        menu.setOnShowing(e -> setupEditMenuItems(ctxFavoriteMenuItem, ctxCardPasteMenuItem));
         return menu;
+    }
+
+    private void setupEditMenuItems(CheckMenuItem favoriteMenuItem, MenuItem pasteMenuItem) {
+        var pasteEnable = false;
+
+        var cb = Clipboard.getSystemClipboard();
+        var targetItem = getSelectedItem();
+
+        favoriteMenuItem.setDisable(targetItem.isEmpty());
+        favoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().favorite());
+
+        if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
+            var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
+            var sourceItem = findRecordById(sourceId);
+            pasteEnable = sourceItem.isPresent();
+        }
+
+        pasteMenuItem.setDisable(!pasteEnable);
     }
 
     private void initialize() {
