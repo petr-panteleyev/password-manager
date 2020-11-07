@@ -1,9 +1,8 @@
-package org.panteleyev.pwdmanager.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager.model;
 
 import javafx.scene.input.DataFormat;
 import org.panteleyev.pwdmanager.Picture;
@@ -51,9 +50,8 @@ public record Card(CardClass cardClass, String uuid, long modified,
     }
 
     public Card {
-        this.fields = new ArrayList<>();
         if (fields != null) {
-            this.fields.addAll(fields);
+            fields = new ArrayList<>(fields);
         }
     }
 

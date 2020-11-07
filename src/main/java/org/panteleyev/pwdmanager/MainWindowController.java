@@ -55,12 +55,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newSearchField;
-import static org.panteleyev.fx.MenuFactory.newCheckMenuItem;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
@@ -95,7 +96,7 @@ class MainWindowController extends Controller implements Styles {
     private final TextField searchTextField = newSearchField(TextFields::createClearableTextField, this::doSearch);
 
     private final Label cardContentTitleLabel = new Label();
-    private final Button cardEditButton = newButton(RB, "button.edit", a -> onEditCard());
+    private final Button cardEditButton = button(fxString(RB, "button.edit"), a -> onEditCard());
     private final BorderPane recordViewPane = new BorderPane();
 
     private final NoteViewer noteViewer = new NoteViewer();
@@ -114,47 +115,47 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private MenuBar createMainMenu() {
-        var pasteMenuItem = newMenuItem(RB, "menu.edit.paste", SHORTCUT_V, a -> onCardPaste());
-        var favoriteMenuItem = newCheckMenuItem(RB, "menu.edit.favorite", false, SHORTCUT_I,
+        var pasteMenuItem = menuItem(fxString(RB, "menu.edit.paste"), SHORTCUT_V, a -> onCardPaste());
+        var favoriteMenuItem = checkMenuItem(fxString(RB, "menu.edit.favorite"), false, SHORTCUT_I,
             a -> onFavorite());
 
-        var editMenu = newMenu(RB, "menu.edit",
-            newMenuItem(RB, "menu.edit.newCard", SHORTCUT_D, a -> onNewCard(),
+        var editMenu = newMenu(fxString(RB, "menu.edit"),
+            menuItem(fxString(RB, "menu.edit.newCard"), SHORTCUT_D, a -> onNewCard(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
-            newMenuItem(RB, "menu.edit.newNote", SHORTCUT_T, a -> onNewNote(),
+            menuItem(fxString(RB, "menu.edit.newNote"), SHORTCUT_T, a -> onNewNote(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.Edit.Filter", SHORTCUT_F, a -> onFilter()),
+            menuItem(fxString(RB, "menu.Edit.Filter"), SHORTCUT_F, a -> onFilter()),
             new SeparatorMenuItem(),
             favoriteMenuItem,
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.edit.copy", SHORTCUT_C, a -> onCardCopy()),
+            menuItem(fxString(RB, "menu.edit.copy"), SHORTCUT_C, a -> onCardCopy()),
             pasteMenuItem,
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.edit.delete", SHIFT_DELETE, a -> onDeleteRecord(), currentFile.isNull())
+            menuItem(fxString(RB, "menu.edit.delete"), SHIFT_DELETE, a -> onDeleteRecord(), currentFile.isNull())
         );
         editMenu.setOnShowing(e -> setupEditMenuItems(favoriteMenuItem, pasteMenuItem));
 
-        return newMenuBar(
-            newMenu(RB, "menu.file",
-                newMenuItem(RB, "menu.file.new", SHORTCUT_N, a -> onNewFile()),
-                newMenuItem(RB, "menu.file.open", SHORTCUT_O, a -> onOpenFile()),
+        return menuBar(
+            newMenu(fxString(RB, "menu.file"),
+                menuItem(fxString(RB, "menu.file.new"), SHORTCUT_N, a -> onNewFile()),
+                menuItem(fxString(RB, "menu.file.open"), SHORTCUT_O, a -> onOpenFile()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.file.exit", a -> onExit())
+                menuItem(fxString(RB, "menu.file.exit"), a -> onExit())
             ),
             // Edit
             editMenu,
             // Tools
-            newMenu(RB, "menu.tools",
-                newMenuItem(RB, "menu.tools.import", a -> onImportFile()),
-                newMenuItem(RB, "menu.tools.export", a -> onExportFile(), currentFile.isNull()),
+            newMenu(fxString(RB, "menu.tools"),
+                menuItem(fxString(RB, "menu.tools.import"), a -> onImportFile()),
+                menuItem(fxString(RB, "menu.tools.export"), a -> onExportFile(), currentFile.isNull()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.tools.changePassword",
+                menuItem(fxString(RB, "menu.tools.changePassword"),
                     a -> onChangePassword(), currentFile.isNull())
             ),
             // Help
-            newMenu(RB, "menu.help",
-                newMenuItem(RB, "menu.help.about", a -> onAbout()))
+            newMenu(fxString(RB, "menu.help"),
+                menuItem(fxString(RB, "menu.help.about"), a -> onAbout()))
         );
     }
 
@@ -186,22 +187,22 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private ContextMenu createContextMenu() {
-        var ctxCardPasteMenuItem = newMenuItem(RB, "menu.edit.paste", a -> onCardPaste());
-        var ctxFavoriteMenuItem = newCheckMenuItem(RB, "menu.edit.favorite", false,
+        var ctxCardPasteMenuItem = menuItem(fxString(RB, "menu.edit.paste"), a -> onCardPaste());
+        var ctxFavoriteMenuItem = checkMenuItem(fxString(RB, "menu.edit.favorite"), false,
             a -> onFavorite());
 
         var menu = new ContextMenu(
             ctxFavoriteMenuItem,
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.edit.newCard", a -> onNewCard(),
+            menuItem(fxString(RB, "menu.edit.newCard"), a -> onNewCard(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
-            newMenuItem(RB, "menu.edit.newNote", a -> onNewNote(),
+            menuItem(fxString(RB, "menu.edit.newNote"), a -> onNewNote(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.edit.delete", a -> onDeleteRecord(),
+            menuItem(fxString(RB, "menu.edit.delete"), a -> onDeleteRecord(),
                 currentFile.isNull()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.edit.copy", a -> onCardCopy()),
+            menuItem(fxString(RB, "menu.edit.copy"), a -> onCardCopy()),
             ctxCardPasteMenuItem
         );
 

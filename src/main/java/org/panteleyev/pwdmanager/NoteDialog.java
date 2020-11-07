@@ -8,14 +8,15 @@ import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.List;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class NoteDialog extends BaseDialog<Card> implements Styles {
@@ -28,8 +29,9 @@ class NoteDialog extends BaseDialog<Card> implements Styles {
 
         setTitle(RB.getString("noteDialog.title"));
 
-        var grid = newGridPane(GRID_PANE,
-            List.of(newLabel(RB, "label.Name"), nameEdit)
+        var grid = gridPane(
+            List.of(gridRow(label(fxString(RB, "label.Name")), nameEdit)),
+            b -> b.withStyle(Styles.GRID_PANE)
         );
 
         getDialogPane().setContent(grid);

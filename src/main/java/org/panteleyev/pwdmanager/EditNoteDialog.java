@@ -23,7 +23,8 @@ import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditNoteDialog extends BaseDialog<Card> {
@@ -47,7 +48,7 @@ class EditNoteDialog extends BaseDialog<Card> {
     private void initialize() {
         setTitle(RB.getString("editNoteDialog.title"));
 
-        var box = new HBox(5, newLabel(RB, "label.Name"), nameEdit);
+        var box = new HBox(5, label(fxString(RB, "label.Name")), nameEdit);
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 0, 5, 0));
         nameEdit.setPrefColumnCount(25);

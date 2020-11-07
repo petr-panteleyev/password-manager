@@ -27,7 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class CardViewer extends BorderPane implements Styles {
@@ -36,7 +37,7 @@ class CardViewer extends BorderPane implements Styles {
     private static final String MASK = "*****";
 
     private final GridPane grid = new GridPane();
-    private final Label noteLabel = newLabel(RB, "label.notesNoSemicolon",
+    private final Label noteLabel = label(fxString(RB, "label.notesNoSemicolon"),
         new ImageView(Picture.NOTE.getImage()));
     private final Label noteViewer = new Label();
 

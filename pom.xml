@@ -8,21 +8,21 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>20.2.4</version>
+    <version>20.2.5</version>
     <packaging>jar</packaging>
 
     <properties>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>14</maven.compiler.source>
-        <maven.compiler.target>14</maven.compiler.target>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <!-- Dependencies -->
-        <javaFxVersion>14.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.3.1</javaFxHelpersVersion>
-        <controlsFxVersion>11.0.2</controlsFxVersion>
+        <javaFxVersion>15</javaFxVersion>
+        <javaFxHelpersVersion>1.6.2</javaFxHelpersVersion>
+        <controlsFxVersion>11.0.3</controlsFxVersion>
         <testngVersion>6.14.3</testngVersion>
         <!-- Plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
@@ -31,7 +31,7 @@
         <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>0.0.1</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.2.1</jpackageMavenPluginVersion>
     </properties>
 
     <dependencies>
@@ -106,7 +106,7 @@
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>14</version>
+                            <version>${maven.compiler.source}</version>
                         </jdk>
                     </toolchains>
                 </configuration>

@@ -14,8 +14,10 @@ import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.List;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 abstract class RecordDialog extends BaseDialog<Card> implements Styles {
@@ -24,17 +26,19 @@ abstract class RecordDialog extends BaseDialog<Card> implements Styles {
     private final TextField nameEdit = new TextField();
     private final ComboBox<RecordType> typeList = new ComboBox<>();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
-    private final Label typeLabel = newLabel(RB, "label.type");
+    private final Label typeLabel = label(fxString(RB, "label.type"));
 
     RecordDialog() {
         super(MainWindowController.CSS_PATH);
 
         nameEdit.setPrefColumnCount(25);
 
-        getDialogPane().setContent(newGridPane(GRID_PANE,
-            List.of(newLabel(RB, "label.Name"), nameEdit),
-            List.of(typeLabel, typeList),
-            List.of(newLabel(RB, "label.Icon"), pictureList)
+        getDialogPane().setContent(gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "label.Name")), nameEdit),
+                gridRow(typeLabel, typeList),
+                gridRow(label(fxString(RB, "label.Icon")), pictureList)
+            ), b -> b.withStyle(Styles.GRID_PANE)
         ));
     }
 

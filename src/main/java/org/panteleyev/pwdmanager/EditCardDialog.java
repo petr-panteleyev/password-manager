@@ -31,9 +31,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newTab;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class EditCardDialog extends BaseDialog<Card> implements Styles {
@@ -61,22 +63,26 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         fieldValueColumn.setSortable(false);
         fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
 
-        cardContentView.getColumns().setAll(fieldNameColumn, fieldValueColumn);
+        cardContentView.getColumns().setAll(List.of(fieldNameColumn, fieldValueColumn));
         cardContentView.setContextMenu(createContextMenu());
         cardContentView.setEditable(true);
 
-        var grid1 = newGridPane(GRID_PANE,
-            List.of(newLabel(RB, "label.FieldName"), fieldNameEdit),
-            List.of(newLabel(RB, "label.FieldType"), fieldTypeCombo)
+        var grid1 = gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "label.FieldName")), fieldNameEdit),
+                gridRow(label(fxString(RB, "label.FieldType")), fieldTypeCombo)
+            ), b -> b.withStyle(Styles.GRID_PANE)
         );
 
         var pane = new BorderPane(cardContentView, null, null, grid1, null);
         BorderPane.setAlignment(grid1, Pos.CENTER);
         BorderPane.setMargin(grid1, new Insets(5, 0, 0, 0));
 
-        var grid3 = newGridPane(GRID_PANE,
-            List.of(newLabel(RB, "label.Name"), cardNameEdit),
-            List.of(newLabel(RB, "label.Icon"), pictureList)
+        var grid3 = gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "label.Name")), cardNameEdit),
+                gridRow(label(fxString(RB, "label.Icon")), pictureList)
+            ), b -> b.withStyle(Styles.GRID_PANE)
         );
         grid3.setPadding(new Insets(5, 5, 5, 5));
         cardNameEdit.setPrefColumnCount(30);
@@ -134,15 +140,15 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-            newMenuItem(RB, "editCardDialog.menu.addField",
+            menuItem(fxString(RB, "editCardDialog.menu.addField"),
                 new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), a -> onNewField()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "editCardDialog.menu.deleteField",
+            menuItem(fxString(RB, "editCardDialog.menu.deleteField"),
                 new KeyCodeCombination(KeyCode.DELETE), a -> onDeleteField()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.item.up",
+            menuItem(fxString(RB, "menu.item.up"),
                 new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN), a -> onFieldUp()),
-            newMenuItem(RB, "menu.item.down",
+            menuItem(fxString(RB, "menu.item.down"),
                 new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), a -> onFieldDown())
         );
     }

@@ -7,7 +7,6 @@ package org.panteleyev.pwdmanager;
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
@@ -17,8 +16,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
 
 class PasswordDialog extends BaseDialog<String> implements Styles {
@@ -34,10 +35,12 @@ class PasswordDialog extends BaseDialog<String> implements Styles {
 
         passwordEdit.setPrefColumnCount(32);
 
-        getDialogPane().setContent(newGridPane(GRID_PANE,
-            List.of(newLabel(RB, "label.File"), new Label(file.getAbsolutePath())),
-            List.of(newLabel(RB, "label.Password"), passwordEdit),
-            change ? List.of(newLabel(RB, "label.Repeat"), passwordEdit2) : List.of()
+        getDialogPane().setContent(gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "label.File")), label(file.getAbsolutePath())),
+                gridRow(label(fxString(RB, "label.Password")), passwordEdit),
+                change ? gridRow(label(fxString(RB, "label.Repeat")), passwordEdit2) : gridRow()
+            ), b -> b.withStyle(Styles.GRID_PANE)
         ));
 
         createDefaultButtons(RB);
