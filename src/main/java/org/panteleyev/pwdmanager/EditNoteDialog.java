@@ -25,7 +25,7 @@ import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
 
 class EditNoteDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();

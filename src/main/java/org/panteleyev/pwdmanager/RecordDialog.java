@@ -18,9 +18,10 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 
-abstract class RecordDialog extends BaseDialog<Card> implements Styles {
+abstract class RecordDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField nameEdit = new TextField();
@@ -38,7 +39,7 @@ abstract class RecordDialog extends BaseDialog<Card> implements Styles {
                 gridRow(label(fxString(RB, "label.Name")), nameEdit),
                 gridRow(typeLabel, typeList),
                 gridRow(label(fxString(RB, "label.Icon")), pictureList)
-            ), b -> b.withStyle(Styles.GRID_PANE)
+            ), b -> b.withStyle(STYLE_GRID_PANE)
         ));
     }
 

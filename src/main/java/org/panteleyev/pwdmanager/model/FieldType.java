@@ -4,26 +4,38 @@
  */
 package org.panteleyev.pwdmanager.model;
 
-import java.util.ResourceBundle;
+import static org.panteleyev.pwdmanager.Constants.FIELD_TYPE_BUNDLE;
 
 public enum FieldType {
     STRING,
-    HIDDEN,
+    HIDDEN(true),
     EMAIL,
     CREDIT_CARD_NUMBER,
-    LINK;
-
-    private static final String BUNDLE = "org.panteleyev.pwdmanager.FieldType";
+    LINK,
+    PIN(true),
+    UNIX_PASSWORD(true),
+    SHORT_PASSWORD(true),
+    LONG_PASSWORD(true);
 
     private final String name;
+    private final boolean masked;
 
     FieldType() {
-        var bundle = ResourceBundle.getBundle(BUNDLE);
-        this.name = bundle.getString(name());
+        this.name = FIELD_TYPE_BUNDLE.getString(name());
+        this.masked = false;
+    }
+
+    FieldType(boolean masked) {
+        this.name = FIELD_TYPE_BUNDLE.getString(name());
+        this.masked = masked;
     }
 
     @Override
     public String toString() {
         return name;
+    }
+
+    public boolean isMasked() {
+        return masked;
     }
 }

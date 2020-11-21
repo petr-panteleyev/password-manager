@@ -1,15 +1,14 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import org.panteleyev.pwdmanager.model.Card;
 import java.util.Objects;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
 
 class CardDialog extends RecordDialog {
     private final RecordType defaultType;
@@ -45,9 +44,9 @@ class CardDialog extends RecordDialog {
             if (b == ButtonType.OK) {
                 var type = getTypeList().getSelectionModel().getSelectedItem();
                 return Card.newCard(
-                        getNameEdit().getText(),
-                        getPictureList().getSelectionModel().getSelectedItem(),
-                        type.getFieldSet()
+                    getNameEdit().getText(),
+                    getPictureList().getSelectionModel().getSelectedItem(),
+                    type.getFieldSet()
                 );
             } else {
                 return null;

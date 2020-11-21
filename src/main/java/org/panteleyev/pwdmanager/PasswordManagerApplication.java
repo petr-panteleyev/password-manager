@@ -7,12 +7,13 @@ package org.panteleyev.pwdmanager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.io.File;
-import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 
 public class PasswordManagerApplication extends Application {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
@@ -20,9 +21,7 @@ public class PasswordManagerApplication extends Application {
     private static final String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
     private static final String OPTIONS_DIRECTORY = ".password-manager";
 
-    private static final String UI_BUNDLE_PATH = "org.panteleyev.pwdmanager.ui";
-
-    public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
+    private static final String ICON_PATH = "org/panteleyev/pwdmanager/icon.png";
 
     public static void main(String[] args) {
         launch(args);
@@ -41,7 +40,8 @@ public class PasswordManagerApplication extends Application {
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 
-        stage.setTitle(AboutDialog.APP_TITLE);
+        stage.setTitle(APP_TITLE);
+        stage.getIcons().add(new Image(ICON_PATH));
 
         new MainWindowController(stage);
         stage.show();

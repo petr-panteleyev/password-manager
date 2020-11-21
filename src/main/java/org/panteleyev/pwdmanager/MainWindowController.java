@@ -35,8 +35,6 @@ import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.pwdmanager.comparators.ByFavorite;
-import org.panteleyev.pwdmanager.comparators.ByName;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.filters.RecordNameFilter;
 import org.panteleyev.pwdmanager.model.Card;
@@ -44,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,18 +59,22 @@ import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
-import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
+import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
+import static org.panteleyev.pwdmanager.Constants.COMPARE_CARDS_BY_FAVORITE;
+import static org.panteleyev.pwdmanager.Constants.COMPARE_CARDS_BY_NAME;
+import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.SHIFT_DELETE;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_C;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_D;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_F;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_I;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_N;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_O;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_T;
+import static org.panteleyev.pwdmanager.Constants.SHORTCUT_V;
+import static org.panteleyev.pwdmanager.Constants.STYLE_CARD_CONTENT_TITLE;
 
-class MainWindowController extends Controller implements Styles {
+class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
 
     static final URL CSS_PATH = MainWindowController.class
@@ -105,11 +106,13 @@ class MainWindowController extends Controller implements Styles {
     MainWindowController(Stage stage) {
         super(stage, CSS_PATH.toString());
 
-        sortedList.setComparator(new ByFavorite().thenComparing(new ByName()));
+        sortedList.setComparator(COMPARE_CARDS_BY_FAVORITE.thenComparing(COMPARE_CARDS_BY_NAME));
 
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
         getStage().setOnHiding(event -> onWindowClosing());
+
         Options.loadWindowDimensions(getStage());
+        Options.loadPasswordOptions();
 
         initialize();
     }
@@ -151,7 +154,9 @@ class MainWindowController extends Controller implements Styles {
                 menuItem(fxString(RB, "menu.tools.export"), a -> onExportFile(), currentFile.isNull()),
                 new SeparatorMenuItem(),
                 menuItem(fxString(RB, "menu.tools.changePassword"),
-                    a -> onChangePassword(), currentFile.isNull())
+                    a -> onChangePassword(), currentFile.isNull()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(RB, "Options", "..."), a -> onOptions())
             ),
             // Help
             newMenu(fxString(RB, "menu.help"),
@@ -173,7 +178,7 @@ class MainWindowController extends Controller implements Styles {
 
         BorderPane.setMargin(buttonBar, new Insets(5, 5, 5, 5));
 
-        cardContentTitleLabel.getStyleClass().add(CARD_CONTENT_TITLE);
+        cardContentTitleLabel.getStyleClass().add(STYLE_CARD_CONTENT_TITLE);
         BorderPane.setAlignment(cardContentTitleLabel, Pos.CENTER);
         BorderPane.setAlignment(buttonBar, Pos.CENTER);
 
@@ -271,13 +276,13 @@ class MainWindowController extends Controller implements Styles {
 
     private void onImportFile() {
         var d = new FileChooser();
-        d.setTitle("Open File");
+        d.setTitle(fxString(RB, "Open File"));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
         var file = d.showOpenDialog(null);
         if (file != null && file.exists()) {
-            new PasswordDialog(file, false).showAndWait().ifPresent(password -> {
+            new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
                 try (var in = new FileInputStream(file)) {
                     var list = new ArrayList<Card>();
                     if (!password.isEmpty()) {
@@ -298,13 +303,13 @@ class MainWindowController extends Controller implements Styles {
 
     private void onExportFile() {
         var d = new FileChooser();
-        d.setTitle("Save File");
+        d.setTitle(fxString(RB, "Save File"));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
         var file = d.showSaveDialog(null);
         if (file != null) {
-            new PasswordDialog(file, false)
+            new PasswordDialog(this, file, false)
                 .showAndWait()
                 .ifPresent(password -> writeDocument(file, password));
         }
@@ -396,7 +401,7 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private void onAbout() {
-        new AboutDialog().showAndWait();
+        new AboutDialog(this).showAndWait();
     }
 
     private void putCardToClipboard(Card record) {
@@ -455,21 +460,21 @@ class MainWindowController extends Controller implements Styles {
 
     private void setTitle() {
         if (currentFile.get() == null) {
-            getStage().setTitle(AboutDialog.APP_TITLE);
+            getStage().setTitle(APP_TITLE);
         } else {
-            getStage().setTitle(AboutDialog.APP_TITLE + " -- " + currentFile.get().getAbsolutePath());
+            getStage().setTitle(APP_TITLE + " -- " + currentFile.get().getAbsolutePath());
         }
     }
 
     private void onNewFile() {
         var d = new FileChooser();
-        d.setTitle("New File");
+        d.setTitle(fxString(RB, "New File"));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
         var file = d.showSaveDialog(null);
         if (file != null) {
-            new PasswordDialog(file, true).showAndWait().ifPresent(password -> {
+            new PasswordDialog(this, file, true).showAndWait().ifPresent(password -> {
                 currentPassword = password;
                 recordList.clear();
 
@@ -484,7 +489,7 @@ class MainWindowController extends Controller implements Styles {
 
     private void onOpenFile() {
         var d = new FileChooser();
-        d.setTitle("Open File");
+        d.setTitle(fxString(RB, "Open File"));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
@@ -503,10 +508,10 @@ class MainWindowController extends Controller implements Styles {
             }
             setTitle();
         } else {
-            new PasswordDialog(file, false).showAndWait().ifPresent(password -> {
+            new PasswordDialog(null, file, false).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
-                try (InputStream in = new FileInputStream(file)) {
+                try (var in = new FileInputStream(file)) {
                     var list = new ArrayList<Card>();
                     if (!currentPassword.isEmpty()) {
                         try (var cin = AES.aes256().getInputStream(in, password)) {
@@ -525,9 +530,12 @@ class MainWindowController extends Controller implements Styles {
 
                     setTitle();
                 } catch (Exception ex) {
-                    new Alert(Alert.AlertType.ERROR, "Exception while reading file "
-                        + file.getAbsolutePath()).showAndWait();
-                    LOGGER.log(Level.SEVERE, "Exception while reading file", ex);
+                    var path = file.getAbsolutePath();
+                    var alert = new Alert(Alert.AlertType.ERROR, ex.toString());
+                    alert.setTitle(fxString(RB, "Error"));
+                    alert.setHeaderText(fxString(RB, "Unable to read file", ": ") + path);
+                    alert.showAndWait();
+                    LOGGER.log(Level.SEVERE, "Exception while reading file " + path, ex);
                 }
             });
         }
@@ -573,13 +581,18 @@ class MainWindowController extends Controller implements Styles {
     }
 
     private void onChangePassword() {
-        new PasswordDialog(currentFile.get(), true).showAndWait().ifPresent(password -> {
+        new PasswordDialog(this, currentFile.get(), true).showAndWait().ifPresent(password -> {
             currentPassword = password;
             writeDocument();
         });
     }
 
+    private void onOptions() {
+        new OptionsDialog(this).showAndWait();
+    }
+
     private void onWindowClosing() {
         Options.saveWindowDimensions(getStage());
+        Options.saveOptions();
     }
 }

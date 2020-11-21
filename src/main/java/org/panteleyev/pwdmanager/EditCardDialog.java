@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -24,6 +25,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.generator.Generator;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.FieldType;
 import java.util.ArrayList;
@@ -36,9 +38,10 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 
-class EditCardDialog extends BaseDialog<Card> implements Styles {
+class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;
 
     private final TableView<EditableField> cardContentView = new TableView<>();
@@ -46,6 +49,9 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
     private final ComboBox<FieldType> fieldTypeCombo = new ComboBox<>();
     private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
+
+    private final MenuItem generateMenuItem = menuItem(fxString(RB, "Generate"),
+        new KeyCodeCombination(KeyCode.G, KeyCombination.SHORTCUT_DOWN), a -> onGeneratePassword());
 
     EditCardDialog(Card card) {
         super(MainWindowController.CSS_PATH);
@@ -64,14 +70,23 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
         fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
 
         cardContentView.getColumns().setAll(List.of(fieldNameColumn, fieldValueColumn));
-        cardContentView.setContextMenu(createContextMenu());
+
+        var contextMenu = createContextMenu();
+        contextMenu.setOnShowing(event ->
+            generateMenuItem.setDisable(getSelectedField()
+                .map(EditableField::getType)
+                .flatMap(Options::getPasswordOptions)
+                .isEmpty())
+        );
+
+        cardContentView.setContextMenu(contextMenu);
         cardContentView.setEditable(true);
 
         var grid1 = gridPane(
             List.of(
                 gridRow(label(fxString(RB, "label.FieldName")), fieldNameEdit),
                 gridRow(label(fxString(RB, "label.FieldType")), fieldTypeCombo)
-            ), b -> b.withStyle(Styles.GRID_PANE)
+            ), b -> b.withStyle(STYLE_GRID_PANE)
         );
 
         var pane = new BorderPane(cardContentView, null, null, grid1, null);
@@ -82,7 +97,7 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
             List.of(
                 gridRow(label(fxString(RB, "label.Name")), cardNameEdit),
                 gridRow(label(fxString(RB, "label.Icon")), pictureList)
-            ), b -> b.withStyle(Styles.GRID_PANE)
+            ), b -> b.withStyle(STYLE_GRID_PANE)
         );
         grid3.setPadding(new Insets(5, 5, 5, 5));
         cardNameEdit.setPrefColumnCount(30);
@@ -146,6 +161,8 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
             menuItem(fxString(RB, "editCardDialog.menu.deleteField"),
                 new KeyCodeCombination(KeyCode.DELETE), a -> onDeleteField()),
             new SeparatorMenuItem(),
+            generateMenuItem,
+            new SeparatorMenuItem(),
             menuItem(fxString(RB, "menu.item.up"),
                 new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN), a -> onFieldUp()),
             menuItem(fxString(RB, "menu.item.down"),
@@ -175,6 +192,13 @@ class EditCardDialog extends BaseDialog<Card> implements Styles {
             var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
             alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> editableFields.remove(sel));
         });
+    }
+
+    private void onGeneratePassword() {
+        getSelectedField().ifPresent(sel -> Options.getPasswordOptions(sel.getType()).ifPresent(options -> {
+            var password = new Generator().generate(options);
+            sel.valueProperty().set(password);
+        }));
     }
 
     private void onFieldNameChanged() {

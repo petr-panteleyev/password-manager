@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>20.2.5</version>
+    <version>20.3.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -30,7 +30,7 @@
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
-        <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
+        <javaFxPluginVersion>0.0.5</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.2.1</jpackageMavenPluginVersion>
     </properties>
 
@@ -171,7 +171,6 @@
                     <name>Password Manager</name>
                     <appVersion>${project.version}</appVersion>
                     <vendor>panteleyev.org</vendor>
-                    <runtimeImage>${java.home}</runtimeImage>
                     <module>${appModule}/${appMainClass}</module>
                     <modulePath>target/jmods</modulePath>
                     <destination>target/dist</destination>

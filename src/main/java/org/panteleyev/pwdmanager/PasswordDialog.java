@@ -12,6 +12,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -20,16 +21,17 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 
-class PasswordDialog extends BaseDialog<String> implements Styles {
+class PasswordDialog extends BaseDialog<String> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final PasswordField passwordEdit = new PasswordField();
     private final PasswordField passwordEdit2 = new PasswordField();
 
-    PasswordDialog(File file, boolean change) {
-        super(MainWindowController.CSS_PATH);
+    PasswordDialog(Controller owner, File file, boolean change) {
+        super(owner, MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("passwordDialog.title"));
 
@@ -40,7 +42,7 @@ class PasswordDialog extends BaseDialog<String> implements Styles {
                 gridRow(label(fxString(RB, "label.File")), label(file.getAbsolutePath())),
                 gridRow(label(fxString(RB, "label.Password")), passwordEdit),
                 change ? gridRow(label(fxString(RB, "label.Repeat")), passwordEdit2) : gridRow()
-            ), b -> b.withStyle(Styles.GRID_PANE)
+            ), b -> b.withStyle(STYLE_GRID_PANE)
         ));
 
         createDefaultButtons(RB);

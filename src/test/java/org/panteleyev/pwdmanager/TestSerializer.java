@@ -1,14 +1,12 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -16,6 +14,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.Arrays;
 import java.util.UUID;
+import static org.testng.Assert.assertEquals;
 
 public class TestSerializer {
     private DocumentBuilder docBuilder;
@@ -39,7 +38,7 @@ public class TestSerializer {
 
         var restored = Serializer.deserializeCard(e);
 
-        Assert.assertEquals(restored, card);
+        assertEquals(restored, card);
     }
 
     @DataProvider(name = "testFieldToFromJson")
@@ -58,7 +57,7 @@ public class TestSerializer {
         var e = Serializer.serializeField(doc, field);
         var restored = Serializer.deserializeField(e);
 
-        Assert.assertEquals(restored, field);
+        assertEquals(restored, field);
     }
 
     @Test
@@ -69,6 +68,6 @@ public class TestSerializer {
 
         var e = Serializer.serializeRecord(doc, note);
         var restored = Serializer.deserializeNote(e);
-        Assert.assertEquals(restored, note);
+        assertEquals(restored, note);
     }
 }

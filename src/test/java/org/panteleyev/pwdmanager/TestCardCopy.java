@@ -1,19 +1,19 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotSame;
 
 public class TestCardCopy {
 
@@ -34,10 +34,10 @@ public class TestCardCopy {
     }
 
     @Test(dataProvider = "dataProvider")
-    public void testCloneable(Card record) throws Exception {
+    public void testCloneable(Card record) {
         var copy = new Card(record);
 
-        Assert.assertEquals(copy, record);
-        Assert.assertNotSame(copy, record);
+        assertEquals(copy, record);
+        assertNotSame(copy, record);
     }
 }

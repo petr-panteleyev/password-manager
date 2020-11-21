@@ -29,9 +29,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 
-class CardViewer extends BorderPane implements Styles {
+class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
     private static final double RIGHT_WIDTH = 100.0 - LEFT_WIDTH;
     private static final String MASK = "*****";
@@ -46,7 +47,7 @@ class CardViewer extends BorderPane implements Styles {
     }
 
     private void initialize() {
-        grid.getStyleClass().add(GRID_PANE);
+        grid.getStyleClass().add(STYLE_GRID_PANE);
 
         var col1 = new ColumnConstraints();
         col1.setPercentWidth(LEFT_WIDTH);
@@ -91,7 +92,7 @@ class CardViewer extends BorderPane implements Styles {
                 valueLabel = new Hyperlink(field.getValue());
                 ((Hyperlink) valueLabel).setOnAction(e -> onHyperlinkClick(field.getValue()));
             } else {
-                valueLabel = new Label(field.getType() == FieldType.HIDDEN ? MASK : field.getValue());
+                valueLabel = new Label(field.getType().isMasked() ? MASK : field.getValue());
 
                 valueLabel.setOnMouseClicked(event -> {
                     if (event.getClickCount() > 1) {
@@ -124,7 +125,7 @@ class CardViewer extends BorderPane implements Styles {
     }
 
     private void onContentViewDoubleClick(FieldWrapper field, Labeled label) {
-        if (field.getType() != FieldType.HIDDEN) {
+        if (!field.getType().isMasked()) {
             return;
         }
 

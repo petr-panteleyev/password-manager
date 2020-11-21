@@ -1,9 +1,8 @@
-package org.panteleyev.crypto;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.crypto;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -11,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import static org.testng.Assert.assertEquals;
 
 @Test
 public class TestAES {
@@ -22,8 +22,8 @@ public class TestAES {
         var aes = AES.aes128();
         var enc = aes.encrypt(TEXT, PASSWORD);
         var dec = aes.decrypt(enc, PASSWORD);
-        Assert.assertEquals(new String(dec, StandardCharsets.UTF_8), TEXT, "Decoded text is the same as original");
-        Assert.assertEquals(aes.decryptString(enc, PASSWORD), TEXT, "Decoded text is the same as original");
+        assertEquals(new String(dec, StandardCharsets.UTF_8), TEXT, "Decoded text is the same as original");
+        assertEquals(aes.decryptString(enc, PASSWORD), TEXT, "Decoded text is the same as original");
     }
 
     @Test
@@ -31,8 +31,8 @@ public class TestAES {
         var aes = AES.aes256();
         var enc = aes.encrypt(TEXT, PASSWORD);
         var dec = aes.decrypt(enc, PASSWORD);
-        Assert.assertEquals(new String(dec, StandardCharsets.UTF_8), TEXT, "Decoded text is the same as original");
-        Assert.assertEquals(aes.decryptString(enc, PASSWORD), TEXT, "Decoded text is the same as original");
+        assertEquals(new String(dec, StandardCharsets.UTF_8), TEXT, "Decoded text is the same as original");
+        assertEquals(aes.decryptString(enc, PASSWORD), TEXT, "Decoded text is the same as original");
     }
 
     @Test
@@ -43,7 +43,7 @@ public class TestAES {
 
         try (var in = new ByteArrayInputStream(enc)) {
             var dec = aes.decrypt(in, PASSWORD);
-            Assert.assertEquals(new String(dec, StandardCharsets.UTF_8), TEXT, "Decoded text is the same as original");
+            assertEquals(new String(dec, StandardCharsets.UTF_8), TEXT, "Decoded text is the same as original");
         }
     }
 
@@ -55,7 +55,7 @@ public class TestAES {
             aes.encrypt(TEXT, PASSWORD, out);
 
             var decrypted = aes.decryptString(out.toByteArray(), PASSWORD);
-            Assert.assertEquals(decrypted, TEXT);
+            assertEquals(decrypted, TEXT);
         }
     }
 
@@ -63,11 +63,11 @@ public class TestAES {
     public void testNewInstance() {
         var aes128_1 = AES.aes128();
         var aes128_2 = AES.aes128();
-        Assert.assertEquals(aes128_1, aes128_2);
+        assertEquals(aes128_1, aes128_2);
 
         var aes256_1 = AES.aes256();
         var aes256_2 = AES.aes256();
-        Assert.assertEquals(aes256_1, aes256_2);
+        assertEquals(aes256_1, aes256_2);
 
         Assert.assertNotEquals(aes128_1, aes256_1);
     }
@@ -75,10 +75,10 @@ public class TestAES {
     @Test
     public void testKeyGen() {
         var key128 = AES.generate128key(UUID.randomUUID().toString());
-        Assert.assertEquals(key128.length, 128 / 8);
+        assertEquals(key128.length, 128 / 8);
 
         var key256 = AES.generate256key(UUID.randomUUID().toString());
-        Assert.assertEquals(key256.length, 256 / 8);
+        assertEquals(key256.length, 256 / 8);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class TestAES {
 
             var encrypted = out.toByteArray();
             var decrypted = aes256.decryptString(encrypted, PASSWORD);
-            Assert.assertEquals(decrypted, TEXT);
+            assertEquals(decrypted, TEXT);
         }
     }
 }

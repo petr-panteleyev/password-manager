@@ -17,9 +17,10 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.PasswordManagerApplication.RB;
+import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 
-class NoteDialog extends BaseDialog<Card> implements Styles {
+class NoteDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField nameEdit = new TextField();
@@ -31,7 +32,7 @@ class NoteDialog extends BaseDialog<Card> implements Styles {
 
         var grid = gridPane(
             List.of(gridRow(label(fxString(RB, "label.Name")), nameEdit)),
-            b -> b.withStyle(Styles.GRID_PANE)
+            b -> b.withStyle(STYLE_GRID_PANE)
         );
 
         getDialogPane().setContent(grid);
