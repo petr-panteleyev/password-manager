@@ -13,7 +13,7 @@ import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 
 public enum RecordType {
-    EMPTY(Picture.GENERIC, Collections.EMPTY_LIST),
+    EMPTY(Picture.GENERIC, Collections.emptyList()),
     CREDIT_CARD(Picture.CREDIT_CARD, Arrays.asList(
         new Field(FieldType.STRING, "Card Provider", ""),
         new Field(FieldType.STRING, "Credit Card Type", ""),

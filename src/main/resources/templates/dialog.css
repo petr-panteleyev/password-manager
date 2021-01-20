@@ -1,0 +1,59 @@
+.label {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.button {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.list-cell {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.table-cell {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.tab {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.text-field {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.text-area {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.titled-pane {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize}
+}
+
+.check-box {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${dialogFontSize};
+}
+
+.aboutLabel {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: ${aboutLabelFontSize};
+    -fx-font-weight: bold;
+}
+
+.gridPane {
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+}
+
+.titled-pane {
+    -fx-collapsible: false;
+}

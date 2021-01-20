@@ -21,6 +21,11 @@ public final class Constants {
 
     public static final String APP_TITLE = fxString(RB, "Application Title");
 
+    public static final String ELLIPSIS = "...";
+    public static final String COLON = ":";
+
+    public static final String MASK = "*****";
+
     // Shortcuts
     public static final KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(KeyCode.C, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_D = new KeyCodeCombination(KeyCode.D, SHORTCUT_DOWN);
@@ -38,6 +43,9 @@ public final class Constants {
     public static final String STYLE_GRID_PANE = "gridPane";
     public static final String STYLE_CARD_CONTENT_TITLE = "cardContentTitle";
     public static final String STYLE_ABOUT_LABEL = "aboutLabel";
+    public static final String STYLE_FIELD_NAME = "fieldName";
+    public static final String STYLE_FIELD_VALUE = "fieldValue";
+    public static final String STYLE_FAVORITE = "favorite";
 
     // Comparators
     public static final Comparator<Card> COMPARE_CARDS_BY_NAME = Comparator.comparing(Card::name);

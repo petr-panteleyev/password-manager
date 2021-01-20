@@ -20,6 +20,7 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.RB;
 import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.Options.options;
 
 abstract class RecordDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -30,7 +31,7 @@ abstract class RecordDialog extends BaseDialog<Card> {
     private final Label typeLabel = label(fxString(RB, "label.type"));
 
     RecordDialog() {
-        super(MainWindowController.CSS_PATH);
+        super(options().getDialogCssFileUrl());
 
         nameEdit.setPrefColumnCount(25);
 

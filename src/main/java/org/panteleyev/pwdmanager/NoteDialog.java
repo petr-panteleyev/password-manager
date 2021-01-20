@@ -19,6 +19,7 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.RB;
 import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.Options.options;
 
 class NoteDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -26,7 +27,7 @@ class NoteDialog extends BaseDialog<Card> {
     private final TextField nameEdit = new TextField();
 
     NoteDialog() {
-        super(MainWindowController.CSS_PATH);
+        super(options().getDialogCssFileUrl());
 
         setTitle(RB.getString("noteDialog.title"));
 

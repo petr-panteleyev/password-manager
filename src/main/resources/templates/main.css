@@ -1,0 +1,88 @@
+.label {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+}
+
+.button {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+}
+
+.text-field {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+}
+
+.list-cell {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+}
+
+.check-box {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+}
+
+.hyperlink {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+    -fx-text-fill: ${hyperLinkColor};
+}
+
+.menu {
+    -fx-font-family: "${menuFontFamily}";
+    -fx-font-size: ${menuFontSize};
+}
+
+.menu .label {
+    -fx-font-family: "${menuFontFamily}";
+    -fx-font-size: ${menuFontSize};
+}
+
+.noteLabel {
+    -fx-padding: 15 5 0 5;
+}
+
+.noteViewer {
+    -fx-padding: 5 5 5 5;
+}
+
+.whiteBackground {
+    -fx-background: rgb(255,255,255);
+}
+
+.webLink {
+    -fx-text-fill: #6666ff;
+}
+
+.fieldName {
+    -fx-text-fill: ${fieldNameColor};
+}
+
+.fieldValue {
+    -fx-text-fill: ${fieldValueColor};
+}
+
+.gridPane {
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+}
+
+.titled-pane {
+    -fx-collapsible: false;
+}
+
+.cardContentTitle {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: 36;
+}
+
+.favorite {
+    -fx-text-fill: ${favoriteColor};
+    -fx-control-inner-background: ${favoriteBackground};
+    -fx-control-inner-background-alt: ${favoriteBackground};
+}
+
+.favorite:selected {
+    -fx-text-fill: -fx-selection-bar-text;
+}

@@ -73,12 +73,10 @@ import static org.panteleyev.pwdmanager.Constants.SHORTCUT_O;
 import static org.panteleyev.pwdmanager.Constants.SHORTCUT_T;
 import static org.panteleyev.pwdmanager.Constants.SHORTCUT_V;
 import static org.panteleyev.pwdmanager.Constants.STYLE_CARD_CONTENT_TITLE;
+import static org.panteleyev.pwdmanager.Options.options;
 
 class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
-
-    static final URL CSS_PATH = MainWindowController.class
-        .getResource("/org/panteleyev/pwdmanager/PasswordManager.css");
 
     // Preferences
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
@@ -104,7 +102,7 @@ class MainWindowController extends Controller {
     private final CardViewer cardContentView = new CardViewer();
 
     MainWindowController(Stage stage) {
-        super(stage, CSS_PATH.toString());
+        super(stage, options().getMainCssFilePath());
 
         sortedList.setComparator(COMPARE_CARDS_BY_FAVORITE.thenComparing(COMPARE_CARDS_BY_NAME));
 

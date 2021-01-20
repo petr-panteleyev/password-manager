@@ -26,6 +26,7 @@ import java.util.Objects;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Options.options;
 
 class EditNoteDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -36,7 +37,7 @@ class EditNoteDialog extends BaseDialog<Card> {
     private final Card note;
 
     EditNoteDialog(Card note) {
-        super(MainWindowController.CSS_PATH);
+        super(options().getDialogCssFileUrl());
 
         Objects.requireNonNull(note);
 

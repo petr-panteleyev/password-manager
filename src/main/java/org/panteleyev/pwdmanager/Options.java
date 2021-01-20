@@ -4,15 +4,48 @@
  */
 package org.panteleyev.pwdmanager;
 
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.panteleyev.fx.WindowManager;
 import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.pwdmanager.options.ColorOption;
+import org.panteleyev.pwdmanager.options.FontOption;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.Preferences;
+import static java.util.Map.entry;
+import static javafx.application.Platform.runLater;
+import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
 
 final class Options {
+    private enum Option {
+        WINDOW_WIDTH,
+        WINDOW_HEIGHT,
+        PASSWORD_OPTIONS,
+        UPPER_CASE,
+        LOWER_CASE,
+        DIGITS,
+        SYMBOLS,
+        LENGTH,
+        FONTS,
+        COLORS;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
+
     private static final double DEFAULT_WIDTH = 800;
     private static final double DEFAULT_HEIGHT = 542;
 
@@ -25,22 +58,143 @@ final class Options {
     private static final String SYMBOLS_PREF = "symbols";
     private static final String LENGTH_PREF = "length";
 
-    private Options() {
-    }
+    private static final String OPTIONS_DIRECTORY = ".password-manager";
+
+    private static final String DEFAULT_FONT_FAMILY = "System";
+    private static final String DEFAULT_FONT_STYLE = "Normal Regular";
+    private static final double DEFAULT_FONT_SIZE = 12;
+
+    private File mainCssFile;
+    private File dialogCssFile;
+
+    private static final Options OPTIONS = new Options();
 
     static final Map<FieldType, GeneratorOptions> PASSWORD_DEFAULTS = Map.ofEntries(
-        Map.entry(FieldType.PIN,
+        entry(FieldType.PIN,
             new GeneratorOptions(false, false, true, false, 4)),
-        Map.entry(FieldType.UNIX_PASSWORD,
+        entry(FieldType.UNIX_PASSWORD,
             new GeneratorOptions(true, true, true, true, 8)),
-        Map.entry(FieldType.SHORT_PASSWORD,
+        entry(FieldType.SHORT_PASSWORD,
             new GeneratorOptions(true, true, true, true, 16)),
-        Map.entry(FieldType.LONG_PASSWORD,
+        entry(FieldType.LONG_PASSWORD,
             new GeneratorOptions(true, true, true, true, 32))
     );
     private static final Map<FieldType, GeneratorOptions> PASSWORD_OPTIONS = new HashMap<>(PASSWORD_DEFAULTS);
 
     private static final Preferences PREFS = Preferences.userNodeForPackage(PasswordManagerApplication.class);
+    private static final Preferences FONT_PREFS = PREFS.node(Option.FONTS.toString());
+    private static final Preferences COLOR_PREFS = PREFS.node(Option.COLORS.toString());
+
+    public static Options options() {
+        return OPTIONS;
+    }
+
+    private Options() {
+    }
+
+    public void initialize() {
+        var settingsDirectory = initDirectory(
+            new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY),
+            "Options"
+        );
+
+        initDirectory(
+            new File(settingsDirectory, "logs"),
+            "Logs"
+        );
+
+        mainCssFile = new File(settingsDirectory, "main.css");
+        dialogCssFile = new File(settingsDirectory, "dialog.css");
+    }
+
+    private static File initDirectory(File dir, String name) {
+        if (!dir.exists()) {
+            if (!dir.mkdir()) {
+                throw new RuntimeException(name + " directory cannot be opened/created");
+            }
+        } else {
+            if (!dir.isDirectory()) {
+                throw new RuntimeException(name + " directory cannot be opened/created");
+            }
+        }
+        return dir;
+    }
+
+    public void loadFontOptions() {
+        for (var option : FontOption.values()) {
+            var prefs = FONT_PREFS.node(option.toString());
+
+            var style = prefs.get("style", DEFAULT_FONT_STYLE);
+            var font = Font.font(prefs.get("family", DEFAULT_FONT_FAMILY),
+                style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
+                style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
+                prefs.getDouble("size", DEFAULT_FONT_SIZE));
+
+            option.setFont(font);
+        }
+    }
+
+    public void loadColorOptions() {
+        for (var option : ColorOption.values()) {
+            var colorString = COLOR_PREFS.get(option.toString(), null);
+            if (colorString != null) {
+                option.setColor(Color.valueOf(colorString));
+            }
+        }
+    }
+
+    public void generateCssFiles() {
+        var dataModel = Map.ofEntries(
+            entry("controlsFontFamily", FontOption.CONTROLS_FONT.getFont().getFamily()),
+            entry("controlsFontSize", (int) FontOption.CONTROLS_FONT.getFont().getSize()),
+            entry("menuFontFamily", FontOption.MENU_FONT.getFont().getFamily()),
+            entry("menuFontSize", (int) FontOption.MENU_FONT.getFont().getSize()),
+            // dialogs
+            entry("dialogFontFamily", FontOption.DIALOG_FONT.getFont().getFamily()),
+            entry("dialogFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize()),
+            entry("aboutLabelFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() + 4),
+            // Colors
+            entry("favoriteColor", ColorOption.FAVORITE.getWebString()),
+            entry("favoriteBackground", ColorOption.FAVORITE_BACKGROUND.getWebString()),
+            entry("fieldNameColor", ColorOption.FIELD_NAME.getWebString()),
+            entry("fieldValueColor", ColorOption.FIELD_VALUE.getWebString()),
+            entry("hyperLinkColor", ColorOption.HYPERLINK.getWebString())
+        );
+
+        try (var w = new FileWriter(mainCssFile)) {
+            templateEngine().process(TemplateEngine.Template.MAIN_CSS, dataModel, w);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+
+        try (var w = new FileWriter(dialogCssFile)) {
+            templateEngine().process(TemplateEngine.Template.DIALOG_CSS, dataModel, w);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public void reloadCssFile() {
+        WindowManager.newInstance().getControllers().forEach(
+            c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
+        );
+    }
+
+    public String getMainCssFilePath() {
+        try {
+            return mainCssFile.toURI().toURL().toExternalForm();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public URL getDialogCssFileUrl() {
+        try {
+            return dialogCssFile.toURI().toURL();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
 
     static void saveWindowDimensions(Stage stage) {
         PREFS.putDouble(WINDOW_WIDTH_PREF, stage.widthProperty().doubleValue());
@@ -115,5 +269,27 @@ final class Options {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static void setFont(FontOption option, Font font) {
+        if (font == null) {
+            return;
+        }
+
+        var prefs = FONT_PREFS.node(option.toString());
+        prefs.put("family", font.getFamily());
+        prefs.put("style", font.getStyle());
+        prefs.putDouble("size", font.getSize());
+
+        option.setFont(font);
+    }
+
+    public static void setColor(ColorOption option, Color color) {
+        if (color == null) {
+            return;
+        }
+
+        COLOR_PREFS.put(option.toString(), color.toString());
+        option.setColor(color);
     }
 }

@@ -18,11 +18,12 @@ import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 import static org.panteleyev.pwdmanager.Constants.RB;
 import static org.panteleyev.pwdmanager.Constants.STYLE_ABOUT_LABEL;
 import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.Options.options;
 
 class AboutDialog extends BaseDialog<Object> {
 
     AboutDialog(Controller owner) {
-        super(owner, MainWindowController.CSS_PATH);
+        super(owner, options().getDialogCssFileUrl());
         setTitle("About Password Manager");
 
         var l0 = label(APP_TITLE);
@@ -31,7 +32,7 @@ class AboutDialog extends BaseDialog<Object> {
         var grid = gridPane(
             List.of(
                 gridRow(gridCell(l0, 2, 1)),
-                gridRow(gridCell(label("Copyright (c) 2016, 2020, Petr Panteleyev"), 2, 1)),
+                gridRow(gridCell(label("Copyright (c) 2016, 2021, Petr Panteleyev"), 2, 1)),
                 gridRow(label(fxString(RB, "Version", ":")), label(fxString(BUILD_INFO_BUNDLE, "version"))),
                 gridRow(label(fxString(RB, "Build", ":")), label(fxString(BUILD_INFO_BUNDLE, "timestamp"))),
                 gridRow(label(fxString(RB, "Encryption", ":")), label("256-bit AES"))

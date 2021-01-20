@@ -29,13 +29,15 @@ import java.net.URISyntaxException;
 import java.util.List;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.pwdmanager.Constants.MASK;
 import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.STYLE_FIELD_NAME;
+import static org.panteleyev.pwdmanager.Constants.STYLE_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 
 class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
     private static final double RIGHT_WIDTH = 100.0 - LEFT_WIDTH;
-    private static final String MASK = "*****";
 
     private final GridPane grid = new GridPane();
     private final Label noteLabel = label(fxString(RB, "label.notesNoSemicolon"),
@@ -85,7 +87,7 @@ class CardViewer extends BorderPane {
         int y = 0;
         for (var field : items) {
             var nameLabel = new Label(field.getName());
-            nameLabel.getStyleClass().add("fieldName");
+            nameLabel.getStyleClass().add(STYLE_FIELD_NAME);
 
             Labeled valueLabel;
             if (field.getType() == FieldType.LINK) {
@@ -93,6 +95,7 @@ class CardViewer extends BorderPane {
                 ((Hyperlink) valueLabel).setOnAction(e -> onHyperlinkClick(field.getValue()));
             } else {
                 valueLabel = new Label(field.getType().isMasked() ? MASK : field.getValue());
+                valueLabel.getStyleClass().add(STYLE_FIELD_VALUE);
 
                 valueLabel.setOnMouseClicked(event -> {
                     if (event.getClickCount() > 1) {

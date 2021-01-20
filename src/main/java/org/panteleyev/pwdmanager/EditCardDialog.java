@@ -40,6 +40,7 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.RB;
 import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.Options.options;
 
 class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;
@@ -54,7 +55,7 @@ class EditCardDialog extends BaseDialog<Card> {
         new KeyCodeCombination(KeyCode.G, KeyCombination.SHORTCUT_DOWN), a -> onGeneratePassword());
 
     EditCardDialog(Card card) {
-        super(MainWindowController.CSS_PATH);
+        super(options().getDialogCssFileUrl());
 
         editableFields = FXCollections.observableArrayList(
             card.fields().stream().map(EditableField::new).collect(Collectors.toList()));
