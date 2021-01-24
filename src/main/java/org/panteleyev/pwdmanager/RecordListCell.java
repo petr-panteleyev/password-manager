@@ -14,14 +14,13 @@ class RecordListCell extends ListCell<Card> {
     protected void updateItem(Card record, boolean empty) {
         super.updateItem(record, empty);
 
+        getStyleClass().remove(STYLE_FAVORITE);
         if (record == null || empty) {
             setText("");
             setGraphic(null);
         } else {
             if (record.favorite()) {
                 getStyleClass().add(STYLE_FAVORITE);
-            } else {
-                getStyleClass().remove(STYLE_FAVORITE);
             }
             setText(record.name());
             setGraphic(new ImageView(record.picture().getImage()));

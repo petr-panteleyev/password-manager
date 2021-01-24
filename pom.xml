@@ -7,58 +7,86 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.panteleyev</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.1.0</version>
-    </parent>
-
+    <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>21.1.0</version>
+    <version>21.1.1</version>
     <packaging>jar</packaging>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>15</maven.compiler.release>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
+        <!-- Plugins -->
+        <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
+        <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
+        <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0-M5</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
+        <javaFxPluginVersion>0.0.5</javaFxPluginVersion>
+        <jpackageMavenPluginVersion>1.3.0</jpackageMavenPluginVersion>
+        <asmVersion>9.0</asmVersion>
+        <!-- Dependencies -->
+        <javaFxVersion>15.0.1</javaFxVersion>
+        <javaFxHelpersVersion>1.7.0</javaFxHelpersVersion>
+        <controlsFxVersion>11.0.3</controlsFxVersion>
+        <testNgVersion>7.3.0</testNgVersion>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
+            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
+            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
+            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
+            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
+            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
             <artifactId>java-fx-helpers</artifactId>
+            <version>${javaFxHelpersVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
+            <version>${controlsFxVersion}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <version>${testNgVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -75,19 +103,43 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
+                <version>${mavenToolchainPluginVersion}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>toolchain</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <toolchains>
+                        <jdk>
+                            <version>${maven.compiler.release}</version>
+                        </jdk>
+                    </toolchains>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${mavenCompilerPluginVersion}</version>
                 <configuration>
                     <compilerArgs>
                         <arg>--enable-preview</arg>
                     </compilerArgs>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                        <version>${asmVersion}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${mavenJarPluginVersion}</version>
                 <configuration>
                     <outputDirectory>target/jmods</outputDirectory>
                     <archive>
@@ -100,6 +152,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${mavenSurefirePluginVersion}</version>
                 <configuration>
                     <argLine>--enable-preview</argLine>
                 </configuration>
@@ -107,6 +160,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>${mavenDependencyPluginVersion}</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -126,6 +180,7 @@
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
+                <version>${jpackageMavenPluginVersion}</version>
 
                 <configuration>
                     <name>Password Manager</name>
@@ -162,6 +217,7 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
+                <version>${javaFxPluginVersion}</version>
                 <configuration>
                     <mainClass>${appModule}/${appMainClass}</mainClass>
                 </configuration>
