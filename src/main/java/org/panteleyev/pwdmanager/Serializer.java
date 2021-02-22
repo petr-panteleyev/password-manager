@@ -172,7 +172,7 @@ class Serializer {
             uuid = UUID.randomUUID().toString();
         }
         var name = element.getAttribute(NAME_ATTR);
-        var picture = Picture.valueOf(element.getAttribute(PICTURE_ATTR));
+        var picture = Picture.of(element.getAttribute(PICTURE_ATTR));
         var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
         var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
 

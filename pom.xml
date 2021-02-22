@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>21.1.1</version>
+    <version>21.1.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -20,14 +20,12 @@
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
-        <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M5</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.5</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.3.0</jpackageMavenPluginVersion>
-        <asmVersion>9.0</asmVersion>
+        <jpackageMavenPluginVersion>1.4.0</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>15.0.1</javaFxVersion>
         <javaFxHelpersVersion>1.7.0</javaFxHelpersVersion>
@@ -102,25 +100,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-toolchains-plugin</artifactId>
-                <version>${mavenToolchainPluginVersion}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>toolchain</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <toolchains>
-                        <jdk>
-                            <version>${maven.compiler.release}</version>
-                        </jdk>
-                    </toolchains>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
                 <configuration>
@@ -128,13 +107,6 @@
                         <arg>--enable-preview</arg>
                     </compilerArgs>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                        <version>${asmVersion}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -187,7 +159,9 @@
                     <appVersion>${project.version}</appVersion>
                     <vendor>panteleyev.org</vendor>
                     <module>${appModule}/${appMainClass}</module>
-                    <modulePath>target/jmods</modulePath>
+                    <modulePaths>
+                        <modulePath>target/jmods</modulePath>
+                    </modulePaths>
                     <destination>target/dist</destination>
                     <javaOptions>
                         <option>--enable-preview</option>

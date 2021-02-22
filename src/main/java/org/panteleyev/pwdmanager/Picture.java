@@ -1,59 +1,74 @@
-package org.panteleyev.pwdmanager;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public enum Picture {
-    GENERIC,
-    PASSWORD,
-    INFO,
-    IMPORTANT,
-    AUTO,
     AIRPLANE,
-    TRAIN,
+    AMAZON,
     AMEX,
-    MASTERCARD,
-    INTERNET,
-    INSURANCE,
-    GLASSES,
-    BANK,
-    RAIF,
-    EMAIL,
-    VISA,
-    CREDIT_CARD,
-    IPHONE,
-    MOBILE,
-    WIFI,
-    CD,
-    COMPUTER,
-    FACEBOOK,
-    VK,
-    SKYPE,
-    TWITTER,
-    GPLUS,
-    MOZILLA,
-    PASSPORT,
-    SHOP,
-    NOTE,
-    MEDICINE,
-    HOUSE,
-    FEMALE,
-    MALE,
-    EDUCATION,
-    STEAM,
-    GITHUB,
-    BITBUCKET,
-    TELEGRAM,
     APPLE,
+    AUTO,
+    BANK,
+    BITBUCKET,
+    CD,
+    CHROME,
+    COMPUTER,
+    CREDIT_CARD,
+    EDUCATION,
+    EMAIL,
+    FACEBOOK,
+    FEMALE,
+    FLICKR,
+    FOLDER,
+    GENERIC,
+    GLASSES,
+    GITHUB,
+    GPLUS,
+    HOUSE,
+    ICQ,
+    IMPORTANT,
+    INFO,
+    INSURANCE,
+    INTERNET,
+    IPHONE,
+    JAVA,
+    LINKEDIN,
+    MALE,
+    MASTERCARD,
+    MEDICINE,
+    MOBILE,
+    MOZILLA,
+    NOTE,
+    NVIDIA,
+    ORIGIN,
+    PASSPORT,
+    PHONE,
+    REDDIT,
+    RUSSIA,
+    SBERBANK,
+    SHOP,
+    SKYPE,
+    STEAM,
+    TELEGRAM,
+    TRAIN,
+    TWITTER,
+    US,
+    VISA,
+    VK,
+    WIFI,
+    WOW,
     YAHOO,
-    FOLDER;
+    YANDEX;
 
     private final Image image;
     private final Image bigImage;
@@ -77,7 +92,20 @@ public enum Picture {
     public static void setupComboBox(ComboBox<Picture> comboBox) {
         comboBox.setCellFactory(p -> new PictureListCell());
         comboBox.setButtonCell(new PictureListCell());
-        comboBox.setItems(FXCollections.observableArrayList(Picture.values()));
+        comboBox.setItems(FXCollections.observableArrayList(
+            Arrays.stream(Picture.values()).sorted(Comparator.comparing(Enum::name)).collect(Collectors.toList()))
+        );
+    }
+
+    public static Picture of(String stringValue) {
+        if (stringValue == null || stringValue.isBlank()) {
+            return GENERIC;
+        }
+
+        try {
+            return valueOf(stringValue.toUpperCase());
+        } catch (Exception ex) {
+            return GENERIC;
+        }
     }
 }
-
