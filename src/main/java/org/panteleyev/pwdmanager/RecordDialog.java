@@ -19,8 +19,8 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.RB;
-import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
 abstract class RecordDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();

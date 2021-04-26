@@ -95,7 +95,7 @@ public enum Picture {
         comboBox.setCellFactory(p -> new PictureListCell());
         comboBox.setButtonCell(new PictureListCell());
         comboBox.setItems(FXCollections.observableArrayList(
-            Arrays.stream(Picture.values()).sorted(Comparator.comparing(Enum::name)).collect(Collectors.toList()))
+            Arrays.stream(Picture.values()).sorted(Comparator.comparing(Enum::name)).toList())
         );
     }
 

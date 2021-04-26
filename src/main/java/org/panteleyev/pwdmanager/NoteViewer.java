@@ -5,13 +5,11 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
+import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
 
 public class NoteViewer extends TextArea {
     public NoteViewer() {
@@ -21,14 +19,9 @@ public class NoteViewer extends TextArea {
     }
 
     private ContextMenu createContextMenu() {
-        var menu = new ContextMenu();
-
-        var m1 = new MenuItem("Copy...");
-        m1.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
-        m1.setOnAction(x -> copy());
-
-        menu.getItems().addAll(m1);
-        return menu;
+        return new ContextMenu(
+            menuItem("Copy...", SHORTCUT_C, x -> copy())
+        );
     }
 
     @Override

@@ -52,7 +52,7 @@ public class PasswordManagerApplication extends Application {
     private static void uncaughtException(Throwable e) {
         LOGGER.log(Level.SEVERE, "Uncaught exception", e);
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, e.toString());
+            var alert = new Alert(Alert.AlertType.ERROR, e.toString());
             alert.showAndWait();
         });
     }

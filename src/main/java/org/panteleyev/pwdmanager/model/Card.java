@@ -7,7 +7,7 @@ package org.panteleyev.pwdmanager.model;
 import javafx.scene.input.DataFormat;
 import org.panteleyev.pwdmanager.Picture;
 import org.panteleyev.pwdmanager.RecordType;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +18,8 @@ public record Card(CardClass cardClass, String uuid, long modified,
     private static final String MIME_TYPE = "application/x-org-panteleyev-password-manager-record-id";
     public static final DataFormat DATA_FORMAT = new DataFormat(MIME_TYPE);
 
+    public static final Comparator<Card> COMPARE_CARDS_BY_NAME = Comparator.comparing(Card::name);
+    public static final Comparator<Card> COMPARE_CARDS_BY_FAVORITE = Comparator.comparing(Card::favorite).reversed();
 
     public static Card newCard(String name, Picture picture, List<Field> fields) {
         return newCard(UUID.randomUUID().toString(), name, picture, fields, "");
@@ -51,7 +53,7 @@ public record Card(CardClass cardClass, String uuid, long modified,
 
     public Card {
         if (fields != null) {
-            fields = new ArrayList<>(fields);
+            fields = List.copyOf(fields);
         }
     }
 

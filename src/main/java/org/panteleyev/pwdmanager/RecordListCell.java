@@ -7,7 +7,7 @@ package org.panteleyev.pwdmanager;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.ImageView;
 import org.panteleyev.pwdmanager.model.Card;
-import static org.panteleyev.pwdmanager.Constants.STYLE_FAVORITE;
+import static org.panteleyev.pwdmanager.Styles.STYLE_FAVORITE;
 
 class RecordListCell extends ListCell<Card> {
     @Override

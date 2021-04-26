@@ -20,9 +20,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.generator.Generator;
@@ -31,7 +28,6 @@ import org.panteleyev.pwdmanager.model.FieldType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newTab;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -39,8 +35,13 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.RB;
-import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.Shortcuts.DELETE;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_G;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_U;
+import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
 class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;
@@ -51,14 +52,17 @@ class EditCardDialog extends BaseDialog<Card> {
     private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
-    private final MenuItem generateMenuItem = menuItem(fxString(RB, "Generate"),
-        new KeyCodeCombination(KeyCode.G, KeyCombination.SHORTCUT_DOWN), a -> onGeneratePassword());
+    private final MenuItem generateMenuItem = menuItem(fxString(RB, "Generate"), SHORTCUT_G,
+        a -> onGeneratePassword());
 
     EditCardDialog(Card card) {
         super(options().getDialogCssFileUrl());
 
         editableFields = FXCollections.observableArrayList(
-            card.fields().stream().map(EditableField::new).collect(Collectors.toList()));
+            card.fields().stream()
+                .map(EditableField::new)
+                .toList()
+        );
 
         setTitle(RB.getString("editCardDialog.title"));
 
@@ -144,8 +148,11 @@ class EditCardDialog extends BaseDialog<Card> {
                     System.currentTimeMillis(),
                     cardNameEdit.getText(),
                     pictureList.getSelectionModel().getSelectedItem(),
-                    new ArrayList<>(editableFields.stream()
-                        .map(EditableField::toField).collect(Collectors.toList())),
+                    new ArrayList<>(
+                        editableFields.stream()
+                            .map(EditableField::toField)
+                            .toList()
+                    ),
                     noteEditor.getText(),
                     card.favorite());
             } else {
@@ -156,18 +163,14 @@ class EditCardDialog extends BaseDialog<Card> {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-            menuItem(fxString(RB, "editCardDialog.menu.addField"),
-                new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), a -> onNewField()),
+            menuItem(fxString(RB, "editCardDialog.menu.addField"), SHORTCUT_N, a -> onNewField()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "editCardDialog.menu.deleteField"),
-                new KeyCodeCombination(KeyCode.DELETE), a -> onDeleteField()),
+            menuItem(fxString(RB, "editCardDialog.menu.deleteField"), DELETE, a -> onDeleteField()),
             new SeparatorMenuItem(),
             generateMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.item.up"),
-                new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN), a -> onFieldUp()),
-            menuItem(fxString(RB, "menu.item.down"),
-                new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN), a -> onFieldDown())
+            menuItem(fxString(RB, "menu.item.up"), SHORTCUT_U, a -> onFieldUp()),
+            menuItem(fxString(RB, "menu.item.down"), SHORTCUT_D, a -> onFieldDown())
         );
     }
 

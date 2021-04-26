@@ -71,7 +71,7 @@ public class Generator {
             new Bucket(SYMBOLS, options.symbols())
         ).stream()
             .filter(Bucket::used)
-            .collect(Collectors.toList());
+            .toList();
 
         if (usedBuckets.isEmpty()) {
             throw new IllegalArgumentException("At least one character set must be selected");

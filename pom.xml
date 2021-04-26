@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>21.2.0</version>
+    <version>21.3.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -24,12 +24,12 @@
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M5</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
-        <javaFxPluginVersion>0.0.5</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.4.0</jpackageMavenPluginVersion>
+        <javaFxPluginVersion>0.0.6</javaFxPluginVersion>
+        <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>16</javaFxVersion>
-        <javaFxHelpersVersion>1.8.0</javaFxHelpersVersion>
-        <controlsFxVersion>11.0.3</controlsFxVersion>
+        <javaFxHelpersVersion>1.8.2</javaFxHelpersVersion>
+        <controlsFxVersion>11.1.0</controlsFxVersion>
         <testNgVersion>7.3.0</testNgVersion>
     </properties>
 
@@ -37,11 +37,6 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>${javaFxVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
             <version>${javaFxVersion}</version>
         </dependency>
         <dependency>

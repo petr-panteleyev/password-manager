@@ -57,3 +57,13 @@
 .titled-pane {
     -fx-collapsible: false;
 }
+
+.action-add {
+    -fx-control-inner-background: ${actionAddColor};
+    -fx-control-inner-background-alt: ${actionAddColor};
+}
+
+.action-replace {
+    -fx-control-inner-background: ${actionReplaceColor};
+    -fx-control-inner-background-alt: ${actionReplaceColor};
+}

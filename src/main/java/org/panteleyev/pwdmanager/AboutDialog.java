@@ -16,9 +16,9 @@ import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 import static org.panteleyev.pwdmanager.Constants.RB;
-import static org.panteleyev.pwdmanager.Constants.STYLE_ABOUT_LABEL;
-import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.Styles.STYLE_ABOUT_LABEL;
+import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
 class AboutDialog extends BaseDialog<Object> {
 

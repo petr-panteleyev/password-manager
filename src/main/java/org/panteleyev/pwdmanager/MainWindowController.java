@@ -42,16 +42,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -60,20 +56,21 @@ import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
-import static org.panteleyev.pwdmanager.Constants.COMPARE_CARDS_BY_FAVORITE;
-import static org.panteleyev.pwdmanager.Constants.COMPARE_CARDS_BY_NAME;
 import static org.panteleyev.pwdmanager.Constants.RB;
-import static org.panteleyev.pwdmanager.Constants.SHIFT_DELETE;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_C;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_D;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_F;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_I;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_N;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_O;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_T;
-import static org.panteleyev.pwdmanager.Constants.SHORTCUT_V;
-import static org.panteleyev.pwdmanager.Constants.STYLE_CARD_CONTENT_TITLE;
+import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
+import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_CARDS_BY_FAVORITE;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_CARDS_BY_NAME;
 
 class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
@@ -278,25 +275,43 @@ class MainWindowController extends Controller {
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
-        var file = d.showOpenDialog(null);
-        if (file != null && file.exists()) {
-            new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
-                try (var in = new FileInputStream(file)) {
-                    var list = new ArrayList<Card>();
-                    if (!password.isEmpty()) {
-                        try (var cin = AES.aes256().getInputStream(in, password)) {
-                            Serializer.deserialize(cin, list);
-                        }
-                    } else {
-                        Serializer.deserialize(in, list);
-                    }
-
-                    importCards(list);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
+        var file = d.showOpenDialog(getStage());
+        if (file == null || !file.exists()) {
+            return;
         }
+
+        new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
+            try (var in = new FileInputStream(file)) {
+                var list = new ArrayList<Card>();
+                if (!password.isEmpty()) {
+                    try (var cin = AES.aes256().getInputStream(in, password)) {
+                        Serializer.deserialize(cin, list);
+                    }
+                } else {
+                    Serializer.deserialize(in, list);
+                }
+
+                var importRecords = calculateImport(recordList, list);
+                if (importRecords.isEmpty()) {
+                    new Alert(Alert.AlertType.INFORMATION, fxString(RB, "Nothing_To_Import"), ButtonType.OK)
+                        .showAndWait();
+                } else {
+                    new ImportDialog(this, importRecords).showAndWait().ifPresent(records -> {
+                        for (var r : records) {
+                            if (r.getExistingCard() != null) {
+                                recordList.removeAll(r.getExistingCard());
+                            }
+                            recordList.add(r.getCardToImport());
+                        }
+                        if (!records.isEmpty()) {
+                            writeDocument();
+                        }
+                    });
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void onExportFile() {
@@ -323,7 +338,11 @@ class MainWindowController extends Controller {
     private void onDeleteRecord() {
         getSelectedItem().ifPresent((Card item) -> {
             var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> recordList.remove(item));
+            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> {
+                    recordList.remove(item);
+                    writeDocument();
+                }
+            );
         });
     }
 
@@ -354,7 +373,8 @@ class MainWindowController extends Controller {
 
                 var wrappers = record.fields().stream()
                     .filter(f -> !f.value().isEmpty())
-                    .map(FieldWrapper::new).collect(Collectors.toList());
+                    .map(FieldWrapper::new)
+                    .toList();
                 cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
             }
         }
@@ -536,22 +556,6 @@ class MainWindowController extends Controller {
                     LOGGER.log(Level.SEVERE, "Exception while reading file " + path, ex);
                 }
             });
-        }
-    }
-
-    private Optional<Card> find(Predicate<Card> filter) {
-        return recordList.stream().filter(filter).findFirst();
-    }
-
-    private void importCards(Collection<Card> toImport) {
-        for (var card : toImport) {
-            find(c -> card.uuid().equals(c.uuid()))
-                .ifPresentOrElse(found -> {
-                    if (found.modified() < card.modified()) {
-                        recordList.removeAll(found);
-                        recordList.add(card);
-                    }
-                }, () -> recordList.add(card));
         }
     }
 

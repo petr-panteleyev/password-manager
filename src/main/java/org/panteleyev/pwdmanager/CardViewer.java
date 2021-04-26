@@ -31,9 +31,9 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.MASK;
 import static org.panteleyev.pwdmanager.Constants.RB;
-import static org.panteleyev.pwdmanager.Constants.STYLE_FIELD_NAME;
-import static org.panteleyev.pwdmanager.Constants.STYLE_FIELD_VALUE;
-import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_NAME;
+import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_VALUE;
+import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
 class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;

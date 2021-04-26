@@ -11,7 +11,9 @@ public enum ColorOption {
     FAVORITE_BACKGROUND(Color.WHITE),
     HYPERLINK(Color.BLUE),
     FIELD_NAME(Color.BLUE),
-    FIELD_VALUE(Color.BLACK);
+    FIELD_VALUE(Color.BLACK),
+    ACTION_ADD(Color.LIGHTGREEN),
+    ACTION_REPLACE(Color.LIGHTYELLOW);
 
     private Color color;
 

@@ -24,26 +24,27 @@ import org.panteleyev.pwdmanager.options.FontOption;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.FxUtils.COLON;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.SKIP;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.Constants.BIG_SPACING;
-import static org.panteleyev.pwdmanager.Constants.COLON;
-import static org.panteleyev.pwdmanager.Constants.ELLIPSIS;
 import static org.panteleyev.pwdmanager.Constants.RB;
-import static org.panteleyev.pwdmanager.Constants.SMALL_SPACING;
-import static org.panteleyev.pwdmanager.Constants.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.Options.PASSWORD_DEFAULTS;
 import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
+import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
+import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_ADD;
+import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_REPLACE;
 import static org.panteleyev.pwdmanager.options.ColorOption.FAVORITE;
 import static org.panteleyev.pwdmanager.options.ColorOption.FAVORITE_BACKGROUND;
 import static org.panteleyev.pwdmanager.options.ColorOption.FIELD_NAME;
@@ -70,6 +71,8 @@ class OptionsDialog extends BaseDialog<ButtonType> {
     private final ColorPicker favoriteBackgroundColorPicker = new ColorPicker(FAVORITE_BACKGROUND.getColor());
     private final ColorPicker fieldNameColorPicker = new ColorPicker(FIELD_NAME.getColor());
     private final ColorPicker fieldValueColorPicker = new ColorPicker(FIELD_VALUE.getColor());
+    private final ColorPicker actionAddColorPicker = new ColorPicker(ACTION_ADD.getColor());
+    private final ColorPicker actionReplaceColorPicker = new ColorPicker(ACTION_REPLACE.getColor());
 
     private final Map<FieldType, GeneratorOptions> passwordOptionsCopy = new EnumMap<>(FieldType.class);
 
@@ -94,7 +97,11 @@ class OptionsDialog extends BaseDialog<ButtonType> {
 
         lengthComboBox.getItems().addAll(4, 6, 8, 16, 24, 32);
         typeComboBox.setItems(
-            observableArrayList(PASSWORD_DEFAULTS.keySet().stream().sorted().collect(Collectors.toList()))
+            observableArrayList(
+                PASSWORD_DEFAULTS.keySet().stream()
+                    .sorted()
+                    .toList()
+            )
         );
         typeComboBox.getSelectionModel().selectedItemProperty().addListener(
             (observableValue, oldValue, newValue) -> updatePasswordControls(newValue));
@@ -142,7 +149,10 @@ class OptionsDialog extends BaseDialog<ButtonType> {
                         gridRow(label(fxString(RB, "Favorite", COLON)),
                             favoriteForegroundColorPicker, favoriteBackgroundColorPicker),
                         gridRow(label(fxString(RB, "Field_Name", COLON)), fieldNameColorPicker),
-                        gridRow(label(fxString(RB, "Field_Value", COLON)), fieldValueColorPicker)
+                        gridRow(label(fxString(RB, "Field_Value", COLON)), fieldValueColorPicker),
+                        gridRow(SKIP, label(fxString(RB, "Import"))),
+                        gridRow(label(fxString(RB, "Add", COLON)), actionAddColorPicker),
+                        gridRow(label(fxString(RB, "Replace", COLON)), actionReplaceColorPicker)
                     ), b -> b.withStyle(STYLE_GRID_PANE))
                 )
             )
@@ -163,6 +173,8 @@ class OptionsDialog extends BaseDialog<ButtonType> {
                 Options.setColor(FAVORITE_BACKGROUND, favoriteBackgroundColorPicker.getValue());
                 Options.setColor(FIELD_NAME, fieldNameColorPicker.getValue());
                 Options.setColor(FIELD_VALUE, fieldValueColorPicker.getValue());
+                Options.setColor(ACTION_ADD, actionAddColorPicker.getValue());
+                Options.setColor(ACTION_REPLACE, actionReplaceColorPicker.getValue());
 
                 options().generateCssFiles();
                 options().reloadCssFile();

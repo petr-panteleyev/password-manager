@@ -27,7 +27,7 @@ import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
 
-final class Options {
+public final class Options {
     private enum Option {
         WINDOW_WIDTH,
         WINDOW_HEIGHT,
@@ -158,7 +158,9 @@ final class Options {
             entry("favoriteBackground", ColorOption.FAVORITE_BACKGROUND.getWebString()),
             entry("fieldNameColor", ColorOption.FIELD_NAME.getWebString()),
             entry("fieldValueColor", ColorOption.FIELD_VALUE.getWebString()),
-            entry("hyperLinkColor", ColorOption.HYPERLINK.getWebString())
+            entry("hyperLinkColor", ColorOption.HYPERLINK.getWebString()),
+            entry("actionAddColor", ColorOption.ACTION_ADD.getWebString()),
+            entry("actionReplaceColor", ColorOption.ACTION_REPLACE.getWebString())
         );
 
         try (var w = new FileWriter(mainCssFile)) {
