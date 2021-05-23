@@ -18,7 +18,7 @@ import static org.testng.Assert.assertEquals;
 public class TestFieldContentFilter {
 
     private static final Card CARD =
-        Card.newCard(UUID.randomUUID().toString(), null, List.of(
+        new Card(UUID.randomUUID().toString(), null, List.of(
             new Field(FieldType.STRING, UUID.randomUUID().toString(), "value1"),
             new Field(FieldType.STRING, UUID.randomUUID().toString(), "Value1"),
             new Field(FieldType.STRING, UUID.randomUUID().toString(), "Value2"))

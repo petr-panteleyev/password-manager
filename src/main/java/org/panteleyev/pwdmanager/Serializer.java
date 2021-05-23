@@ -7,6 +7,9 @@ package org.panteleyev.pwdmanager;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.pwdmanager.model.Note;
+import org.panteleyev.pwdmanager.model.Picture;
+import org.panteleyev.pwdmanager.model.WalletRecord;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -25,7 +28,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-class Serializer {
+final class Serializer {
+
+    private enum CardClass {
+        CARD,
+        NOTE,
+        UNKNOWN;
+
+        public static CardClass of(String value) {
+            try {
+                return valueOf(value);
+            } catch (Exception ex) {
+                return UNKNOWN;
+            }
+        }
+    }
+
     // Attributes
     private static final String CLASS_ATTR = "recordClass";
     private static final String UUID_ATTR = "uuid";
@@ -35,15 +53,16 @@ class Serializer {
     private static final String VALUE_ATTR = "value";
     private static final String PICTURE_ATTR = "picture";
     private static final String FAVORITE_ATTR = "favorite";
+    private static final String ACTIVE_ATTR = "active";
 
     // Tags
     private static final String FIELD = "field";
     private static final String FIELDS = FIELD + "s";
     private static final String RECORDS = "records";
 
-    private static final DocumentBuilderFactory DOC_FACTORY;
+    private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
 
-    static void serialize(OutputStream out, List<Card> records) throws ParserConfigurationException,
+    static void serialize(OutputStream out, List<WalletRecord> records) throws ParserConfigurationException,
         TransformerException
     {
         var docBuilder = DOC_FACTORY.newDocumentBuilder();
@@ -57,8 +76,9 @@ class Serializer {
         rootElement.appendChild(recordsElement);
 
         for (var r : records) {
-            var recordXml = serializeRecord(doc, r);
-            recordsElement.appendChild(recordXml);
+            recordsElement.appendChild(
+                serializeRecord(doc, r)
+            );
         }
 
         var transformerFactory = TransformerFactory.newInstance();
@@ -68,7 +88,7 @@ class Serializer {
         transformer.transform(new DOMSource(doc), new StreamResult(out));
     }
 
-    static void deserialize(InputStream in, List<Card> list) throws ParserConfigurationException,
+    static void deserialize(InputStream in, List<WalletRecord> list) throws ParserConfigurationException,
         SAXException, IOException
     {
         var docBuilder = DOC_FACTORY.newDocumentBuilder();
@@ -80,37 +100,38 @@ class Serializer {
         deserializeRecords(records, list);
     }
 
-    static Element serializeRecord(Document doc, Card r) {
+    static Element serializeRecord(Document doc, WalletRecord r) {
         var xmlRecord = doc.createElement("record");
-        xmlRecord.setAttribute(CLASS_ATTR, r.cardClass().name());
-        xmlRecord.setAttribute(UUID_ATTR, r.uuid());
+
+        xmlRecord.setAttribute(UUID_ATTR, r.uuid().toString());
         xmlRecord.setAttribute(NAME_ATTR, r.name());
-        xmlRecord.setAttribute(TYPE_ATTR, r.type().name());
         xmlRecord.setAttribute(MODIFIED_ATTR, Long.toString(r.modified()));
         xmlRecord.setAttribute(PICTURE_ATTR, r.picture().name());
         xmlRecord.setAttribute(FAVORITE_ATTR, Boolean.toString(r.favorite()));
+        xmlRecord.setAttribute(ACTIVE_ATTR, Boolean.toString(r.active()));
 
-        // Card - serialize fields
-        if (r.isCard()) {
-            var fields = r.fields();
+        if (r instanceof Card card) {
+            xmlRecord.setAttribute(CLASS_ATTR, CardClass.CARD.name());
+
+            var fields = card.fields();
             if (!fields.isEmpty()) {
                 var fieldsElement = doc.createElement(FIELDS);
                 xmlRecord.appendChild(fieldsElement);
 
-                fields.forEach((f) -> {
-                    var fe = serializeField(doc, f);
-                    fieldsElement.appendChild(fe);
-                });
+                for (var f : fields) {
+                    fieldsElement.appendChild(
+                        serializeField(doc, f)
+                    );
+                }
             }
 
-            var note = r.note();
+            var note = card.note();
             var noteElement = doc.createElement("note");
             noteElement.setTextContent(note);
             xmlRecord.appendChild(noteElement);
-        }
-
-        if (r.isNote()) {
-            xmlRecord.appendChild(doc.createTextNode(r.note()));
+        } else if (r instanceof Note note) {
+            xmlRecord.setAttribute(CLASS_ATTR, CardClass.NOTE.name());
+            xmlRecord.appendChild(doc.createTextNode(note.note()));
         }
 
         return xmlRecord;
@@ -132,34 +153,32 @@ class Serializer {
         return new Field(type, name, value);
     }
 
-    static Card deserializeNote(Element element) {
-        var uuid = element.getAttribute(UUID_ATTR);
-        if (uuid == null || uuid.isEmpty()) {
-            uuid = UUID.randomUUID().toString();
-        }
+    static WalletRecord deserializeNote(Element element) {
+        var uuid = readUuidAttribute(element);
         var name = element.getAttribute(NAME_ATTR);
         var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
         var text = element.getTextContent();
         var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
+        var active = readActiveAttribute(element);
 
-        return Card.newNote(uuid, modified, name, text, favorite);
+        return new Note(uuid, name, text, favorite, active, modified);
     }
 
-    private static void deserializeRecords(NodeList records, List<Card> list) {
+    private static void deserializeRecords(NodeList records, List<WalletRecord> list) {
         // children
         for (int i = 0; i < records.getLength(); i++) {
             var item = records.item(i);
 
             if (item instanceof Element element) {
-                var recordClass = element.getAttribute(CLASS_ATTR);
+                var recordClass = CardClass.of(element.getAttribute(CLASS_ATTR));
                 if (recordClass != null) {
                     var record = switch (recordClass) {
-                        case "CARD" -> deserializeCard(element);
-                        case "NOTE" -> deserializeNote(element);
+                        case CARD -> deserializeCard(element);
+                        case NOTE -> deserializeNote(element);
                         default -> null;
                     };
                     if (record != null) {
-                        list.add((Card) record);
+                        list.add(record);
                     }
                 }
             }
@@ -167,14 +186,12 @@ class Serializer {
     }
 
     static Card deserializeCard(Element element) {
-        var uuid = element.getAttribute(UUID_ATTR);
-        if (uuid == null || uuid.isEmpty()) {
-            uuid = UUID.randomUUID().toString();
-        }
+        var uuid = readUuidAttribute(element);
         var name = element.getAttribute(NAME_ATTR);
         var picture = Picture.of(element.getAttribute(PICTURE_ATTR));
         var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
         var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
+        var active = readActiveAttribute(element);
 
         // fields
         var fList = element.getElementsByTagName(FIELD);
@@ -192,10 +209,21 @@ class Serializer {
             note = noteElement.getTextContent();
         }
 
-        return Card.newCard(uuid, modified, name, picture, fields, note, favorite);
+        return new Card(uuid, modified, picture, name, fields, note, favorite, active);
     }
 
-    static {
-        DOC_FACTORY = DocumentBuilderFactory.newInstance();
+    private static boolean readActiveAttribute(Element element) {
+        // For backward compatibility missing 'active' attribute means true
+        var activeElement = element.getAttribute(ACTIVE_ATTR);
+        return activeElement == null || activeElement.isBlank() || Boolean.parseBoolean(activeElement);
+    }
+
+    private static UUID readUuidAttribute(Element element) {
+        var uuidString = element.getAttribute(UUID_ATTR);
+        if (uuidString == null || uuidString.isEmpty()) {
+            return UUID.randomUUID();
+        } else {
+            return UUID.fromString(uuidString);
+        }
     }
 }

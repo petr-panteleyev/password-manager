@@ -25,10 +25,12 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.FxFactory.textField;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.SKIP;
@@ -44,7 +46,11 @@ import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_ADD;
+import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_DELETE;
 import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_REPLACE;
+import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_RESTORE;
+import static org.panteleyev.pwdmanager.options.ColorOption.DELETED;
+import static org.panteleyev.pwdmanager.options.ColorOption.DELETED_BACKGROUND;
 import static org.panteleyev.pwdmanager.options.ColorOption.FAVORITE;
 import static org.panteleyev.pwdmanager.options.ColorOption.FAVORITE_BACKGROUND;
 import static org.panteleyev.pwdmanager.options.ColorOption.FIELD_NAME;
@@ -53,7 +59,7 @@ import static org.panteleyev.pwdmanager.options.FontOption.CONTROLS_FONT;
 import static org.panteleyev.pwdmanager.options.FontOption.DIALOG_FONT;
 import static org.panteleyev.pwdmanager.options.FontOption.MENU_FONT;
 
-class OptionsDialog extends BaseDialog<ButtonType> {
+final class OptionsDialog extends BaseDialog<ButtonType> {
     private final ComboBox<FieldType> typeComboBox = new ComboBox<>();
 
     private final CheckBox digitsCheckBox = new CheckBox(fxString(RB, "Digits"));
@@ -63,16 +69,20 @@ class OptionsDialog extends BaseDialog<ButtonType> {
     private final ComboBox<Integer> lengthComboBox = new ComboBox<>();
 
     // Font text fields
-    private final TextField controlsFontField = new TextField();
-    private final TextField menuFontField = new TextField();
-    private final TextField dialogFontField = new TextField();
+    private final TextField controlsFontField = textField(20);
+    private final TextField menuFontField = textField(20);
+    private final TextField dialogFontField = textField(20);
     // Colors
     private final ColorPicker favoriteForegroundColorPicker = new ColorPicker(FAVORITE.getColor());
     private final ColorPicker favoriteBackgroundColorPicker = new ColorPicker(FAVORITE_BACKGROUND.getColor());
+    private final ColorPicker deletedForegroundColorPicker = new ColorPicker(DELETED.getColor());
+    private final ColorPicker deletedBackgroundColorPicker = new ColorPicker(DELETED_BACKGROUND.getColor());
     private final ColorPicker fieldNameColorPicker = new ColorPicker(FIELD_NAME.getColor());
     private final ColorPicker fieldValueColorPicker = new ColorPicker(FIELD_VALUE.getColor());
     private final ColorPicker actionAddColorPicker = new ColorPicker(ACTION_ADD.getColor());
     private final ColorPicker actionReplaceColorPicker = new ColorPicker(ACTION_REPLACE.getColor());
+    private final ColorPicker actionDeleteColorPicker = new ColorPicker(ACTION_DELETE.getColor());
+    private final ColorPicker actionRestoreColorPicker = new ColorPicker(ACTION_RESTORE.getColor());
 
     private final Map<FieldType, GeneratorOptions> passwordOptionsCopy = new EnumMap<>(FieldType.class);
 
@@ -81,11 +91,8 @@ class OptionsDialog extends BaseDialog<ButtonType> {
         setTitle(fxString(RB, "Options"));
 
         controlsFontField.setEditable(false);
-        controlsFontField.setPrefColumnCount(20);
         menuFontField.setEditable(false);
-        menuFontField.setPrefColumnCount(20);
         dialogFontField.setEditable(false);
-        dialogFontField.setPrefColumnCount(20);
 
         loadFont(CONTROLS_FONT, controlsFontField);
         loadFont(MENU_FONT, menuFontField);
@@ -148,18 +155,22 @@ class OptionsDialog extends BaseDialog<ButtonType> {
                         gridRow(SKIP, label(fxString(RB, "Foreground")), label(fxString(RB, "Background"))),
                         gridRow(label(fxString(RB, "Favorite", COLON)),
                             favoriteForegroundColorPicker, favoriteBackgroundColorPicker),
+                        gridRow(label(fxString(RB, "Deleted", COLON)),
+                            deletedForegroundColorPicker, deletedBackgroundColorPicker),
                         gridRow(label(fxString(RB, "Field_Name", COLON)), fieldNameColorPicker),
                         gridRow(label(fxString(RB, "Field_Value", COLON)), fieldValueColorPicker),
                         gridRow(SKIP, label(fxString(RB, "Import"))),
                         gridRow(label(fxString(RB, "Add", COLON)), actionAddColorPicker),
-                        gridRow(label(fxString(RB, "Replace", COLON)), actionReplaceColorPicker)
+                        gridRow(label(fxString(RB, "Replace", COLON)), actionReplaceColorPicker),
+                        gridRow(label(fxString(RB, "Delete", COLON)), actionDeleteColorPicker),
+                        gridRow(label(fxString(RB, "Restore", COLON)), actionRestoreColorPicker)
                     ), b -> b.withStyle(STYLE_GRID_PANE))
                 )
             )
         );
 
-        setResultConverter((ButtonType param) -> {
-            if (param == ButtonType.OK) {
+        setResultConverter(buttonType -> {
+            if (OK.equals(buttonType)) {
                 Options.setPasswordOptions(passwordOptionsCopy);
                 Options.saveOptions();
 
@@ -171,15 +182,19 @@ class OptionsDialog extends BaseDialog<ButtonType> {
                 // Colors
                 Options.setColor(FAVORITE, favoriteForegroundColorPicker.getValue());
                 Options.setColor(FAVORITE_BACKGROUND, favoriteBackgroundColorPicker.getValue());
+                Options.setColor(DELETED, deletedForegroundColorPicker.getValue());
+                Options.setColor(DELETED_BACKGROUND, deletedBackgroundColorPicker.getValue());
                 Options.setColor(FIELD_NAME, fieldNameColorPicker.getValue());
                 Options.setColor(FIELD_VALUE, fieldValueColorPicker.getValue());
                 Options.setColor(ACTION_ADD, actionAddColorPicker.getValue());
                 Options.setColor(ACTION_REPLACE, actionReplaceColorPicker.getValue());
+                Options.setColor(ACTION_DELETE, actionDeleteColorPicker.getValue());
+                Options.setColor(ACTION_RESTORE, actionRestoreColorPicker.getValue());
 
                 options().generateCssFiles();
                 options().reloadCssFile();
             }
-            return param;
+            return buttonType;
         });
     }
 
@@ -198,7 +213,9 @@ class OptionsDialog extends BaseDialog<ButtonType> {
 
     private void makePasswordOptionsLocalCopy() {
         for (var type : FieldType.values()) {
-            Options.getPasswordOptions(type).ifPresent(options -> passwordOptionsCopy.put(type, options));
+            Options.getPasswordOptions(type).ifPresent(
+                options -> passwordOptionsCopy.put(type, options)
+            );
         }
     }
 

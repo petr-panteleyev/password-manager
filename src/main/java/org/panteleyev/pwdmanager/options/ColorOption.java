@@ -9,11 +9,15 @@ import javafx.scene.paint.Color;
 public enum ColorOption {
     FAVORITE(Color.GREEN),
     FAVORITE_BACKGROUND(Color.WHITE),
+    DELETED(Color.BLACK),
+    DELETED_BACKGROUND(Color.PINK),
     HYPERLINK(Color.BLUE),
     FIELD_NAME(Color.BLUE),
     FIELD_VALUE(Color.BLACK),
     ACTION_ADD(Color.LIGHTGREEN),
-    ACTION_REPLACE(Color.LIGHTYELLOW);
+    ACTION_REPLACE(Color.LIGHTYELLOW),
+    ACTION_DELETE(Color.PINK),
+    ACTION_RESTORE(Color.ORANGE);
 
     private Color color;
 

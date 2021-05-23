@@ -5,9 +5,9 @@
 package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
-import org.panteleyev.pwdmanager.model.CardClass;
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
+import org.panteleyev.pwdmanager.model.Picture;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.util.List;
@@ -19,45 +19,57 @@ import static org.testng.Assert.assertEquals;
 public class TestImportUtil {
     private static final int SIZE = 10;
     private static final int NEW_SIZE = 3;
+    private static final int DELETE_SIZE = 5;
 
     private static final List<Card> CARDS = IntStream.range(0, SIZE).mapToObj(x -> new Card(
-            CardClass.CARD,
-            UUID.randomUUID().toString(),
+            UUID.randomUUID(),
             x,
-            RecordType.CAR,
             Picture.AIRPLANE,
             UUID.randomUUID().toString(),
             emptyList(),
             "",
-            false
+            false,
+            true
         )
     ).toList();
 
     private static final List<Card> REPLACE = IntStream.range(0, SIZE).mapToObj(x -> {
         var c = CARDS.get(x);
         return new Card(
-            c.cardClass(),
             c.uuid(),
             c.modified() + 10,
-            c.type(),
             c.picture(),
             c.name(),
             emptyList(),
             "",
+            false,
+            true
+        );
+    }).toList();
+
+    private static final List<Card> DELETE = IntStream.range(0, DELETE_SIZE).mapToObj(x -> {
+        var c = CARDS.get(x);
+        return new Card(
+            c.uuid(),
+            c.modified() + 10,
+            c.picture(),
+            c.name(),
+            emptyList(),
+            "",
+            false,
             false
         );
     }).toList();
 
     private static final List<Card> ADD = IntStream.range(0, NEW_SIZE).mapToObj(x -> new Card(
-            CardClass.CARD,
-            UUID.randomUUID().toString(),
+            UUID.randomUUID(),
             x,
-            RecordType.CAR,
             Picture.AIRPLANE,
             UUID.randomUUID().toString(),
             emptyList(),
             "",
-            false
+            false,
+            true
         )
     ).toList();
 
@@ -74,6 +86,11 @@ public class TestImportUtil {
             {CARDS, ADD,
                 IntStream.range(0, NEW_SIZE).mapToObj(
                     x -> new ImportRecord(ImportAction.ADD, null, ADD.get(x))
+                ).toList()
+            },
+            {CARDS, DELETE,
+                IntStream.range(0, DELETE_SIZE).mapToObj(
+                    x -> new ImportRecord(ImportAction.DELETE, CARDS.get(x), DELETE.get(x))
                 ).toList()
             }
         };

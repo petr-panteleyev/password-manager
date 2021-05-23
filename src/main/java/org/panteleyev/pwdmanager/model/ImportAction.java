@@ -5,6 +5,9 @@
 package org.panteleyev.pwdmanager.model;
 
 public enum ImportAction {
+    SKIP,
     REPLACE,
-    ADD
+    ADD,
+    DELETE,
+    RESTORE
 }

@@ -5,20 +5,19 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.scene.control.ButtonType;
 import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.RecordType;
 import java.util.Objects;
+import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.pwdmanager.Constants.RB;
 
-class CardDialog extends RecordDialog {
+final class CardDialog extends RecordDialog {
     private final RecordType defaultType;
-    private final Card card;
 
-    CardDialog(RecordType defaultType, Card card) {
+    CardDialog(RecordType defaultType) {
         Objects.requireNonNull(defaultType);
 
         this.defaultType = defaultType;
-        this.card = card;
 
         initialize();
     }
@@ -30,20 +29,14 @@ class CardDialog extends RecordDialog {
         initLists();
         setTypeLabelText(RB.getString("label.type"));
 
-        if (card != null) {
-            getNameEdit().setText(card.name());
-            getTypeList().getSelectionModel().select(card.type());
-            getPictureList().getSelectionModel().select(card.picture());
-        } else {
-            getNameEdit().setText("");
-            getTypeList().getSelectionModel().select(defaultType);
-            getPictureList().getSelectionModel().select(RecordType.PASSWORD.getPicture());
-        }
+        getNameEdit().setText("");
+        getTypeList().getSelectionModel().select(defaultType);
+        getPictureList().getSelectionModel().select(RecordType.PASSWORD.getPicture());
 
-        setResultConverter((ButtonType b) -> {
-            if (b == ButtonType.OK) {
+        setResultConverter(buttonType -> {
+            if (OK.equals(buttonType)) {
                 var type = getTypeList().getSelectionModel().getSelectedItem();
-                return Card.newCard(
+                return new Card(
                     getNameEdit().getText(),
                     getPictureList().getSelectionModel().getSelectedItem(),
                     type.getFieldSet()

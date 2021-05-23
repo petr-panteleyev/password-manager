@@ -6,7 +6,6 @@ package org.panteleyev.pwdmanager;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
@@ -23,7 +22,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import static javafx.scene.control.ButtonType.CANCEL;
+import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
@@ -31,13 +33,27 @@ import static org.panteleyev.pwdmanager.Constants.RB;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_P;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_ADD;
+import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_DELETE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_REPLACE;
+import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_RESTORE;
 
-public class ImportDialog extends BaseDialog<List<ImportRecord>> {
+final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-    private static final String ACTION_ADD = fxString(RB, "Add");
-    private static final String ACTION_REPLACE = fxString(RB, "Replace");
-    private static final String ACTION_SKIP = fxString(RB, "Skip");
+
+    private static final Map<ImportAction, String> STYLE_MAP = Map.of(
+        ImportAction.ADD, STYLE_ACTION_ADD,
+        ImportAction.REPLACE, STYLE_ACTION_REPLACE,
+        ImportAction.DELETE, STYLE_ACTION_DELETE,
+        ImportAction.RESTORE, STYLE_ACTION_RESTORE
+    );
+
+    private static final Map<ImportAction, String> STRING_MAP = Map.of(
+        ImportAction.ADD, fxString(RB, "Add"),
+        ImportAction.REPLACE, fxString(RB, "Replace"),
+        ImportAction.DELETE, fxString(RB, "Delete"),
+        ImportAction.RESTORE, fxString(RB, "Restore"),
+        ImportAction.SKIP, fxString(RB, "Skip")
+    );
 
     private final ObservableList<ImportRecord> importRecords = FXCollections.observableArrayList();
     private final TableView<ImportRecord> tableView = new TableView<>(importRecords);
@@ -60,17 +76,12 @@ public class ImportDialog extends BaseDialog<List<ImportRecord>> {
         protected void updateItem(ImportRecord importRecord, boolean empty) {
             super.updateItem(importRecord, empty);
 
-            getStyleClass().removeAll(STYLE_ACTION_ADD);
-            if (importRecord == null || empty || !importRecord.isApproved()) {
+            getStyleClass().removeAll(STYLE_MAP.values());
+            if (importRecord == null || empty || !importRecord.approved()) {
                 return;
             }
 
-            getStyleClass().add(
-                switch (importRecord.getAction()) {
-                    case ADD -> STYLE_ACTION_ADD;
-                    case REPLACE -> STYLE_ACTION_REPLACE;
-                }
-            );
+            getStyleClass().add(STYLE_MAP.get(importRecord.getEffectiveAction()));
         }
     }
 
@@ -91,25 +102,24 @@ public class ImportDialog extends BaseDialog<List<ImportRecord>> {
 
         tableView.getColumns().setAll(List.of(
             tableColumn(fxString(RB, "Name"), b ->
-                b.withPropertyCallback(r -> r.getCardToImport().name())
+                b.withPropertyCallback(r -> r.cardToImport().name())
                     .withWidthBinding(w.multiply(0.35))
             ),
             tableColumn(fxString(RB, "Updated"), (TableColumnBuilder<ImportRecord, Long> b) ->
-                b.withPropertyCallback(r -> r.getCardToImport().modified())
+                b.withPropertyCallback(r -> r.cardToImport().modified())
                     .withCellFactory(x -> new TimestampCell())
                     .withWidthBinding(w.multiply(0.35))
             ),
-            tableColumn(fxString(RB, "Action"), b ->
-                b.withPropertyCallback(r -> !r.isApproved() ?
-                    ACTION_SKIP : r.getAction() == ImportAction.ADD ? ACTION_ADD : ACTION_REPLACE
-                ).withWidthBinding(w.multiply(0.27))
+            tableColumn(fxString(RB, "Action"),
+                b -> b.withPropertyCallback(r -> STRING_MAP.get(r.getEffectiveAction()))
+                    .withWidthBinding(w.multiply(0.27))
             )
         ));
 
         setResultConverter(buttonType -> {
-            if (buttonType.equals(ButtonType.OK)) {
+            if (OK.equals(buttonType)) {
                 return importRecords.stream()
-                    .filter(ImportRecord::isApproved)
+                    .filter(ImportRecord::approved)
                     .toList();
             } else {
                 return Collections.emptyList();
@@ -117,7 +127,7 @@ public class ImportDialog extends BaseDialog<List<ImportRecord>> {
         });
 
         getDialogPane().setContent(tableView);
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        getDialogPane().getButtonTypes().addAll(OK, CANCEL);
     }
 
     private Optional<ImportRecord> getSelectedItem() {
@@ -125,7 +135,12 @@ public class ImportDialog extends BaseDialog<List<ImportRecord>> {
     }
 
     private void onToggleApproval() {
-        getSelectedItem().ifPresent(ImportRecord::toggleApproval);
+        getSelectedItem().ifPresent(item -> {
+            var newItem = item.toggleApproval();
+            var index = importRecords.indexOf(item);
+            importRecords.set(index, newItem);
+            tableView.getSelectionModel().select(index);
+        });
         var column = tableView.getColumns().get(0);
         column.setVisible(false);
         column.setVisible(true);
@@ -140,7 +155,7 @@ public class ImportDialog extends BaseDialog<List<ImportRecord>> {
         );
 
         menu.setOnShowing(e -> toggleMenuItem.setSelected(
-            getSelectedItem().map(r -> !r.isApproved()).orElse(false))
+            getSelectedItem().map(r -> !r.approved()).orElse(false))
         );
 
         return menu;

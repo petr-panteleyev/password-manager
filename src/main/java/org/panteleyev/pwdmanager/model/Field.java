@@ -5,8 +5,4 @@
 package org.panteleyev.pwdmanager.model;
 
 public record Field(FieldType type, String name, String value) {
-
-    public Field(Field field) {
-        this(field.type, field.name, field.value);
-    }
 }

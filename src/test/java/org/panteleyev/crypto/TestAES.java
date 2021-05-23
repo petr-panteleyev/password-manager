@@ -37,8 +37,7 @@ public class TestAES {
 
     @Test
     public void testAESInputStreamDecrypt() throws Exception {
-        AES aes = AES.aes256();
-
+        var aes = AES.aes256();
         var enc = aes.encrypt(TEXT, PASSWORD);
 
         try (var in = new ByteArrayInputStream(enc)) {
@@ -49,7 +48,7 @@ public class TestAES {
 
     @Test
     public void testAESOutputStreamEncrypt() throws Exception {
-        AES aes = AES.aes256();
+        var aes = AES.aes256();
 
         try (var out = new ByteArrayOutputStream()) {
             aes.encrypt(TEXT, PASSWORD, out);

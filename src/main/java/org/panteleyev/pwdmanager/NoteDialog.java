@@ -5,14 +5,15 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
-import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.Note;
 import java.util.List;
+import static javafx.scene.control.ButtonType.OK;
+import static org.panteleyev.fx.FxFactory.textField;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
@@ -21,28 +22,23 @@ import static org.panteleyev.pwdmanager.Constants.RB;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
-class NoteDialog extends BaseDialog<Card> {
+final class NoteDialog extends BaseDialog<Note> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final TextField nameEdit = new TextField();
+    private final TextField nameEdit = textField(20);
 
     NoteDialog() {
         super(options().getDialogCssFileUrl());
 
         setTitle(RB.getString("noteDialog.title"));
 
-        var grid = gridPane(
+        getDialogPane().setContent(gridPane(
             List.of(gridRow(label(fxString(RB, "label.Name")), nameEdit)),
             b -> b.withStyle(STYLE_GRID_PANE)
-        );
-
-        getDialogPane().setContent(grid);
+        ));
         createDefaultButtons(RB);
 
-        nameEdit.setPrefColumnCount(20);
-
-        setResultConverter(b -> b == ButtonType.OK ?
-            Card.newNote(nameEdit.getText(), "", false) : null);
+        setResultConverter(buttonType -> OK.equals(buttonType) ? new Note(nameEdit.getText()) : null);
 
         Platform.runLater(this::setupValidator);
     }

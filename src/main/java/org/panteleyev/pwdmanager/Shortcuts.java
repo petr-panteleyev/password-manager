@@ -9,7 +9,7 @@ import javafx.scene.input.KeyCodeCombination;
 import static javafx.scene.input.KeyCombination.SHIFT_DOWN;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 
-public interface Shortcuts {
+interface Shortcuts {
     KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(KeyCode.C, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_D = new KeyCodeCombination(KeyCode.D, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_F = new KeyCodeCombination(KeyCode.F, SHORTCUT_DOWN);

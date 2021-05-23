@@ -4,30 +4,41 @@
  */
 package org.panteleyev.pwdmanager;
 
-import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
+import org.panteleyev.pwdmanager.model.WalletRecord;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public interface ImportUtil {
 
-    static List<ImportRecord> calculateImport(Collection<Card> existing, Collection<Card> toImport) {
-        var result = new ArrayList<ImportRecord>();
+    static List<ImportRecord> calculateImport(Collection<? extends WalletRecord> existing, Collection<? extends WalletRecord> toImport) {
+        var result = new ArrayList<ImportRecord>(toImport.size());
         for (var card : toImport) {
             existing.stream()
                 .filter(x -> x.uuid().equals(card.uuid()))
                 .findAny()
                 .ifPresentOrElse(
-                    found -> {
-                        if (found.modified() < card.modified()) {
-                            result.add(new ImportRecord(ImportAction.REPLACE, found, card));
-                        }
-                    },
-                    () -> result.add(new ImportRecord(ImportAction.ADD, null, card))
+                    found -> processUpdate(result, found, card),
+                    () -> processAddition(result, card)
                 );
         }
         return result;
+    }
+
+    private static void processUpdate(List<ImportRecord> importRecords, WalletRecord existing, WalletRecord toImport) {
+        if (existing.modified() < toImport.modified()) {
+            var action = existing.active() == toImport.active() ?
+                ImportAction.REPLACE : toImport.active() ? ImportAction.RESTORE : ImportAction.DELETE;
+            importRecords.add(new ImportRecord(action, existing, toImport));
+        }
+    }
+
+    private static void processAddition(List<ImportRecord> importRecords, WalletRecord toImport) {
+        if (toImport.active()) {
+            // Inactive cards will not be added
+            importRecords.add(new ImportRecord(toImport));
+        }
     }
 }

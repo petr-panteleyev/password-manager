@@ -7,12 +7,14 @@ package org.panteleyev.pwdmanager;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.pwdmanager.model.Note;
+import org.panteleyev.pwdmanager.model.Picture;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import static org.testng.Assert.assertEquals;
 
@@ -27,10 +29,18 @@ public class TestSerializer {
 
     @Test
     public void testCardSerialization() {
-        var card = Card.newCard(UUID.randomUUID().toString(), Picture.AMEX, Arrays.asList(
-            new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-            new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())
-        ), UUID.randomUUID().toString());
+        var card = new Card(
+            UUID.randomUUID(),
+            System.currentTimeMillis(),
+            Picture.AMEX,
+            UUID.randomUUID().toString(),
+            List.of(
+                new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+                new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            ),
+            UUID.randomUUID().toString(),
+            true, false
+        );
 
         var doc = docBuilder.newDocument();
 
@@ -62,7 +72,7 @@ public class TestSerializer {
 
     @Test
     public void testNoteSerialization() {
-        var note = Card.newNote(UUID.randomUUID().toString(), UUID.randomUUID().toString(), true);
+        var note = new Note(UUID.randomUUID().toString());
 
         var doc = docBuilder.newDocument();
 

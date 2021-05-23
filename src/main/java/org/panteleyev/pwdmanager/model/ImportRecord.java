@@ -4,54 +4,21 @@
  */
 package org.panteleyev.pwdmanager.model;
 
-import java.util.Objects;
+public record ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport, boolean approved) {
 
-public class ImportRecord {
-    private final ImportAction action;
-    private final Card existingCard;
-    private final Card cardToImport;
-    private boolean approved = true;
-
-    public ImportRecord(ImportAction action, Card existingCard, Card cardToImport) {
-        this.action = action;
-        this.existingCard = existingCard;
-        this.cardToImport = cardToImport;
+    public ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport) {
+        this(action, existingCard, cardToImport, true);
     }
 
-    public ImportAction getAction() {
-        return action;
+    public ImportRecord(WalletRecord cardToImport) {
+        this(ImportAction.ADD, null, cardToImport, true);
     }
 
-    public Card getExistingCard() {
-        return existingCard;
+    public ImportAction getEffectiveAction() {
+        return approved ? action : ImportAction.SKIP;
     }
 
-    public Card getCardToImport() {
-        return cardToImport;
-    }
-
-    public boolean isApproved() {
-        return approved;
-    }
-
-    public void toggleApproval() {
-        approved = !approved;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof ImportRecord that) {
-            return Objects.equals(this.action, that.action)
-                && Objects.equals(this.existingCard, that.existingCard)
-                && Objects.equals(this.cardToImport, that.cardToImport)
-                && Objects.equals(this.approved, that.approved);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(action, existingCard, cardToImport, approved);
+    public ImportRecord toggleApproval() {
+        return new ImportRecord(action, existingCard, cardToImport, !approved);
     }
 }

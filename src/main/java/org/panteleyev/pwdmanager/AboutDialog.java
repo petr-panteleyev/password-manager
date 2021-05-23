@@ -20,7 +20,7 @@ import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ABOUT_LABEL;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
-class AboutDialog extends BaseDialog<Object> {
+final class AboutDialog extends BaseDialog<Object> {
 
     AboutDialog(Controller owner) {
         super(owner, options().getDialogCssFileUrl());

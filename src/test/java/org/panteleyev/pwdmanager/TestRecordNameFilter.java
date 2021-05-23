@@ -14,7 +14,7 @@ import static org.testng.Assert.assertEquals;
 @Test
 public class TestRecordNameFilter {
     private static final Card CARD =
-        Card.newCard("Card Name", null, List.of());
+        new Card("Card Name", null, List.of());
 
     @DataProvider
     public Object[][] dataProvider() {

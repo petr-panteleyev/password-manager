@@ -25,10 +25,12 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.generator.Generator;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.FieldType;
-import java.util.ArrayList;
+import org.panteleyev.pwdmanager.model.Picture;
 import java.util.List;
 import java.util.Optional;
+import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.FxFactory.textField;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -43,13 +45,13 @@ import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
-class EditCardDialog extends BaseDialog<Card> {
+final class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;
 
     private final TableView<EditableField> cardContentView = new TableView<>();
     private final TextField fieldNameEdit = new TextField();
     private final ComboBox<FieldType> fieldTypeCombo = new ComboBox<>();
-    private final TextField cardNameEdit = new TextField();
+    private final TextField cardNameEdit = textField(30);
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
     private final MenuItem generateMenuItem = menuItem(fxString(RB, "Generate"), SHORTCUT_G,
@@ -105,7 +107,6 @@ class EditCardDialog extends BaseDialog<Card> {
             ), b -> b.withStyle(STYLE_GRID_PANE)
         );
         grid3.setPadding(new Insets(5, 5, 5, 5));
-        cardNameEdit.setPrefColumnCount(30);
 
         var noteEditor = new TextArea();
 
@@ -141,20 +142,20 @@ class EditCardDialog extends BaseDialog<Card> {
         cardNameEdit.setText(card.name());
         pictureList.getSelectionModel().select(card.picture());
 
-        setResultConverter((ButtonType b) -> {
-            if (b == ButtonType.OK) {
-                return Card.newCard(
+        setResultConverter(buttonType -> {
+            if (OK.equals(buttonType)) {
+                return new Card(
                     card.uuid(),
                     System.currentTimeMillis(),
-                    cardNameEdit.getText(),
                     pictureList.getSelectionModel().getSelectedItem(),
-                    new ArrayList<>(
-                        editableFields.stream()
-                            .map(EditableField::toField)
-                            .toList()
-                    ),
+                    cardNameEdit.getText(),
+                    editableFields.stream()
+                        .map(EditableField::toField)
+                        .toList(),
                     noteEditor.getText(),
-                    card.favorite());
+                    card.favorite(),
+                    card.active()
+                );
             } else {
                 return null;
             }

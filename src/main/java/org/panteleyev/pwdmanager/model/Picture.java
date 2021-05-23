@@ -2,14 +2,14 @@
  Copyright (c) Petr Panteleyev. All rights reserved.
  Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.model;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
+import org.panteleyev.pwdmanager.cells.PictureListCell;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public enum Picture {

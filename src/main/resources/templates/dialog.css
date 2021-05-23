@@ -67,3 +67,13 @@
     -fx-control-inner-background: ${actionReplaceColor};
     -fx-control-inner-background-alt: ${actionReplaceColor};
 }
+
+.action-delete {
+    -fx-control-inner-background: ${actionDeleteColor};
+    -fx-control-inner-background-alt: ${actionDeleteColor};
+}
+
+.action-restore {
+    -fx-control-inner-background: ${actionRestoreColor};
+    -fx-control-inner-background-alt: ${actionRestoreColor};
+}

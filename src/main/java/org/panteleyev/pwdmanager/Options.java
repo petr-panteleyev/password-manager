@@ -28,6 +28,7 @@ import static javafx.application.Platform.runLater;
 import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
 
 public final class Options {
+    @SuppressWarnings("unused")
     private enum Option {
         WINDOW_WIDTH,
         WINDOW_HEIGHT,
@@ -156,11 +157,15 @@ public final class Options {
             // Colors
             entry("favoriteColor", ColorOption.FAVORITE.getWebString()),
             entry("favoriteBackground", ColorOption.FAVORITE_BACKGROUND.getWebString()),
+            entry("deletedColor", ColorOption.DELETED.getWebString()),
+            entry("deletedBackground", ColorOption.DELETED_BACKGROUND.getWebString()),
             entry("fieldNameColor", ColorOption.FIELD_NAME.getWebString()),
             entry("fieldValueColor", ColorOption.FIELD_VALUE.getWebString()),
             entry("hyperLinkColor", ColorOption.HYPERLINK.getWebString()),
             entry("actionAddColor", ColorOption.ACTION_ADD.getWebString()),
-            entry("actionReplaceColor", ColorOption.ACTION_REPLACE.getWebString())
+            entry("actionReplaceColor", ColorOption.ACTION_REPLACE.getWebString()),
+            entry("actionDeleteColor", ColorOption.ACTION_DELETE.getWebString()),
+            entry("actionRestoreColor", ColorOption.ACTION_RESTORE.getWebString())
         );
 
         try (var w = new FileWriter(mainCssFile)) {
@@ -177,9 +182,9 @@ public final class Options {
     }
 
     public void reloadCssFile() {
-        WindowManager.newInstance().getControllers().forEach(
-            c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
-        );
+        for (var c : WindowManager.newInstance().getControllers()) {
+            runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()));
+        }
     }
 
     public String getMainCssFilePath() {

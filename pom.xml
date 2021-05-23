@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>21.3.0</version>
+    <version>21.4.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -28,7 +28,7 @@
         <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>16</javaFxVersion>
-        <javaFxHelpersVersion>1.8.2</javaFxHelpersVersion>
+        <javaFxHelpersVersion>1.8.3</javaFxHelpersVersion>
         <controlsFxVersion>11.1.0</controlsFxVersion>
         <testNgVersion>7.3.0</testNgVersion>
     </properties>

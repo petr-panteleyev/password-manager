@@ -14,7 +14,10 @@ public interface Styles {
     String STYLE_FIELD_NAME = "fieldName";
     String STYLE_FIELD_VALUE = "fieldValue";
     String STYLE_FAVORITE = "favorite";
+    String STYLE_DELETED = "deleted";
 
     String STYLE_ACTION_ADD = "action-add";
     String STYLE_ACTION_REPLACE = "action-replace";
+    String STYLE_ACTION_DELETE = "action-delete";
+    String STYLE_ACTION_RESTORE = "action-restore";
 }

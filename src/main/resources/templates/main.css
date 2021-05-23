@@ -86,3 +86,13 @@
 .favorite:selected {
     -fx-text-fill: -fx-selection-bar-text;
 }
+
+.deleted {
+    -fx-text-fill: ${deletedColor};
+    -fx-control-inner-background: ${deletedBackground};
+    -fx-control-inner-background-alt: ${deletedBackground};
+}
+
+.deleted:selected {
+    -fx-text-fill: -fx-selection-bar-text;
+}

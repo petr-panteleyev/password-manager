@@ -36,8 +36,8 @@ public class TestGenerator {
     }
 
     private static boolean contains(String password, List<Character> characters) {
-        for (int i = 0; i < password.length(); i++) {
-            char ch = password.charAt(i);
+        for (var i = 0; i < password.length(); i++) {
+            var ch = password.charAt(i);
             if (characters.contains(ch)) {
                 return true;
             }

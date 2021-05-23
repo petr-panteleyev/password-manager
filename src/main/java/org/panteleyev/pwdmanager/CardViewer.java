@@ -23,6 +23,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.pwdmanager.model.Picture;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,7 +36,7 @@ import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_NAME;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 
-class CardViewer extends BorderPane {
+final class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
     private static final double RIGHT_WIDTH = 100.0 - LEFT_WIDTH;
 

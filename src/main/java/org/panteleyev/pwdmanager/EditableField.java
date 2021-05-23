@@ -10,7 +10,7 @@ import javafx.beans.property.StringProperty;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 
-class EditableField {
+final class EditableField {
     private final SimpleObjectProperty<FieldType> type = new SimpleObjectProperty<>();
     private final SimpleStringProperty name = new SimpleStringProperty();
     private final SimpleStringProperty value = new SimpleStringProperty();

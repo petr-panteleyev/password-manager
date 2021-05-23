@@ -5,9 +5,13 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,22 +38,31 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
+import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.pwdmanager.cells.RecordListCell;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.filters.RecordNameFilter;
 import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.Note;
+import org.panteleyev.pwdmanager.model.RecordType;
+import org.panteleyev.pwdmanager.model.WalletRecord;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -69,22 +82,27 @@ import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
 import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_CARDS_BY_FAVORITE;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_CARDS_BY_NAME;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
 
-class MainWindowController extends Controller {
+final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
 
     // Preferences
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
     private static final String PREF_CURRENT_FILE = "current_file";
 
+    private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
+    private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
+
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private String currentPassword;
 
-    private final ObservableList<Card> recordList = FXCollections.observableArrayList();
-    private final SortedList<Card> sortedList = new SortedList<>(recordList);
-    private final ListView<Card> cardListView = new ListView<>(sortedList);
+    private final ObservableList<WalletRecord> recordList = FXCollections.observableArrayList();
+    private final SortedList<WalletRecord> sortedList = new SortedList<>(recordList);
+    private final FilteredList<WalletRecord> filteredList = sortedList.filtered(defaultFilter);
+    private final ListView<WalletRecord> cardListView = new ListView<>(filteredList);
 
     private final BorderPane leftPane = new BorderPane(cardListView);
     private final TitledPane treeViewPane = new TitledPane("", leftPane);
@@ -101,7 +119,11 @@ class MainWindowController extends Controller {
     MainWindowController(Stage stage) {
         super(stage, options().getMainCssFilePath());
 
-        sortedList.setComparator(COMPARE_CARDS_BY_FAVORITE.thenComparing(COMPARE_CARDS_BY_NAME));
+        sortedList.setComparator(COMPARE_BY_ACTIVE
+            .thenComparing(COMPARE_BY_FAVORITE)
+            .thenComparing(COMPARE_BY_NAME));
+
+        filteredList.predicateProperty().bind(defaultFilter);
 
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
         getStage().setOnHiding(event -> onWindowClosing());
@@ -127,12 +149,19 @@ class MainWindowController extends Controller {
             new SeparatorMenuItem(),
             favoriteMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.copy"), SHORTCUT_C, a -> onCardCopy()),
+            menuItem(fxString(RB, "menu.edit.copy"), SHORTCUT_C,
+                a -> onCardCopy(), selectedItemProperty().isNull()),
             pasteMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.delete"), SHIFT_DELETE, a -> onDeleteRecord(), currentFile.isNull())
+            menuItem(fxString(RB, "menu.edit.delete"), SHIFT_DELETE,
+                a -> onDeleteRecord(), selectedItemProperty().isNull()),
+            menuItem(fxString(RB, "Restore"), a -> onRestoreRecord(), selectedItemProperty().isNull())
         );
         editMenu.setOnShowing(e -> setupEditMenuItems(favoriteMenuItem, pasteMenuItem));
+
+        var showDeletedItemsMenuItem = checkMenuItem(fxString(RB, "Show_Deleted"), false);
+        showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
+        showDeletedRecords.addListener((observableValue, oldValue, newValue) -> onShowDeletedItems(newValue));
 
         return menuBar(
             newMenu(fxString(RB, "menu.file"),
@@ -143,10 +172,15 @@ class MainWindowController extends Controller {
             ),
             // Edit
             editMenu,
+            newMenu(fxString(RB, "View"),
+                showDeletedItemsMenuItem
+            ),
             // Tools
             newMenu(fxString(RB, "menu.tools"),
                 menuItem(fxString(RB, "menu.tools.import"), a -> onImportFile()),
                 menuItem(fxString(RB, "menu.tools.export"), a -> onExportFile(), currentFile.isNull()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(RB, "Purge", ELLIPSIS), a -> onPurge(), currentFile.isNull()),
                 new SeparatorMenuItem(),
                 menuItem(fxString(RB, "menu.tools.changePassword"),
                     a -> onChangePassword(), currentFile.isNull()),
@@ -200,7 +234,9 @@ class MainWindowController extends Controller {
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
             menuItem(fxString(RB, "menu.edit.delete"), a -> onDeleteRecord(),
-                currentFile.isNull()),
+                selectedItemProperty().isNull()),
+            menuItem(fxString(RB, "Restore"), a -> onRestoreRecord(),
+                selectedItemProperty().isNull()),
             new SeparatorMenuItem(),
             menuItem(fxString(RB, "menu.edit.copy"), a -> onCardCopy()),
             ctxCardPasteMenuItem
@@ -220,7 +256,7 @@ class MainWindowController extends Controller {
         favoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().favorite());
 
         if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
-            var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
+            var sourceId = (UUID) cb.getContent(Card.DATA_FORMAT);
             var sourceItem = findRecordById(sourceId);
             pasteEnable = sourceItem.isPresent();
         }
@@ -231,8 +267,7 @@ class MainWindowController extends Controller {
     private void initialize() {
         cardListView.getSelectionModel().selectedItemProperty().addListener(x -> onListViewSelected());
 
-        cardEditButton.disableProperty().bind(cardListView.getSelectionModel().selectedItemProperty().isNull());
-
+        cardEditButton.setDisable(true);
         leftPane.setTop(searchTextField);
         BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
 
@@ -251,15 +286,23 @@ class MainWindowController extends Controller {
 
     private void doSearch(String newValue) {
         if (newValue.isEmpty()) {
-            cardListView.setItems(sortedList);
+            filteredList.predicateProperty().bind(defaultFilter);
         } else {
-            cardListView.setItems(sortedList.filtered(
-                new RecordNameFilter(newValue).or(new FieldContentFilter(newValue))));
+            filteredList.predicateProperty().bind(
+                PredicateProperty.and(List.of(
+                    defaultFilter,
+                    new PredicateProperty<>(new RecordNameFilter(newValue).or(new FieldContentFilter(newValue)))
+                ))
+            );
         }
     }
 
-    private Optional<Card> getSelectedItem() {
+    private Optional<WalletRecord> getSelectedItem() {
         return Optional.ofNullable(cardListView.getSelectionModel().getSelectedItem());
+    }
+
+    private ReadOnlyObjectProperty<WalletRecord> selectedItemProperty() {
+        return cardListView.getSelectionModel().selectedItemProperty();
     }
 
     private void onExit() {
@@ -282,7 +325,7 @@ class MainWindowController extends Controller {
 
         new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
             try (var in = new FileInputStream(file)) {
-                var list = new ArrayList<Card>();
+                var list = new ArrayList<WalletRecord>();
                 if (!password.isEmpty()) {
                     try (var cin = AES.aes256().getInputStream(in, password)) {
                         Serializer.deserialize(cin, list);
@@ -298,10 +341,10 @@ class MainWindowController extends Controller {
                 } else {
                     new ImportDialog(this, importRecords).showAndWait().ifPresent(records -> {
                         for (var r : records) {
-                            if (r.getExistingCard() != null) {
-                                recordList.removeAll(r.getExistingCard());
+                            if (r.existingCard() != null) {
+                                recordList.removeAll(r.existingCard());
                             }
-                            recordList.add(r.getCardToImport());
+                            recordList.add(r.cardToImport());
                         }
                         if (!records.isEmpty()) {
                             writeDocument();
@@ -328,7 +371,7 @@ class MainWindowController extends Controller {
         }
     }
 
-    private void processNewRecord(Card newRecord) {
+    private void processNewRecord(WalletRecord newRecord) {
         recordList.add(newRecord);
         cardListView.getSelectionModel().select(newRecord);
         cardListView.scrollTo(newRecord);
@@ -336,18 +379,28 @@ class MainWindowController extends Controller {
     }
 
     private void onDeleteRecord() {
-        getSelectedItem().ifPresent((Card item) -> {
+        getSelectedItem().ifPresent((WalletRecord item) -> {
             var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> {
-                    recordList.remove(item);
+            alert.showAndWait()
+                .filter(x -> x.equals(ButtonType.YES))
+                .ifPresent(x -> {
+                    var newCard = item.setActive(false);
+                    updateListItem(newCard);
                     writeDocument();
-                }
-            );
+                });
+        });
+    }
+
+    private void onRestoreRecord() {
+        getSelectedItem().ifPresent(card -> {
+            var newCard = card.setActive(true);
+            updateListItem(newCard);
+            writeDocument();
         });
     }
 
     private void onNewCard() {
-        new CardDialog(RecordType.PASSWORD, null)
+        new CardDialog(RecordType.PASSWORD)
             .showAndWait()
             .ifPresent(this::processNewRecord);
     }
@@ -360,18 +413,18 @@ class MainWindowController extends Controller {
         searchTextField.requestFocus();
     }
 
-    private void setupRecordViewer(Card record) {
+    private void setupRecordViewer(WalletRecord record) {
         cardContentTitleLabel.setText(record.name());
         cardContentTitleLabel.setGraphic(new ImageView(record.picture().getBigImage()));
 
-        if (record.isNote()) {
-            noteViewer.setText(record.note());
+        if (record instanceof Note note) {
+            noteViewer.setText(note.note());
             recordViewPane.setCenter(noteViewer);
         } else {
-            if (record.isCard()) {
+            if (record instanceof Card card) {
                 recordViewPane.setCenter(cardContentView);
 
-                var wrappers = record.fields().stream()
+                var wrappers = card.fields().stream()
                     .filter(f -> !f.value().isEmpty())
                     .map(FieldWrapper::new)
                     .toList();
@@ -382,6 +435,7 @@ class MainWindowController extends Controller {
 
     private void onListViewSelected() {
         var item = cardListView.getSelectionModel().getSelectedItem();
+        cardEditButton.setDisable(item == null || !item.active());
 
         if (item == null) {
             recordViewPane.setCenter(null);
@@ -392,12 +446,12 @@ class MainWindowController extends Controller {
         }
     }
 
-    private Optional<Card> findByUuid(String uuid) {
+    private Optional<WalletRecord> findByUuid(UUID uuid) {
         return recordList.stream().filter(x -> x.uuid().equals(uuid)).findFirst();
     }
 
 
-    private void processEditedRecord(Card r) {
+    private void processEditedRecord(WalletRecord r) {
         var index = getIndexByUUID(r.uuid());
         if (index != -1) {
             recordList.set(index, r);
@@ -410,10 +464,16 @@ class MainWindowController extends Controller {
     }
 
     private void onEditCard() {
-        getSelectedItem().ifPresent(card -> {
-            switch (card.cardClass()) {
-                case CARD -> new EditCardDialog(card).showAndWait().ifPresent(this::processEditedRecord);
-                case NOTE -> new EditNoteDialog(card).showAndWait().ifPresent(this::processEditedRecord);
+        getSelectedItem().ifPresent(item -> {
+            // TODO: reimplement with switch pattern matching when available
+            BaseDialog<? extends WalletRecord> dialog = null;
+            if (item instanceof Card card) {
+                dialog = new EditCardDialog(card);
+            } else if (item instanceof Note note) {
+                dialog = new EditNoteDialog(note);
+            }
+            if (dialog != null) {
+                dialog.showAndWait().ifPresent(this::processEditedRecord);
             }
         });
     }
@@ -422,7 +482,7 @@ class MainWindowController extends Controller {
         new AboutDialog(this).showAndWait();
     }
 
-    private void putCardToClipboard(Card record) {
+    private void putCardToClipboard(WalletRecord record) {
         var cb = Clipboard.getSystemClipboard();
         var content = new ClipboardContent();
         content.put(Card.DATA_FORMAT, record.uuid());
@@ -435,7 +495,7 @@ class MainWindowController extends Controller {
 
     private void onCardPaste() {
         var cb = Clipboard.getSystemClipboard();
-        var sourceId = (String) cb.getContent(Card.DATA_FORMAT);
+        var sourceId = (UUID) cb.getContent(Card.DATA_FORMAT);
 
         findByUuid(sourceId).ifPresent(sourceRecord -> {
             var newRecord = sourceRecord.copyWithNewUuid();
@@ -446,7 +506,7 @@ class MainWindowController extends Controller {
         });
     }
 
-    private int getIndexByUUID(String uuid) {
+    private int getIndexByUUID(UUID uuid) {
         for (int index = 0; index < recordList.size(); index++) {
             if (recordList.get(index).uuid().equals(uuid)) {
                 return index;
@@ -455,7 +515,7 @@ class MainWindowController extends Controller {
         return -1;
     }
 
-    private void updateListItem(Card card) {
+    private void updateListItem(WalletRecord card) {
         var index = getIndexByUUID(card.uuid());
         if (index != -1) {
             recordList.set(index, card);
@@ -472,7 +532,7 @@ class MainWindowController extends Controller {
         });
     }
 
-    private Optional<Card> findRecordById(String uuid) {
+    private Optional<WalletRecord> findRecordById(UUID uuid) {
         return sortedList.stream().filter(x -> x.uuid().equals(uuid)).findFirst();
     }
 
@@ -530,7 +590,7 @@ class MainWindowController extends Controller {
                 currentPassword = password;
 
                 try (var in = new FileInputStream(file)) {
-                    var list = new ArrayList<Card>();
+                    var list = new ArrayList<WalletRecord>();
                     if (!currentPassword.isEmpty()) {
                         try (var cin = AES.aes256().getInputStream(in, password)) {
                             Serializer.deserialize(cin, list);
@@ -567,8 +627,8 @@ class MainWindowController extends Controller {
     private void writeDocument(File file, String password) {
         try (var bOut = new ByteArrayOutputStream()) {
             if (!password.isEmpty()) {
-                try (var cout = AES.aes256().getOutputStream(bOut, password)) {
-                    Serializer.serialize(cout, recordList);
+                try (var cOut = AES.aes256().getOutputStream(bOut, password)) {
+                    Serializer.serialize(cOut, recordList);
                 }
             } else {
                 Serializer.serialize(bOut, recordList);
@@ -596,5 +656,21 @@ class MainWindowController extends Controller {
     private void onWindowClosing() {
         Options.saveWindowDimensions(getStage());
         Options.saveOptions();
+    }
+
+    private void onShowDeletedItems(boolean show) {
+        defaultFilter.set(
+            show ? card -> true : WalletRecord::active
+        );
+    }
+
+    private void onPurge() {
+        var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
+        alert.showAndWait()
+            .filter(x -> x.equals(ButtonType.YES))
+            .ifPresent(x -> {
+                recordList.removeIf(card -> !card.active());
+                writeDocument();
+            });
     }
 }

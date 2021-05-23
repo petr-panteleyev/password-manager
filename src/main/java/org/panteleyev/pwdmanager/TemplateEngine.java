@@ -11,7 +11,7 @@ import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.Map;
 
-public final class TemplateEngine {
+final class TemplateEngine {
     public enum Template {
         MAIN_CSS("main.css"),
         DIALOG_CSS("dialog.css");

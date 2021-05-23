@@ -2,15 +2,13 @@
  Copyright (c) Petr Panteleyev. All rights reserved.
  Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.model;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.scene.image.Image;
-import org.panteleyev.pwdmanager.model.Field;
-import org.panteleyev.pwdmanager.model.FieldType;
 
 public enum RecordType {
     EMPTY(Picture.GENERIC, Collections.emptyList()),

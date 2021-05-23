@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
@@ -48,7 +49,7 @@ class PasswordDialog extends BaseDialog<String> {
 
         createDefaultButtons(RB);
 
-        setResultConverter(b -> b == ButtonType.OK ? passwordEdit.getText() : null);
+        setResultConverter(buttonType -> OK.equals(buttonType) ? passwordEdit.getText() : null);
 
         if (change) {
             Platform.runLater(this::createValidationSupport);
