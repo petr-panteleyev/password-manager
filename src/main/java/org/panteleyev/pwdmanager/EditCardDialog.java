@@ -21,6 +21,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.generator.Generator;
 import org.panteleyev.pwdmanager.model.Card;
@@ -30,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.newTab;
-import static org.panteleyev.fx.FxFactory.textField;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -51,7 +52,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     private final TableView<EditableField> cardContentView = new TableView<>();
     private final TextField fieldNameEdit = new TextField();
     private final ComboBox<FieldType> fieldTypeCombo = new ComboBox<>();
-    private final TextField cardNameEdit = textField(30);
+    private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
     private final MenuItem generateMenuItem = menuItem(fxString(RB, "Generate"), SHORTCUT_G,
@@ -59,6 +60,7 @@ final class EditCardDialog extends BaseDialog<Card> {
 
     EditCardDialog(Card card) {
         super(options().getDialogCssFileUrl());
+        setResizable(true);
 
         editableFields = FXCollections.observableArrayList(
             card.fields().stream()
@@ -68,15 +70,9 @@ final class EditCardDialog extends BaseDialog<Card> {
 
         setTitle(RB.getString("editCardDialog.title"));
 
-        var fieldNameColumn = new TableColumn<EditableField, String>();
-        fieldNameColumn.setSortable(false);
-        fieldNameColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
-
-        var fieldValueColumn = new TableColumn<EditableField, String>();
-        fieldValueColumn.setSortable(false);
-        fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
-
-        cardContentView.getColumns().setAll(List.of(fieldNameColumn, fieldValueColumn));
+        cardContentView.getColumns().setAll(
+            createEditorColumns()
+        );
 
         var contextMenu = createContextMenu();
         contextMenu.setOnShowing(event ->
@@ -100,31 +96,24 @@ final class EditCardDialog extends BaseDialog<Card> {
         BorderPane.setAlignment(grid1, Pos.CENTER);
         BorderPane.setMargin(grid1, new Insets(5, 0, 0, 0));
 
-        var grid3 = gridPane(
+        var optionsPane = gridPane(
             List.of(
                 gridRow(label(fxString(RB, "label.Name")), cardNameEdit),
                 gridRow(label(fxString(RB, "label.Icon")), pictureList)
             ), b -> b.withStyle(STYLE_GRID_PANE)
         );
-        grid3.setPadding(new Insets(5, 5, 5, 5));
+        optionsPane.setPadding(new Insets(5, 5, 5, 5));
+        GridPane.setHgrow(cardNameEdit, Priority.ALWAYS);
 
         var noteEditor = new TextArea();
 
         var tabPane = new TabPane(
             newTab(RB, "editCardDialog.tab.fields", false, pane),
             newTab(RB, "editCardDialog.tab.notes", false, noteEditor),
-            newTab(RB, "editCardDialog.tab.properties", false, grid3));
+            newTab(RB, "editCardDialog.tab.properties", false, optionsPane));
 
         getDialogPane().setContent(tabPane);
         createDefaultButtons(RB);
-
-        fieldValueColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        fieldNameColumn.setCellValueFactory(p -> p.getValue().nameProperty());
-        fieldValueColumn.setCellValueFactory(p -> p.getValue().valueProperty());
-
-        fieldNameColumn.prefWidthProperty().bind(cardContentView.widthProperty().divide(2).subtract(1));
-        fieldValueColumn.prefWidthProperty().bind(cardContentView.widthProperty().divide(2).subtract(1));
 
         cardContentView.setItems(editableFields);
 
@@ -173,6 +162,29 @@ final class EditCardDialog extends BaseDialog<Card> {
             menuItem(fxString(RB, "menu.item.up"), SHORTCUT_U, a -> onFieldUp()),
             menuItem(fxString(RB, "menu.item.down"), SHORTCUT_D, a -> onFieldDown())
         );
+    }
+
+    private List<TableColumn<EditableField, String>> createEditorColumns() {
+        var fieldNameColumn = new TableColumn<EditableField, String>();
+        fieldNameColumn.setSortable(false);
+        fieldNameColumn.setResizable(false);
+        fieldNameColumn.setReorderable(false);
+        fieldNameColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
+        fieldNameColumn.setCellValueFactory(p -> p.getValue().nameProperty());
+
+        var fieldValueColumn = new TableColumn<EditableField, String>();
+        fieldValueColumn.setSortable(false);
+        fieldValueColumn.setResizable(false);
+        fieldValueColumn.setReorderable(false);
+        fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
+        fieldValueColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        fieldValueColumn.setCellValueFactory(p -> p.getValue().valueProperty());
+
+        var w = cardContentView.widthProperty().subtract(5);
+        fieldNameColumn.prefWidthProperty().bind(w.divide(2));
+        fieldValueColumn.prefWidthProperty().bind(w.subtract(fieldNameColumn.widthProperty()));
+
+        return List.of(fieldNameColumn, fieldValueColumn);
     }
 
     private Optional<EditableField> getSelectedField() {

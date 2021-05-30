@@ -67,6 +67,7 @@ public final class Options {
 
     private File mainCssFile;
     private File dialogCssFile;
+    private File aboutDialogCssFile;
 
     private static final Options OPTIONS = new Options();
 
@@ -106,6 +107,7 @@ public final class Options {
 
         mainCssFile = new File(settingsDirectory, "main.css");
         dialogCssFile = new File(settingsDirectory, "dialog.css");
+        aboutDialogCssFile = new File(settingsDirectory, "about-dialog.css");
     }
 
     private static File initDirectory(File dir, String name) {
@@ -153,7 +155,8 @@ public final class Options {
             // dialogs
             entry("dialogFontFamily", FontOption.DIALOG_FONT.getFont().getFamily()),
             entry("dialogFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize()),
-            entry("aboutLabelFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() + 4),
+            entry("aboutLabelFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() * 2),
+            entry("aboutLabelSmallFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() + 2),
             // Colors
             entry("favoriteColor", ColorOption.FAVORITE.getWebString()),
             entry("favoriteBackground", ColorOption.FAVORITE_BACKGROUND.getWebString()),
@@ -179,6 +182,12 @@ public final class Options {
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+
+        try (var w = new FileWriter(aboutDialogCssFile)) {
+            templateEngine().process(TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel, w);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     public void reloadCssFile() {
@@ -198,6 +207,14 @@ public final class Options {
     public URL getDialogCssFileUrl() {
         try {
             return dialogCssFile.toURI().toURL();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public URL getAboutDialogCssFileUrl() {
+        try {
+            return aboutDialogCssFile.toURI().toURL();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

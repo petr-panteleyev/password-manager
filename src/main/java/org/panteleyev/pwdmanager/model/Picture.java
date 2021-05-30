@@ -67,6 +67,7 @@ public enum Picture {
     US,
     VISA,
     VK,
+    WALLET,
     WIFI,
     WOW,
     YAHOO,

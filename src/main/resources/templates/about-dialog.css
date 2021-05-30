@@ -1,0 +1,21 @@
+.gridPane {
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+}
+
+.dialog-pane:header .header-panel .label {
+    -fx-font-family: "Dialog";
+    -fx-font-size: ${aboutLabelFontSize};
+    -fx-font-weight: bold;
+}
+
+.label {
+    -fx-font-family: "Dialog";
+    -fx-font-size: ${dialogFontSize};
+}
+
+.aboutLabel {
+    -fx-font-family: "Dialog";
+    -fx-font-size: ${aboutLabelSmallFontSize};
+    -fx-font-weight: bold;
+}

@@ -18,12 +18,6 @@ public record Card(
     boolean active
 ) implements WalletRecord {
 
-    public Card {
-        if (fields != null) {
-            fields = List.copyOf(fields);
-        }
-    }
-
     public Card(String name, Picture picture, List<Field> fields) {
         this(UUID.randomUUID(), System.currentTimeMillis(), picture, name, fields, "", false, true);
     }

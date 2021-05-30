@@ -43,12 +43,6 @@
     -fx-font-size: ${dialogFontSize};
 }
 
-.aboutLabel {
-    -fx-font-family: "${dialogFontFamily}";
-    -fx-font-size: ${aboutLabelFontSize};
-    -fx-font-weight: bold;
-}
-
 .gridPane {
     -fx-hgap: 5;
     -fx-vgap: 5;

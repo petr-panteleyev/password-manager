@@ -14,7 +14,8 @@ import java.util.Map;
 final class TemplateEngine {
     public enum Template {
         MAIN_CSS("main.css"),
-        DIALOG_CSS("dialog.css");
+        DIALOG_CSS("dialog.css"),
+        ABOUT_DIALOG_CSS("about-dialog.css");
 
         private final String fileName;
 

@@ -156,6 +156,9 @@ https://iconarchive.com/show/flatastic-3-icons-by-custom-icon-design/payment-cre
 ![vk](src/main/resources/org/panteleyev/pwdmanager/res/vk.png)
 https://iconarchive.com/show/flat-gradient-social-icons-by-limav/Vk-icon.html
 
+![wallet](src/main/resources/org/panteleyev/pwdmanager/res/wallet.png)
+https://iconarchive.com/show/ecommerce-business-icons-by-designcontest/wallet-icon.html
+
 ![wifi](src/main/resources/org/panteleyev/pwdmanager/res/wifi.png)
 https://iconarchive.com/show/pretty-office-12-icons-by-custom-icon-design/wifi-circle-icon.html
 
