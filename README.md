@@ -20,7 +20,7 @@ Make sure ```JAVA_HOME``` is set to JDK 16.
 
 Execute the following:
 ```shell script
-$ mvn clean package
+mvn clean package
 ```
 
 Application JAR and all dependencies will be placed in ```target/jmods```.
@@ -28,7 +28,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ## Run
 
 ```shell script
-$ mvn javafx:run
+mvn javafx:run
 ```
 
 To open specific file add ```-Dpassword.file=<file>``` to the command line.
@@ -41,9 +41,13 @@ environment variable
 * Execute the following commands:
 
 ```shell script
-$ mvn clean package jpackage:jpackage@mac
-  or
-$ mvn clean package jpackage:jpackage@win
+mvn clean package jpackage:jpackage@mac
+```
+
+or
+
+```shell script
+mvn clean package jpackage:jpackage@win
 ```
 
 Installation packages will be found in ```target/dist``` directory.
