@@ -6,8 +6,8 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
 import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.panteleyev.pwdmanager.model.Picture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.lang.Thread.setDefaultUncaughtExceptionHandler;
@@ -20,8 +20,6 @@ public final class PasswordManagerApplication extends Application {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
     private static final String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
     private static final String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
-
-    private static final String ICON_PATH = "org/panteleyev/pwdmanager/icon.png";
 
     public static void main(String[] args) {
         launch(args);
@@ -38,13 +36,12 @@ public final class PasswordManagerApplication extends Application {
         if (formatProperty == null) {
             System.setProperty(FORMAT_PROP, FORMAT);
         }
-        getLogManager()
-            .readConfiguration(PasswordManagerApplication.class.getResourceAsStream("logger.properties"));
+        getLogManager().readConfiguration(getClass().getResourceAsStream("/logger.properties"));
 
         setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 
         stage.setTitle(APP_TITLE);
-        stage.getIcons().add(new Image(ICON_PATH));
+        stage.getIcons().add(Picture.WALLET.getImage());
 
         new MainWindowController(stage);
         stage.show();

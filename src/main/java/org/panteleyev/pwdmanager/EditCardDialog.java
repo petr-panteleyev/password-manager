@@ -32,12 +32,13 @@ import java.util.List;
 import java.util.Optional;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Shortcuts.DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
@@ -45,6 +46,20 @@ import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_G;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18M_FIELDS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ADD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DOWN;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_NAME;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_TYPE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_GENERATE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ICON;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_FIELD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTES;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PROPERTIES;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UP;
 
 final class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;
@@ -55,7 +70,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
-    private final MenuItem generateMenuItem = menuItem(fxString(RB, "Generate"), SHORTCUT_G,
+    private final MenuItem generateMenuItem = menuItem(fxString(UI_BUNDLE, I18N_GENERATE), SHORTCUT_G,
         a -> onGeneratePassword());
 
     EditCardDialog(Card card) {
@@ -68,7 +83,7 @@ final class EditCardDialog extends BaseDialog<Card> {
                 .toList()
         );
 
-        setTitle(RB.getString("editCardDialog.title"));
+        setTitle(UI_BUNDLE.getString(I18N_CARD));
 
         cardContentView.getColumns().setAll(
             createEditorColumns()
@@ -87,8 +102,8 @@ final class EditCardDialog extends BaseDialog<Card> {
 
         var grid1 = gridPane(
             List.of(
-                gridRow(label(fxString(RB, "label.FieldName")), fieldNameEdit),
-                gridRow(label(fxString(RB, "label.FieldType")), fieldTypeCombo)
+                gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_NAME, COLON)), fieldNameEdit),
+                gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_TYPE, COLON)), fieldTypeCombo)
             ), b -> b.withStyle(STYLE_GRID_PANE)
         );
 
@@ -98,8 +113,8 @@ final class EditCardDialog extends BaseDialog<Card> {
 
         var optionsPane = gridPane(
             List.of(
-                gridRow(label(fxString(RB, "label.Name")), cardNameEdit),
-                gridRow(label(fxString(RB, "label.Icon")), pictureList)
+                gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), cardNameEdit),
+                gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
             ), b -> b.withStyle(STYLE_GRID_PANE)
         );
         optionsPane.setPadding(new Insets(5, 5, 5, 5));
@@ -108,12 +123,12 @@ final class EditCardDialog extends BaseDialog<Card> {
         var noteEditor = new TextArea();
 
         var tabPane = new TabPane(
-            newTab(RB, "editCardDialog.tab.fields", false, pane),
-            newTab(RB, "editCardDialog.tab.notes", false, noteEditor),
-            newTab(RB, "editCardDialog.tab.properties", false, optionsPane));
+            newTab(UI_BUNDLE, I18M_FIELDS, false, pane),
+            newTab(UI_BUNDLE, I18N_NOTES, false, noteEditor),
+            newTab(UI_BUNDLE, I18N_PROPERTIES, false, optionsPane));
 
         getDialogPane().setContent(tabPane);
-        createDefaultButtons(RB);
+        createDefaultButtons(UI_BUNDLE);
 
         cardContentView.setItems(editableFields);
 
@@ -153,14 +168,14 @@ final class EditCardDialog extends BaseDialog<Card> {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-            menuItem(fxString(RB, "editCardDialog.menu.addField"), SHORTCUT_N, a -> onNewField()),
+            menuItem(fxString(UI_BUNDLE, I18N_ADD), SHORTCUT_N, a -> onNewField()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "editCardDialog.menu.deleteField"), DELETE, a -> onDeleteField()),
+            menuItem(fxString(UI_BUNDLE, I18N_DELETE), DELETE, a -> onDeleteField()),
             new SeparatorMenuItem(),
             generateMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.item.up"), SHORTCUT_U, a -> onFieldUp()),
-            menuItem(fxString(RB, "menu.item.down"), SHORTCUT_D, a -> onFieldDown())
+            menuItem(fxString(UI_BUNDLE, I18N_UP), SHORTCUT_U, a -> onFieldUp()),
+            menuItem(fxString(UI_BUNDLE, I18N_DOWN), SHORTCUT_D, a -> onFieldDown())
         );
     }
 
@@ -199,7 +214,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     }
 
     private void onNewField() {
-        var f = new EditableField(FieldType.STRING, "New field", "");
+        var f = new EditableField(FieldType.STRING, fxString(UI_BUNDLE, I18N_NEW_FIELD), "");
         editableFields.add(f);
         cardContentView.getSelectionModel().select(f);
     }

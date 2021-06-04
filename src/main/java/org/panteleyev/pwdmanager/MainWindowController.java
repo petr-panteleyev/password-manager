@@ -54,12 +54,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import static java.util.Objects.requireNonNull;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -69,7 +69,7 @@ import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
@@ -82,6 +82,34 @@ import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
 import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EDIT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EDIT_BUTTON;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ERROR;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXIT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FAVORITE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILTER;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_HELP;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_HELP_ABOUT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_CARD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_NOTE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTHING_TO_IMPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPEN;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPTIONS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASTE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PURGE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_RESTORE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SAVE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SHOW_DELETED;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TOOLS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UNABLE_TO_READ_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VIEW;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
@@ -110,7 +138,7 @@ final class MainWindowController extends Controller {
     private final TextField searchTextField = newSearchField(TextFields::createClearableTextField, this::doSearch);
 
     private final Label cardContentTitleLabel = new Label();
-    private final Button cardEditButton = button(fxString(RB, "button.edit"), a -> onEditCard());
+    private final Button cardEditButton = button(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS), a -> onEditCard());
     private final BorderPane recordViewPane = new BorderPane();
 
     private final NoteViewer noteViewer = new NoteViewer();
@@ -135,61 +163,61 @@ final class MainWindowController extends Controller {
     }
 
     private MenuBar createMainMenu() {
-        var pasteMenuItem = menuItem(fxString(RB, "menu.edit.paste"), SHORTCUT_V, a -> onCardPaste());
-        var favoriteMenuItem = checkMenuItem(fxString(RB, "menu.edit.favorite"), false, SHORTCUT_I,
+        var pasteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_PASTE), SHORTCUT_V, a -> onCardPaste());
+        var favoriteMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_FAVORITE), false, SHORTCUT_I,
             a -> onFavorite());
 
-        var editMenu = newMenu(fxString(RB, "menu.edit"),
-            menuItem(fxString(RB, "menu.edit.newCard"), SHORTCUT_D, a -> onNewCard(),
+        var editMenu = newMenu(fxString(UI_BUNDLE, I18N_EDIT),
+            menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), SHORTCUT_D, a -> onNewCard(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
-            menuItem(fxString(RB, "menu.edit.newNote"), SHORTCUT_T, a -> onNewNote(),
+            menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), SHORTCUT_T, a -> onNewNote(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.Edit.Filter"), SHORTCUT_F, a -> onFilter()),
+            menuItem(fxString(UI_BUNDLE, I18N_FILTER), SHORTCUT_F, a -> onFilter()),
             new SeparatorMenuItem(),
             favoriteMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.copy"), SHORTCUT_C,
+            menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C,
                 a -> onCardCopy(), selectedItemProperty().isNull()),
             pasteMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.delete"), SHIFT_DELETE,
+            menuItem(fxString(UI_BUNDLE, I18N_DELETE), SHIFT_DELETE,
                 a -> onDeleteRecord(), selectedItemProperty().isNull()),
-            menuItem(fxString(RB, "Restore"), a -> onRestoreRecord(), selectedItemProperty().isNull())
+            menuItem(fxString(UI_BUNDLE, I18N_RESTORE), a -> onRestoreRecord(), selectedItemProperty().isNull())
         );
         editMenu.setOnShowing(e -> setupEditMenuItems(favoriteMenuItem, pasteMenuItem));
 
-        var showDeletedItemsMenuItem = checkMenuItem(fxString(RB, "Show_Deleted"), false);
+        var showDeletedItemsMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SHOW_DELETED), false);
         showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
         showDeletedRecords.addListener((observableValue, oldValue, newValue) -> onShowDeletedItems(newValue));
 
         return menuBar(
-            newMenu(fxString(RB, "menu.file"),
-                menuItem(fxString(RB, "menu.file.new"), SHORTCUT_N, a -> onNewFile()),
-                menuItem(fxString(RB, "menu.file.open"), SHORTCUT_O, a -> onOpenFile()),
+            newMenu(fxString(UI_BUNDLE, I18N_FILE),
+                menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), SHORTCUT_N, a -> onNewFile()),
+                menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, a -> onOpenFile()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "menu.file.exit"), a -> onExit())
+                menuItem(fxString(UI_BUNDLE, I18N_EXIT), a -> onExit())
             ),
             // Edit
             editMenu,
-            newMenu(fxString(RB, "View"),
+            newMenu(fxString(UI_BUNDLE, I18N_VIEW),
                 showDeletedItemsMenuItem
             ),
             // Tools
-            newMenu(fxString(RB, "menu.tools"),
-                menuItem(fxString(RB, "menu.tools.import"), a -> onImportFile()),
-                menuItem(fxString(RB, "menu.tools.export"), a -> onExportFile(), currentFile.isNull()),
+            newMenu(fxString(UI_BUNDLE, I18N_TOOLS),
+                menuItem(fxString(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), a -> onImportFile(), currentFile.isNull()),
+                menuItem(fxString(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), a -> onExportFile(), currentFile.isNull()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Purge", ELLIPSIS), a -> onPurge(), currentFile.isNull()),
+                menuItem(fxString(UI_BUNDLE, I18N_PURGE, ELLIPSIS), a -> onPurge(), currentFile.isNull()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "menu.tools.changePassword"),
+                menuItem(fxString(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS),
                     a -> onChangePassword(), currentFile.isNull()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Options", "..."), a -> onOptions())
+                menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), a -> onOptions())
             ),
             // Help
-            newMenu(fxString(RB, "menu.help"),
-                menuItem(fxString(RB, "menu.help.about"), a -> onAbout()))
+            newMenu(fxString(UI_BUNDLE, I18N_HELP),
+                menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), a -> onAbout()))
         );
     }
 
@@ -221,24 +249,24 @@ final class MainWindowController extends Controller {
     }
 
     private ContextMenu createContextMenu() {
-        var ctxCardPasteMenuItem = menuItem(fxString(RB, "menu.edit.paste"), a -> onCardPaste());
-        var ctxFavoriteMenuItem = checkMenuItem(fxString(RB, "menu.edit.favorite"), false,
+        var ctxCardPasteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_PASTE), a -> onCardPaste());
+        var ctxFavoriteMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_FAVORITE), false,
             a -> onFavorite());
 
         var menu = new ContextMenu(
             ctxFavoriteMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.newCard"), a -> onNewCard(),
+            menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), a -> onNewCard(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
-            menuItem(fxString(RB, "menu.edit.newNote"), a -> onNewNote(),
+            menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), a -> onNewNote(),
                 currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.delete"), a -> onDeleteRecord(),
+            menuItem(fxString(UI_BUNDLE, I18N_DELETE), a -> onDeleteRecord(),
                 selectedItemProperty().isNull()),
-            menuItem(fxString(RB, "Restore"), a -> onRestoreRecord(),
+            menuItem(fxString(UI_BUNDLE, I18N_RESTORE), a -> onRestoreRecord(),
                 selectedItemProperty().isNull()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.edit.copy"), a -> onCardCopy()),
+            menuItem(fxString(UI_BUNDLE, I18N_COPY), a -> onCardCopy()),
             ctxCardPasteMenuItem
         );
 
@@ -314,7 +342,7 @@ final class MainWindowController extends Controller {
 
     private void onImportFile() {
         var d = new FileChooser();
-        d.setTitle(fxString(RB, "Open File"));
+        d.setTitle(fxString(UI_BUNDLE, I18N_OPEN));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
@@ -336,7 +364,7 @@ final class MainWindowController extends Controller {
 
                 var importRecords = calculateImport(recordList, list);
                 if (importRecords.isEmpty()) {
-                    new Alert(Alert.AlertType.INFORMATION, fxString(RB, "Nothing_To_Import"), ButtonType.OK)
+                    new Alert(Alert.AlertType.INFORMATION, fxString(UI_BUNDLE, I18N_NOTHING_TO_IMPORT), ButtonType.OK)
                         .showAndWait();
                 } else {
                     new ImportDialog(this, importRecords).showAndWait().ifPresent(records -> {
@@ -359,7 +387,7 @@ final class MainWindowController extends Controller {
 
     private void onExportFile() {
         var d = new FileChooser();
-        d.setTitle(fxString(RB, "Save File"));
+        d.setTitle(fxString(UI_BUNDLE, I18N_SAVE));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
@@ -546,7 +574,7 @@ final class MainWindowController extends Controller {
 
     private void onNewFile() {
         var d = new FileChooser();
-        d.setTitle(fxString(RB, "New File"));
+        d.setTitle(fxString(UI_BUNDLE, I18N_NEW_FILE));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
@@ -567,7 +595,7 @@ final class MainWindowController extends Controller {
 
     private void onOpenFile() {
         var d = new FileChooser();
-        d.setTitle(fxString(RB, "Open File"));
+        d.setTitle(fxString(UI_BUNDLE, I18N_OPEN));
         d.getExtensionFilters().addAll(
             new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
         );
@@ -610,8 +638,8 @@ final class MainWindowController extends Controller {
                 } catch (Exception ex) {
                     var path = file.getAbsolutePath();
                     var alert = new Alert(Alert.AlertType.ERROR, ex.toString());
-                    alert.setTitle(fxString(RB, "Error"));
-                    alert.setHeaderText(fxString(RB, "Unable to read file", ": ") + path);
+                    alert.setTitle(fxString(UI_BUNDLE, I18N_ERROR));
+                    alert.setHeaderText(fxString(UI_BUNDLE, I18N_UNABLE_TO_READ_FILE, ": ") + path);
                     alert.showAndWait();
                     LOGGER.log(Level.SEVERE, "Exception while reading file " + path, ex);
                 }
@@ -620,7 +648,7 @@ final class MainWindowController extends Controller {
     }
 
     private void writeDocument() {
-        Objects.requireNonNull(currentFile);
+        requireNonNull(currentFile.get());
         writeDocument(currentFile.get(), currentPassword);
     }
 

@@ -20,6 +20,7 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.options.FontOption;
 import java.util.EnumMap;
 import java.util.List;
@@ -39,12 +40,32 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.PASSWORD_DEFAULTS;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_BACKGROUND;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COLORS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONTROLS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETED;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DIALOGS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DIGITS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FAVORITE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_NAME;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_VALUE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FONTS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FOREGROUND;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_LENGTH;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_LOWER_CASE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_MENU;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPTIONS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASSWORDS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SYMBOLS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TEXT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPPER_CASE;
 import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_ADD;
 import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_DELETE;
 import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_REPLACE;
@@ -62,10 +83,10 @@ import static org.panteleyev.pwdmanager.options.FontOption.MENU_FONT;
 final class OptionsDialog extends BaseDialog<ButtonType> {
     private final ComboBox<FieldType> typeComboBox = new ComboBox<>();
 
-    private final CheckBox digitsCheckBox = new CheckBox(fxString(RB, "Digits"));
-    private final CheckBox upperCaseCheckBox = new CheckBox(fxString(RB, "Upper Case"));
-    private final CheckBox lowerCaseCheckBox = new CheckBox(fxString(RB, "Lower Case"));
-    private final CheckBox symbolsCheckBox = new CheckBox(fxString(RB, "Digits"));
+    private final CheckBox digitsCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_DIGITS));
+    private final CheckBox upperCaseCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_UPPER_CASE));
+    private final CheckBox lowerCaseCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_LOWER_CASE));
+    private final CheckBox symbolsCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_SYMBOLS));
     private final ComboBox<Integer> lengthComboBox = new ComboBox<>();
 
     // Font text fields
@@ -88,7 +109,7 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
 
     public OptionsDialog(Controller owner) {
         super(owner, options().getDialogCssFileUrl());
-        setTitle(fxString(RB, "Options"));
+        setTitle(fxString(UI_BUNDLE, I18N_OPTIONS));
 
         controlsFontField.setEditable(false);
         menuFontField.setEditable(false);
@@ -98,7 +119,7 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
         loadFont(MENU_FONT, menuFontField);
         loadFont(FontOption.DIALOG_FONT, dialogFontField);
 
-        createDefaultButtons(RB, new ValidationSupport().invalidProperty());
+        createDefaultButtons(UI_BUNDLE, new ValidationSupport().invalidProperty());
 
         makePasswordOptionsLocalCopy();
 
@@ -124,24 +145,24 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
         var vBox = vBox(BIG_SPACING,
             hBox(SMALL_SPACING, typeComboBox),
             hBox(SMALL_SPACING, upperCaseCheckBox, lowerCaseCheckBox, digitsCheckBox, symbolsCheckBox),
-            hBox(SMALL_SPACING, label(fxString(RB, "Length", ":")), lengthComboBox)
+            hBox(SMALL_SPACING, label(fxString(UI_BUNDLE, I18N_LENGTH, COLON)), lengthComboBox)
         );
         vBox.setPadding(new Insets(BIG_SPACING, 0, BIG_SPACING, 0));
 
         getDialogPane().setContent(
             new TabPane(
-                newTab(RB, "Passwords", false, vBox),
-                newTab(RB, "Fonts", false,
+                newTab(UI_BUNDLE, I18N_PASSWORDS, false, vBox),
+                newTab(UI_BUNDLE, I18N_FONTS, false,
                     vBox(10,
-                        titledPane(fxString(RB, "Controls"),
+                        titledPane(fxString(UI_BUNDLE, I18N_CONTROLS),
                             gridPane(List.of(
-                                gridRow(label(fxString(RB, "Text", COLON)), controlsFontField,
+                                gridRow(label(fxString(UI_BUNDLE, I18N_TEXT, COLON)), controlsFontField,
                                     button(ELLIPSIS, actionEvent -> onFontSelected(controlsFontField))),
-                                gridRow(label(fxString(RB, "Menu", COLON)), menuFontField,
+                                gridRow(label(fxString(UI_BUNDLE, I18N_MENU, COLON)), menuFontField,
                                     button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
                             ), b -> b.withStyle(STYLE_GRID_PANE))
                         ),
-                        titledPane(fxString(RB, "Dialogs"),
+                        titledPane(fxString(UI_BUNDLE, I18N_DIALOGS),
                             gridPane(List.of(
                                 gridRow(dialogFontField,
                                     button(ELLIPSIS, actionEvent -> onFontSelected(dialogFontField)))
@@ -150,20 +171,21 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
                         )
                     )
                 ),
-                newTab(RB, "Colors", false,
+                newTab(UI_BUNDLE, I18N_COLORS, false,
                     gridPane(List.of(
-                        gridRow(SKIP, label(fxString(RB, "Foreground")), label(fxString(RB, "Background"))),
-                        gridRow(label(fxString(RB, "Favorite", COLON)),
+                        gridRow(SKIP,
+                            label(fxString(UI_BUNDLE, I18N_FOREGROUND)), label(fxString(UI_BUNDLE, I18N_BACKGROUND))),
+                        gridRow(label(fxString(UI_BUNDLE, I18N_FAVORITE, COLON)),
                             favoriteForegroundColorPicker, favoriteBackgroundColorPicker),
-                        gridRow(label(fxString(RB, "Deleted", COLON)),
+                        gridRow(label(fxString(UI_BUNDLE, I18N_DELETED, COLON)),
                             deletedForegroundColorPicker, deletedBackgroundColorPicker),
-                        gridRow(label(fxString(RB, "Field_Name", COLON)), fieldNameColorPicker),
-                        gridRow(label(fxString(RB, "Field_Value", COLON)), fieldValueColorPicker),
-                        gridRow(SKIP, label(fxString(RB, "Import"))),
-                        gridRow(label(fxString(RB, "Add", COLON)), actionAddColorPicker),
-                        gridRow(label(fxString(RB, "Replace", COLON)), actionReplaceColorPicker),
-                        gridRow(label(fxString(RB, "Delete", COLON)), actionDeleteColorPicker),
-                        gridRow(label(fxString(RB, "Restore", COLON)), actionRestoreColorPicker)
+                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_NAME, COLON)), fieldNameColorPicker),
+                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_VALUE, COLON)), fieldValueColorPicker),
+                        gridRow(SKIP, label(fxString(UI_BUNDLE, I18N_IMPORT))),
+                        gridRow(label(fxString(ImportAction.ADD.toString(), COLON)), actionAddColorPicker),
+                        gridRow(label(fxString(ImportAction.REPLACE.toString(), COLON)), actionReplaceColorPicker),
+                        gridRow(label(fxString(ImportAction.DELETE.toString(), COLON)), actionDeleteColorPicker),
+                        gridRow(label(fxString(ImportAction.RESTORE.toString(), COLON)), actionRestoreColorPicker)
                     ), b -> b.withStyle(STYLE_GRID_PANE))
                 )
             )

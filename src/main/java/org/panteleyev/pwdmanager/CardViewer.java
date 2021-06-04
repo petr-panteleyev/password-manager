@@ -31,17 +31,19 @@ import java.util.List;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.MASK;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_NAME;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTES;
 
 final class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
     private static final double RIGHT_WIDTH = 100.0 - LEFT_WIDTH;
 
     private final GridPane grid = new GridPane();
-    private final Label noteLabel = label(fxString(RB, "label.notesNoSemicolon"),
+    private final Label noteLabel = label(fxString(UI_BUNDLE, I18N_NOTES),
         new ImageView(Picture.NOTE.getImage()));
     private final Label noteViewer = new Label();
 
@@ -138,7 +140,7 @@ final class CardViewer extends BorderPane {
     }
 
     private ContextMenu createContextMenu(FieldWrapper field) {
-        var copyMenuItem = new MenuItem(RB.getString("menu.ctx.copy") + " '" + field.getName() + "'");
+        var copyMenuItem = new MenuItem(UI_BUNDLE.getString(I18N_COPY) + " '" + field.getName() + "'");
         copyMenuItem.setOnAction(x -> onCopy(field.getField()));
 
         return new ContextMenu(copyMenuItem);

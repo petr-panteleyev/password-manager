@@ -13,12 +13,9 @@ public class PictureListCell extends ListCell<Picture> {
     public void updateItem(Picture item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (empty || item == null) {
-            setText(null);
-            setGraphic(null);
-        } else {
-            setText(null);
-            setGraphic(new ImageView(item.getImage()));
-        }
+        setText(null);
+        setGraphic(
+            empty || item == null ? null : new ImageView(item.getImage())
+        );
     }
 }

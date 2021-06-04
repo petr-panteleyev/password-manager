@@ -17,13 +17,17 @@ import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Picture;
 import org.panteleyev.pwdmanager.model.RecordType;
 import java.util.List;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ICON;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TYPE;
 
 abstract class RecordDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -31,18 +35,20 @@ abstract class RecordDialog extends BaseDialog<Card> {
     private final TextField nameEdit = new TextField();
     private final ComboBox<RecordType> typeList = new ComboBox<>();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
-    private final Label typeLabel = label(fxString(RB, "label.type"));
+    private final Label typeLabel = label(fxString(UI_BUNDLE, I18N_TYPE, COLON));
 
     RecordDialog() {
         super(options().getDialogCssFileUrl());
 
         nameEdit.setPrefColumnCount(25);
 
+        typeList.setOnAction(event -> onCardTypeSelected());
+
         getDialogPane().setContent(gridPane(
             List.of(
-                gridRow(label(fxString(RB, "label.Name")), nameEdit),
+                gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit),
                 gridRow(typeLabel, typeList),
-                gridRow(label(fxString(RB, "label.Icon")), pictureList)
+                gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
             ), b -> b.withStyle(STYLE_GRID_PANE)
         ));
     }
@@ -74,5 +80,9 @@ abstract class RecordDialog extends BaseDialog<Card> {
         validation.registerValidator(nameEdit, (Control c, String value) ->
             ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
+    }
+
+    private void onCardTypeSelected() {
+        pictureList.getSelectionModel().select(typeList.getSelectionModel().getSelectedItem().getPicture());
     }
 }

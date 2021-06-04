@@ -7,27 +7,28 @@ package org.panteleyev.pwdmanager;
 import javafx.application.Platform;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.RecordType;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.fx.FxUtils.COLON;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TYPE;
 
 final class CardDialog extends RecordDialog {
     private final RecordType defaultType;
 
     CardDialog(RecordType defaultType) {
-        Objects.requireNonNull(defaultType);
-
-        this.defaultType = defaultType;
-
+        this.defaultType = requireNonNull(defaultType);
         initialize();
     }
 
     private void initialize() {
-        setTitle(RB.getString("cardDialog.title"));
-        createDefaultButtons(RB);
+        setTitle(fxString(UI_BUNDLE, I18N_CARD));
+        createDefaultButtons(UI_BUNDLE);
 
         initLists();
-        setTypeLabelText(RB.getString("label.type"));
+        setTypeLabelText(fxString(UI_BUNDLE, I18N_TYPE, COLON));
 
         getNameEdit().setText("");
         getTypeList().getSelectionModel().select(defaultType);

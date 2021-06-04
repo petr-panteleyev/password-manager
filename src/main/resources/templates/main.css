@@ -13,6 +13,11 @@
     -fx-font-size: ${controlsFontSize};
 }
 
+.text-area {
+    -fx-font-family: "${controlsFontFamily}";
+    -fx-font-size: ${controlsFontSize};
+}
+
 .list-cell {
     -fx-font-family: "${controlsFontFamily}";
     -fx-font-size: ${controlsFontSize};

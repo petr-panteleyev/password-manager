@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.Map;
+import static java.util.Objects.requireNonNull;
 
 final class TemplateEngine {
     public enum Template {
@@ -39,7 +40,9 @@ final class TemplateEngine {
     }
 
     public void process(Template template, Map<String, ?> model, Writer out) {
-        try (var in = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(TEMPLATE_PATH + template.getFileName())))) {
+        try (var in = new BufferedReader(new InputStreamReader(
+            requireNonNull(getClass().getResourceAsStream(TEMPLATE_PATH + template.getFileName())))
+        )) {
             while (in.ready()) {
                 var string = in.readLine();
                 for (var e : model.entrySet()) {

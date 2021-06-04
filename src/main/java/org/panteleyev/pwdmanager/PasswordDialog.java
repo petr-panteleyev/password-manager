@@ -5,7 +5,6 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import org.controlsfx.validation.ValidationResult;
@@ -18,13 +17,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import static javafx.scene.control.ButtonType.OK;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASSWORD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_REPEAT;
 
 class PasswordDialog extends BaseDialog<String> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -35,19 +38,19 @@ class PasswordDialog extends BaseDialog<String> {
     PasswordDialog(Controller owner, File file, boolean change) {
         super(owner, options().getDialogCssFileUrl());
 
-        setTitle(RB.getString("passwordDialog.title"));
+        setTitle(fxString(UI_BUNDLE, I18N_PASSWORD));
 
         passwordEdit.setPrefColumnCount(32);
 
         getDialogPane().setContent(gridPane(
             List.of(
-                gridRow(label(fxString(RB, "label.File")), label(file.getAbsolutePath())),
-                gridRow(label(fxString(RB, "label.Password")), passwordEdit),
-                change ? gridRow(label(fxString(RB, "label.Repeat")), passwordEdit2) : gridRow()
+                gridRow(label(fxString(UI_BUNDLE, I18N_FILE, COLON)), label(file.getAbsolutePath())),
+                gridRow(label(fxString(UI_BUNDLE, I18N_PASSWORD, COLON)), passwordEdit),
+                change ? gridRow(label(fxString(UI_BUNDLE, I18N_REPEAT, COLON)), passwordEdit2) : gridRow()
             ), b -> b.withStyle(STYLE_GRID_PANE)
         ));
 
-        createDefaultButtons(RB);
+        createDefaultButtons(UI_BUNDLE);
 
         setResultConverter(buttonType -> OK.equals(buttonType) ? passwordEdit.getText() : null);
 

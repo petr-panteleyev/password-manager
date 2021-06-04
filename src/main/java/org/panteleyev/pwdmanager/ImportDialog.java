@@ -29,13 +29,18 @@ import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_P;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_ADD;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_DELETE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_REPLACE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_RESTORE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ACTION;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SKIP;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPDATED;
 
 final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -45,14 +50,6 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         ImportAction.REPLACE, STYLE_ACTION_REPLACE,
         ImportAction.DELETE, STYLE_ACTION_DELETE,
         ImportAction.RESTORE, STYLE_ACTION_RESTORE
-    );
-
-    private static final Map<ImportAction, String> STRING_MAP = Map.of(
-        ImportAction.ADD, fxString(RB, "Add"),
-        ImportAction.REPLACE, fxString(RB, "Replace"),
-        ImportAction.DELETE, fxString(RB, "Delete"),
-        ImportAction.RESTORE, fxString(RB, "Restore"),
-        ImportAction.SKIP, fxString(RB, "Skip")
     );
 
     private final ObservableList<ImportRecord> importRecords = FXCollections.observableArrayList();
@@ -89,7 +86,7 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         super(owner, options().getDialogCssFileUrl());
         this.importRecords.addAll(importRecords);
 
-        setTitle(RB.getString("Import"));
+        setTitle(UI_BUNDLE.getString(I18N_IMPORT));
         setResizable(true);
 
         tableView.setPrefSize(1024, 768);
@@ -101,17 +98,17 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         tableView.setRowFactory(t -> new ImportRow());
 
         tableView.getColumns().setAll(List.of(
-            tableColumn(fxString(RB, "Name"), b ->
+            tableColumn(fxString(UI_BUNDLE, I18N_TITLE), b ->
                 b.withPropertyCallback(r -> r.cardToImport().name())
                     .withWidthBinding(w.multiply(0.35))
             ),
-            tableColumn(fxString(RB, "Updated"), (TableColumnBuilder<ImportRecord, Long> b) ->
+            tableColumn(fxString(UI_BUNDLE, I18N_UPDATED), (TableColumnBuilder<ImportRecord, Long> b) ->
                 b.withPropertyCallback(r -> r.cardToImport().modified())
                     .withCellFactory(x -> new TimestampCell())
                     .withWidthBinding(w.multiply(0.35))
             ),
-            tableColumn(fxString(RB, "Action"),
-                b -> b.withPropertyCallback(r -> STRING_MAP.get(r.getEffectiveAction()))
+            tableColumn(fxString(UI_BUNDLE, I18N_ACTION),
+                b -> b.withPropertyCallback(ImportRecord::getEffectiveAction)
                     .withWidthBinding(w.multiply(0.27))
             )
         ));
@@ -147,7 +144,8 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     }
 
     private ContextMenu createContextMenu() {
-        var toggleMenuItem = checkMenuItem(fxString(RB, "Skip"), false, SHORTCUT_P, event -> onToggleApproval());
+        var toggleMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SKIP), false,
+            SHORTCUT_P, event -> onToggleApproval());
         toggleMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
 
         var menu = new ContextMenu(

@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import org.panteleyev.pwdmanager.cells.PictureListCell;
 import java.util.Arrays;
 import java.util.Comparator;
+import static java.util.Objects.requireNonNull;
 
 @SuppressWarnings("unused")
 public enum Picture {
@@ -80,8 +81,8 @@ public enum Picture {
         var res = name().toLowerCase() + ".png";
         var bigRes = name().toLowerCase() + "-48.png";
 
-        image = new Image(getClass().getResourceAsStream("/org/panteleyev/pwdmanager/res/" + res));
-        bigImage = new Image(getClass().getResourceAsStream("/org/panteleyev/pwdmanager/res/" + bigRes));
+        image = new Image(requireNonNull(getClass().getResourceAsStream("/images/" + res)));
+        bigImage = new Image(requireNonNull(getClass().getResourceAsStream("/images/" + bigRes)));
     }
 
     public Image getImage() {

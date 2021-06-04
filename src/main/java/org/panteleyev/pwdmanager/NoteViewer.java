@@ -10,8 +10,9 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
 
 final class NoteViewer extends TextArea {
     public NoteViewer() {
@@ -22,7 +23,7 @@ final class NoteViewer extends TextArea {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-            menuItem(fxString(RB, "Copy"), SHORTCUT_C, x -> copy())
+            menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C, x -> copy())
         );
     }
 

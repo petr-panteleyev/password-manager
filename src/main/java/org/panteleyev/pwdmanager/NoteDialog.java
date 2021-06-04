@@ -14,13 +14,16 @@ import org.panteleyev.pwdmanager.model.Note;
 import java.util.List;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.textField;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 
 final class NoteDialog extends BaseDialog<Note> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -30,13 +33,13 @@ final class NoteDialog extends BaseDialog<Note> {
     NoteDialog() {
         super(options().getDialogCssFileUrl());
 
-        setTitle(RB.getString("noteDialog.title"));
+        setTitle(UI_BUNDLE.getString(I18N_NOTE));
 
         getDialogPane().setContent(gridPane(
-            List.of(gridRow(label(fxString(RB, "label.Name")), nameEdit)),
+            List.of(gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit)),
             b -> b.withStyle(STYLE_GRID_PANE)
         ));
-        createDefaultButtons(RB);
+        createDefaultButtons(UI_BUNDLE);
 
         setResultConverter(buttonType -> OK.equals(buttonType) ? new Note(nameEdit.getText()) : null);
 

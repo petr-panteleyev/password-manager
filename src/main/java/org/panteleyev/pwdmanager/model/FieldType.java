@@ -4,7 +4,9 @@
  */
 package org.panteleyev.pwdmanager.model;
 
-import static org.panteleyev.pwdmanager.Constants.FIELD_TYPE_BUNDLE;
+import org.panteleyev.pwdmanager.bundles.FieldTypeBundle;
+import java.util.ResourceBundle;
+import static java.util.ResourceBundle.getBundle;
 
 public enum FieldType {
     STRING,
@@ -17,22 +19,21 @@ public enum FieldType {
     SHORT_PASSWORD(true),
     LONG_PASSWORD(true);
 
-    private final String name;
+    private static final ResourceBundle BUNDLE = getBundle(FieldTypeBundle.class.getCanonicalName());
+
     private final boolean masked;
 
     FieldType() {
-        this.name = FIELD_TYPE_BUNDLE.getString(name());
-        this.masked = false;
+        this(false);
     }
 
     FieldType(boolean masked) {
-        this.name = FIELD_TYPE_BUNDLE.getString(name());
         this.masked = masked;
     }
 
     @Override
     public String toString() {
-        return name;
+        return BUNDLE.getString(name());
     }
 
     public boolean isMasked() {

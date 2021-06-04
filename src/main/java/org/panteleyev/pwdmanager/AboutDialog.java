@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
@@ -28,12 +29,12 @@ final class AboutDialog extends BaseDialog<Object> {
     AboutDialog(Controller owner) {
         super(owner, options().getAboutDialogCssFileUrl());
 
-        setHeaderText("Password Manager");
+        setHeaderText(APP_TITLE);
         setGraphic(new ImageView(Picture.WALLET.getBigImage()));
 
-        setTitle("About Password Manager");
+        setTitle("About " + APP_TITLE);
 
-        var aboutLabel = label("Password Manager " + fxString(BUILD_INFO_BUNDLE, "version"));
+        var aboutLabel = label(APP_TITLE + " " + fxString(BUILD_INFO_BUNDLE, "version"));
         aboutLabel.getStyleClass().add(STYLE_ABOUT_LABEL);
 
         var vBox = vBox(BIG_SPACING,

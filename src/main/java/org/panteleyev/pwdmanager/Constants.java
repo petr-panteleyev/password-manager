@@ -4,16 +4,14 @@
  */
 package org.panteleyev.pwdmanager;
 
+import org.panteleyev.pwdmanager.bundles.UiBundle;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
-import static org.panteleyev.fx.FxUtils.fxString;
 
 public interface Constants {
-    ResourceBundle RB = getBundle("org.panteleyev.pwdmanager.ui");
-    ResourceBundle BUILD_INFO_BUNDLE = getBundle("org.panteleyev.pwdmanager.buildInfo");
-    ResourceBundle FIELD_TYPE_BUNDLE = getBundle("org.panteleyev.pwdmanager.FieldType");
+    ResourceBundle BUILD_INFO_BUNDLE = getBundle("buildInfo");
+    ResourceBundle UI_BUNDLE = getBundle(UiBundle.class.getCanonicalName());
 
-    String APP_TITLE = fxString(RB, "Application Title");
-
+    String APP_TITLE = "Password Manager";
     String MASK = "*****";
 }

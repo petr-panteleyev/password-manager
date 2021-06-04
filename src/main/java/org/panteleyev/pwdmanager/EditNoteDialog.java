@@ -16,13 +16,16 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Note;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.textField;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.pwdmanager.Constants.RB;
+import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 
 final class EditNoteDialog extends BaseDialog<Note> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -34,18 +37,14 @@ final class EditNoteDialog extends BaseDialog<Note> {
 
     EditNoteDialog(Note note) {
         super(options().getDialogCssFileUrl());
-
-        Objects.requireNonNull(note);
-
-        this.note = note;
-
+        this.note = requireNonNull(note);
         initialize();
     }
 
     private void initialize() {
-        setTitle(RB.getString("editNoteDialog.title"));
+        setTitle(UI_BUNDLE.getString(I18N_NOTE));
 
-        var box = new HBox(5, label(fxString(RB, "label.Name")), nameEdit);
+        var box = new HBox(5, label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit);
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 0, 5, 0));
 
@@ -54,7 +53,7 @@ final class EditNoteDialog extends BaseDialog<Note> {
         BorderPane.setAlignment(box, Pos.CENTER_LEFT);
 
         getDialogPane().setContent(pane);
-        createDefaultButtons(RB);
+        createDefaultButtons(UI_BUNDLE);
 
         nameEdit.setText(note.name());
         noteEdit.setText(note.note());
