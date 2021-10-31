@@ -6,9 +6,11 @@ package org.panteleyev.generator;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Generator {
+    private static final int MIN_LENGTH = 4;
+
     static final List<Character> UPPER_CASE_CHARS = List.of(
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
         'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
@@ -52,24 +54,19 @@ public class Generator {
 
     private final Random random = new Random(System.currentTimeMillis());
 
-    /**
-     * Generates new password.
-     *
-     * @throws IllegalArgumentException if password length &lt; 4
-     */
     public String generate(GeneratorOptions options) {
         int len = options.length();
 
-        if (len < 4) {
-            throw new IllegalArgumentException("Password length must be 4 or greater");
+        if (len < MIN_LENGTH) {
+            throw new IllegalArgumentException("Password length must be " + MIN_LENGTH + " or greater");
         }
 
-        var usedBuckets = List.of(
-            new Bucket(UPPER_CASE_CHARS, options.upperCase()),
-            new Bucket(LOWER_CASE_CHARS, options.lowerCase()),
-            new Bucket(DIGITS, options.digits()),
-            new Bucket(SYMBOLS, options.symbols())
-        ).stream()
+        var usedBuckets = Stream.of(
+                new Bucket(UPPER_CASE_CHARS, options.upperCase()),
+                new Bucket(LOWER_CASE_CHARS, options.lowerCase()),
+                new Bucket(DIGITS, options.digits()),
+                new Bucket(SYMBOLS, options.symbols())
+            )
             .filter(Bucket::used)
             .toList();
 
