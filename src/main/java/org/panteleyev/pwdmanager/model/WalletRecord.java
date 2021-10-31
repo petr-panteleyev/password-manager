@@ -8,8 +8,7 @@ import javafx.scene.input.DataFormat;
 import java.util.Comparator;
 import java.util.UUID;
 
-// TODO: make it sealed when feature is finalized
-public interface WalletRecord {
+public sealed interface WalletRecord permits Card, Note {
     DataFormat DATA_FORMAT = new DataFormat("application/x-org-panteleyev-password-manager-record-id");
 
     Comparator<WalletRecord> COMPARE_BY_NAME = Comparator.comparing(WalletRecord::name);
@@ -17,14 +16,21 @@ public interface WalletRecord {
     Comparator<WalletRecord> COMPARE_BY_ACTIVE = Comparator.comparing(WalletRecord::active);
 
     UUID uuid();
+
     String name();
+
     String note();
+
     Picture picture();
+
     boolean favorite();
+
     boolean active();
+
     long modified();
 
     WalletRecord setFavorite(boolean favorite);
+
     WalletRecord setActive(boolean active);
 
     WalletRecord copyWithNewUuid();

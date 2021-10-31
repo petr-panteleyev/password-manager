@@ -110,28 +110,31 @@ final class Serializer {
         xmlRecord.setAttribute(FAVORITE_ATTR, Boolean.toString(r.favorite()));
         xmlRecord.setAttribute(ACTIVE_ATTR, Boolean.toString(r.active()));
 
-        if (r instanceof Card card) {
-            xmlRecord.setAttribute(CLASS_ATTR, CardClass.CARD.name());
+        switch (r) {
+            case Card card -> {
+                xmlRecord.setAttribute(CLASS_ATTR, CardClass.CARD.name());
 
-            var fields = card.fields();
-            if (!fields.isEmpty()) {
-                var fieldsElement = doc.createElement(FIELDS);
-                xmlRecord.appendChild(fieldsElement);
+                var fields = card.fields();
+                if (!fields.isEmpty()) {
+                    var fieldsElement = doc.createElement(FIELDS);
+                    xmlRecord.appendChild(fieldsElement);
 
-                for (var f : fields) {
-                    fieldsElement.appendChild(
-                        serializeField(doc, f)
-                    );
+                    for (var f : fields) {
+                        fieldsElement.appendChild(
+                            serializeField(doc, f)
+                        );
+                    }
                 }
-            }
 
-            var note = card.note();
-            var noteElement = doc.createElement("note");
-            noteElement.setTextContent(note);
-            xmlRecord.appendChild(noteElement);
-        } else if (r instanceof Note note) {
-            xmlRecord.setAttribute(CLASS_ATTR, CardClass.NOTE.name());
-            xmlRecord.appendChild(doc.createTextNode(note.note()));
+                var note = card.note();
+                var noteElement = doc.createElement("note");
+                noteElement.setTextContent(note);
+                xmlRecord.appendChild(noteElement);
+            }
+            case Note note -> {
+                xmlRecord.setAttribute(CLASS_ATTR, CardClass.NOTE.name());
+                xmlRecord.appendChild(doc.createTextNode(note.note()));
+            }
         }
 
         return xmlRecord;

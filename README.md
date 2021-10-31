@@ -1,8 +1,8 @@
 # Password Manager
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-16-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
-[![JavaFX](https://img.shields.io/badge/JavaFX-16-orange?logo=java)](https://openjfx.io/)
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
+[![JavaFX](https://img.shields.io/badge/JavaFX-17-orange?logo=java)](https://openjfx.io/)
 
 Desktop application to store passwords, credit card numbers and other sensitive information. 
 Application uses 256-bit AES encryption.
@@ -16,11 +16,11 @@ to user account, operating system or hardware including RAM.
 
 ## Build
 
-Make sure ```JAVA_HOME``` is set to JDK 16.
+Make sure ```JAVA_HOME``` is set to JDK 17.
 
 Execute the following:
 ```shell script
-mvn clean package
+mvn clean verify
 ```
 
 Application JAR and all dependencies will be placed in ```target/jmods```.
