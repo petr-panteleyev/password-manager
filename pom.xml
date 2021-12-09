@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>21.4.3</version>
+    <version>21.4.4</version>
     <packaging>jar</packaging>
 
     <properties>

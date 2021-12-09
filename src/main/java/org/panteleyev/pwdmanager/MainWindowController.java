@@ -190,7 +190,7 @@ final class MainWindowController extends Controller {
         showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
         showDeletedRecords.addListener((observableValue, oldValue, newValue) -> onShowDeletedItems(newValue));
 
-        return menuBar(
+        var menuBar = menuBar(
             newMenu(fxString(UI_BUNDLE, I18N_FILE),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), SHORTCUT_N, a -> onNewFile()),
                 menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, a -> onOpenFile()),
@@ -218,6 +218,9 @@ final class MainWindowController extends Controller {
             newMenu(fxString(UI_BUNDLE, I18N_HELP),
                 menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), a -> onAbout()))
         );
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
+
+        return menuBar;
     }
 
     private Control createControls() {
