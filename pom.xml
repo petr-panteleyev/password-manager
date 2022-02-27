@@ -172,6 +172,12 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>linux</id>
+                        <configuration>
+                            <icon>icons/icon.png</icon>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>win</id>
                         <configuration>
                             <icon>icons/icons.ico</icon>
