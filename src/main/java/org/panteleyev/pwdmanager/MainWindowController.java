@@ -38,6 +38,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
+import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.pwdmanager.cells.RecordListCell;
@@ -447,19 +448,17 @@ final class MainWindowController extends Controller {
         cardContentTitleLabel.setText(record.name());
         cardContentTitleLabel.setGraphic(new ImageView(record.picture().getBigImage()));
 
-        switch (record) {
-            case Note note -> {
-                noteViewer.setText(note.note());
-                recordViewPane.setCenter(noteViewer);
-            }
-            case Card card -> {
-                recordViewPane.setCenter(cardContentView);
-                var wrappers = card.fields().stream()
-                    .filter(f -> !f.value().isEmpty())
-                    .map(FieldWrapper::new)
-                    .toList();
-                cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
-            }
+        // TODO: reimplement with switch pattern matching when available
+        if (record instanceof Note note) {
+            noteViewer.setText(note.note());
+            recordViewPane.setCenter(noteViewer);
+        } else if (record instanceof Card card) {
+            recordViewPane.setCenter(cardContentView);
+            var wrappers = card.fields().stream()
+                .filter(f -> !f.value().isEmpty())
+                .map(FieldWrapper::new)
+                .toList();
+            cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
         }
     }
 
@@ -495,11 +494,16 @@ final class MainWindowController extends Controller {
 
     private void onEditCard() {
         getSelectedItem().ifPresent(item -> {
-            var dialog = switch (item) {
-                case Card card -> new EditCardDialog(card);
-                case Note note -> new EditNoteDialog(note);
-            };
-            dialog.showAndWait().ifPresent(this::processEditedRecord);
+            // TODO: reimplement with switch pattern matching when available
+            BaseDialog<? extends WalletRecord> dialog = null;
+            if (item instanceof Card card) {
+                dialog = new EditCardDialog(card);
+            } else if (item instanceof Note note) {
+                dialog = new EditNoteDialog(note);
+            }
+            if (dialog != null) {
+                dialog.showAndWait().ifPresent(this::processEditedRecord);
+            }
         });
     }
 

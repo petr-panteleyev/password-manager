@@ -9,12 +9,12 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>22.1.0</version>
+    <version>22.1.1</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>18</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
@@ -97,11 +97,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
-                <configuration>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -120,9 +115,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
-                <configuration>
-                    <argLine>--enable-preview</argLine>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -158,10 +150,6 @@
                         <modulePath>target/jmods</modulePath>
                     </modulePaths>
                     <destination>target/dist</destination>
-                    <javaOptions>
-                        <option>--enable-preview</option>
-                        <option>-Dfile.encoding=UTF-8</option>
-                    </javaOptions>
                 </configuration>
 
                 <executions>
@@ -201,8 +189,6 @@
                         <id>default-cli</id>
                         <configuration>
                             <options>
-                                <option>--enable-preview</option>
-                                <option>-Dfile.encoding=UTF-8</option>
                                 <option>-Dpassword.file=${password.file}</option>
                             </options>
                         </configuration>
@@ -211,8 +197,6 @@
                         <id>debug</id>
                         <configuration>
                             <options>
-                                <option>--enable-preview</option>
-                                <option>-Dfile.encoding=UTF-8</option>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
                                 <option>-Dpassword.file=${password.file}</option>
                             </options>
