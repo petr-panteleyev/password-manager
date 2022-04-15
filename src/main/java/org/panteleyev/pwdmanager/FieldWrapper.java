@@ -35,7 +35,11 @@ final class FieldWrapper {
         return field.type();
     }
 
-    public String getValue() {
+    public Object getValue() {
         return field.value();
+    }
+
+    public String getValueAsString() {
+        return field.getValueAsString();
     }
 }

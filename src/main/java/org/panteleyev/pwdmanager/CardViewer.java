@@ -21,6 +21,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.panteleyev.pwdmanager.model.CardType;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Picture;
@@ -37,6 +38,8 @@ import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTES;
+import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;
+import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 final class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
@@ -93,18 +96,27 @@ final class CardViewer extends BorderPane {
             nameLabel.getStyleClass().add(STYLE_FIELD_NAME);
 
             Labeled valueLabel;
-            if (field.getType() == FieldType.LINK) {
-                valueLabel = new Hyperlink(field.getValue());
-                ((Hyperlink) valueLabel).setOnAction(e -> onHyperlinkClick(field.getValue()));
-            } else {
-                valueLabel = new Label(field.getType().isMasked() ? MASK : field.getValue());
-                valueLabel.getStyleClass().add(STYLE_FIELD_VALUE);
 
-                valueLabel.setOnMouseClicked(event -> {
-                    if (event.getClickCount() > 1) {
-                        onContentViewDoubleClick(field, valueLabel);
-                    }
-                });
+            switch (field.getType()) {
+                case LINK -> {
+                    valueLabel = new Hyperlink(field.getValueAsString());
+                    ((Hyperlink) valueLabel).setOnAction(e -> onHyperlinkClick(field.getValueAsString()));
+                }
+                case CARD_TYPE -> {
+                    var cardType = (CardType) field.getValue();
+                    valueLabel = new Label(cardType.getName(),
+                        imageView(cardType.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
+                }
+                default -> {
+                    valueLabel = new Label(field.getType().isMasked() ? MASK : field.getValueAsString());
+                    valueLabel.getStyleClass().add(STYLE_FIELD_VALUE);
+
+                    valueLabel.setOnMouseClicked(event -> {
+                        if (event.getClickCount() > 1) {
+                            onContentViewDoubleClick(field, valueLabel);
+                        }
+                    });
+                }
             }
 
             valueLabel.setContextMenu(createContextMenu(field));
@@ -136,7 +148,7 @@ final class CardViewer extends BorderPane {
         }
 
         field.toggleShow();
-        label.setText(field.getShow() ? field.getValue() : MASK);
+        label.setText(field.getShow() ? field.getValueAsString() : MASK);
     }
 
     private ContextMenu createContextMenu(FieldWrapper field) {
@@ -153,10 +165,10 @@ final class CardViewer extends BorderPane {
         var value = field.value();
         if (field.type() == FieldType.CREDIT_CARD_NUMBER) {
             // remove all spaces from credit card number
-            value = value.trim().replaceAll(" ", "");
+            value = value.toString().replaceAll(" ", "");
         }
 
-        content.putString(value);
+        content.putString(value.toString());
         cb.setContent(content);
     }
 }

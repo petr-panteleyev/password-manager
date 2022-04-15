@@ -35,7 +35,7 @@ public enum RecordType {
     EMPTY(Picture.GENERIC, List.of()),
     CREDIT_CARD(Picture.CREDIT_CARD, List.of(
         new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_CARD_PROVIDER), ""),
-        new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_CARD_TYPE), ""),
+        new Field(FieldType.CARD_TYPE, fxString(UI_BUNDLE, I18N_CARD_TYPE), CardType.OTHER),
         new Field(FieldType.CREDIT_CARD_NUMBER, fxString(UI_BUNDLE, I18N_CARD_NUMBER), ""),
         new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_EXPIRATION_DATE), ""),
         new Field(FieldType.PIN, "PIN", ""),

@@ -7,6 +7,7 @@ package org.panteleyev.pwdmanager.model;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.panteleyev.pwdmanager.cells.PictureListCell;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,8 +25,10 @@ public enum Picture {
     CD,
     CHESS,
     CHROME,
+    CITI,
     COMPUTER,
     CREDIT_CARD,
+    DINERS,
     EDUCATION,
     EMAIL,
     FACEBOOK,
@@ -44,10 +47,12 @@ public enum Picture {
     INTERNET,
     IPHONE,
     JAVA,
+    JCB,
     LINKEDIN,
     MALE,
     MASTERCARD,
     MEDICINE,
+    MIR,
     MOBILE,
     MOZILLA,
     NOTE,
@@ -55,7 +60,9 @@ public enum Picture {
     ODNOKLASSNIKI,
     ORIGIN,
     PASSPORT,
+    PAYPAL,
     PHONE,
+    RAIFFEISEN,
     REDDIT,
     RUSSIA,
     SBERBANK,
@@ -65,6 +72,7 @@ public enum Picture {
     TELEGRAM,
     TRAIN,
     TWITTER,
+    UNIONPAY,
     US,
     VISA,
     VK,
@@ -73,6 +81,9 @@ public enum Picture {
     WOW,
     YAHOO,
     YANDEX;
+
+    public static final int SMALL_IMAGE_SIZE = 24;
+    public static final int BIG_IMAGE_SIZE = 48;
 
     private final Image image;
     private final Image bigImage;
@@ -111,5 +122,12 @@ public enum Picture {
         } catch (Exception ex) {
             return GENERIC;
         }
+    }
+
+    public static ImageView imageView(Image image, int width, int height) {
+        var view = new ImageView(image);
+        view.setFitWidth(width);
+        view.setFitHeight(height);
+        return view;
     }
 }

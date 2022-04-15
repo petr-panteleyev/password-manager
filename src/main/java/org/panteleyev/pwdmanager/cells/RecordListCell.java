@@ -9,6 +9,8 @@ import javafx.scene.image.ImageView;
 import org.panteleyev.pwdmanager.model.WalletRecord;
 import static org.panteleyev.pwdmanager.Styles.STYLE_DELETED;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FAVORITE;
+import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;
+import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 public class RecordListCell extends ListCell<WalletRecord> {
     @Override
@@ -28,7 +30,7 @@ public class RecordListCell extends ListCell<WalletRecord> {
                 }
             }
             setText(record.name());
-            setGraphic(new ImageView(record.picture().getImage()));
+            setGraphic(imageView(record.picture().getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
         }
     }
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wallet version="22.2.0">
+    <records>
+        <record active="false" favorite="false" modified="1650043791945" name="Credit MasterCard" picture="MASTERCARD" recordClass="CARD" uuid="dd0bc864-0cbb-4ca7-b730-0ff023de58c0">
+            <fields>
+                <field name="Card Provider" type="STRING" value=""/>
+                <field name="Card Type" type="CARD_TYPE" value="VISA"/>
+                <field name="Card Number" type="CREDIT_CARD_NUMBER" value=""/>
+                <field name="Expiration Date" type="STRING" value=""/>
+                <field name="PIN" type="PIN" value=""/>
+                <field name="Name on Card" type="STRING" value=""/>
+                <field name="Phone Number" type="STRING" value=""/>
+                <field name="CVC#" type="HIDDEN" value=""/>
+                <field name="Login" type="STRING" value=""/>
+                <field name="Password" type="LONG_PASSWORD" value=""/>
+            </fields>
+            <note/>
+        </record>
+        <record active="true" favorite="false" modified="1650044792163" name="Credit MasterCard" picture="MASTERCARD" recordClass="CARD" uuid="91ef512d-2da4-4ca3-9cd7-6b0395cee493">
+            <fields>
+                <field name="Card Provider" type="STRING" value="Sample Bank"/>
+                <field name="Card Type" type="CARD_TYPE" value="MASTERCARD"/>
+                <field name="Card Number" type="CREDIT_CARD_NUMBER" value="1234 5678 9012 3456"/>
+                <field name="Expiration Date" type="STRING" value="12/22"/>
+                <field name="PIN" type="PIN" value="123"/>
+                <field name="Name on Card" type="STRING" value="Card Holder"/>
+                <field name="Phone Number" type="STRING" value="+1 (234) 5678900"/>
+                <field name="CVC#" type="HIDDEN" value="123"/>
+                <field name="Login" type="STRING" value="username"/>
+                <field name="Password" type="LONG_PASSWORD" value="password"/>
+            </fields>
+            <note/>
+        </record>
+        <record active="true" favorite="false" modified="1650043985406" name="Debit Visa" picture="VISA" recordClass="CARD" uuid="d32f569c-5639-42d8-8ce3-0d6eac1fef89">
+            <fields>
+                <field name="Card Provider" type="STRING" value="Another Bank"/>
+                <field name="Card Type" type="CARD_TYPE" value="VISA"/>
+                <field name="Card Number" type="CREDIT_CARD_NUMBER" value="1111 2222 3333 4444"/>
+                <field name="Expiration Date" type="STRING" value=""/>
+                <field name="PIN" type="PIN" value=""/>
+                <field name="Name on Card" type="STRING" value=""/>
+                <field name="Phone Number" type="STRING" value=""/>
+                <field name="CVC#" type="HIDDEN" value=""/>
+                <field name="Login" type="STRING" value=""/>
+                <field name="Password" type="LONG_PASSWORD" value=""/>
+            </fields>
+            <note/>
+        </record>
+        <record active="true" favorite="false" modified="1650044021668" name="GitHub" picture="GITHUB" recordClass="CARD" uuid="162d45ed-0772-4321-956c-caca63a038c7">
+            <fields>
+                <field name="System" type="STRING" value=""/>
+                <field name="Login" type="STRING" value="login"/>
+                <field name="Password" type="LONG_PASSWORD" value="password"/>
+                <field name="URL" type="LINK" value="https://github.com"/>
+            </fields>
+            <note/>
+        </record>
+    </records>
+</wallet>

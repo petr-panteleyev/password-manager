@@ -5,6 +5,7 @@
 package org.panteleyev.pwdmanager.bundles;
 
 import java.util.ListResourceBundle;
+import static org.panteleyev.pwdmanager.model.FieldType.CARD_TYPE;
 import static org.panteleyev.pwdmanager.model.FieldType.CREDIT_CARD_NUMBER;
 import static org.panteleyev.pwdmanager.model.FieldType.EMAIL;
 import static org.panteleyev.pwdmanager.model.FieldType.HIDDEN;
@@ -27,7 +28,8 @@ public class FieldTypeBundle extends ListResourceBundle {
             {PIN.name(), "PIN code"},
             {SHORT_PASSWORD.name(), "Short Password"},
             {STRING.name(), "String"},
-            {UNIX_PASSWORD.name(), "UNIX Password"}
+            {UNIX_PASSWORD.name(), "UNIX Password"},
+            {CARD_TYPE.name(), "Card Type"}
         };
     }
 }

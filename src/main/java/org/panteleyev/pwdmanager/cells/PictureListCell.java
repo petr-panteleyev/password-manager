@@ -7,6 +7,7 @@ package org.panteleyev.pwdmanager.cells;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.ImageView;
 import org.panteleyev.pwdmanager.model.Picture;
+import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 public class PictureListCell extends ListCell<Picture> {
     @Override
@@ -15,7 +16,7 @@ public class PictureListCell extends ListCell<Picture> {
 
         setText(null);
         setGraphic(
-            empty || item == null ? null : new ImageView(item.getImage())
+            empty || item == null ? null : imageView(item.getImage(), 16, 16)
         );
     }
 }

@@ -30,7 +30,6 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
@@ -113,6 +112,8 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VIEW;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
+import static org.panteleyev.pwdmanager.model.Picture.BIG_IMAGE_SIZE;
+import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
@@ -446,7 +447,7 @@ final class MainWindowController extends Controller {
 
     private void setupRecordViewer(WalletRecord record) {
         cardContentTitleLabel.setText(record.name());
-        cardContentTitleLabel.setGraphic(new ImageView(record.picture().getBigImage()));
+        cardContentTitleLabel.setGraphic(imageView(record.picture().getBigImage(), BIG_IMAGE_SIZE, BIG_IMAGE_SIZE));
 
         // TODO: reimplement with switch pattern matching when available
         if (record instanceof Note note) {
@@ -455,7 +456,7 @@ final class MainWindowController extends Controller {
         } else if (record instanceof Card card) {
             recordViewPane.setCenter(cardContentView);
             var wrappers = card.fields().stream()
-                .filter(f -> !f.value().isEmpty())
+                .filter(f -> !f.isEmpty())
                 .map(FieldWrapper::new)
                 .toList();
             cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());

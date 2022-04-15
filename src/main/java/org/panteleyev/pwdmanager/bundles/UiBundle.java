@@ -33,7 +33,6 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXPIRA
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXPORT;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FAVORITE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_NAME;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_TYPE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILTER;
@@ -120,7 +119,6 @@ public class UiBundle extends ListResourceBundle {
             {I18N_EXPORT, "Export"},
             {I18N_FAVORITE, "Favorite"},
             {I18N_FIELD_NAME, "Field Name"},
-            {I18N_FIELD_TYPE, "Field Type"},
             {I18N_FIELD_VALUE, "Field Value"},
             {I18M_FIELDS, "Fields"},
             {I18N_FILE, "File"},

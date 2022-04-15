@@ -32,7 +32,6 @@ public interface Internationalization {
     String I18N_EXPORT = "I18N_EXPORT";
     String I18N_FAVORITE = "I18N_FAVORITE";
     String I18N_FIELD_NAME = "I18N_FIELD_NAME";
-    String I18N_FIELD_TYPE = "I18N_FIELD_TYPE";
     String I18N_FIELD_VALUE = "I18N_FIELD_VALUE";
     String I18M_FIELDS = "I18M_FIELDS";
     String I18N_FILE = "I18N_FILE";

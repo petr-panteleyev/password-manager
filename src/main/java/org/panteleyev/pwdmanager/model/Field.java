@@ -4,5 +4,29 @@
  */
 package org.panteleyev.pwdmanager.model;
 
-public record Field(FieldType type, String name, String value) {
+public record Field(FieldType type, String name, Object value) {
+    public String getValueAsString() {
+        return value.toString();
+    }
+
+    public boolean isEmpty() {
+        return getValueAsString().isEmpty();
+    }
+
+    public String serializeValue() {
+        // TODO: reimplement with switch pattern matching when available
+        if (value instanceof Enum enumValue) {
+            return enumValue.name();
+        } else {
+            return value.toString();
+        }
+    }
+
+    public static Object deserializeValue(FieldType type, String value) {
+        if (type == FieldType.CARD_TYPE) {
+            return CardType.of(value);
+        } else {
+            return value;
+        }
+    }
 }

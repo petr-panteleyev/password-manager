@@ -14,6 +14,6 @@ public record FieldContentFilter(String value) implements Predicate<WalletRecord
         return !(record instanceof Card card) ||
             card.fields()
                 .stream()
-                .anyMatch(f -> f.value().toLowerCase().contains(value.toLowerCase()));
+                .anyMatch(f -> f.getValueAsString().toLowerCase().contains(value.toLowerCase()));
     }
 }

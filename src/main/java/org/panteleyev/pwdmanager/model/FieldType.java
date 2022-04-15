@@ -17,7 +17,8 @@ public enum FieldType {
     PIN(true),
     UNIX_PASSWORD(true),
     SHORT_PASSWORD(true),
-    LONG_PASSWORD(true);
+    LONG_PASSWORD(true),
+    CARD_TYPE;
 
     private static final ResourceBundle BUNDLE = getBundle(FieldTypeBundle.class.getCanonicalName());
 

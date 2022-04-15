@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
 final class Serializer {
 
@@ -69,6 +70,7 @@ final class Serializer {
 
         var doc = docBuilder.newDocument();
         var rootElement = doc.createElement("wallet");
+        rootElement.setAttribute("version", BUILD_INFO_BUNDLE.getString("version"));
 
         doc.appendChild(rootElement);
 
@@ -142,14 +144,14 @@ final class Serializer {
         var e = doc.createElement(FIELD);
         e.setAttribute(NAME_ATTR, f.name());
         e.setAttribute(TYPE_ATTR, f.type().name());
-        e.setAttribute(VALUE_ATTR, f.value());
+        e.setAttribute(VALUE_ATTR, f.serializeValue());
         return e;
     }
 
     static Field deserializeField(Element e) {
         var name = e.getAttribute(NAME_ATTR);
         var type = FieldType.valueOf(e.getAttribute(TYPE_ATTR));
-        var value = e.getAttribute(VALUE_ATTR);
+        var value = Field.deserializeValue(type, e.getAttribute(VALUE_ATTR));
 
         return new Field(type, name, value);
     }

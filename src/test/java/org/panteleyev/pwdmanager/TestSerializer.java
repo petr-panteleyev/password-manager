@@ -5,6 +5,7 @@
 package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.Card;
+import org.panteleyev.pwdmanager.model.CardType;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Note;
@@ -36,7 +37,8 @@ public class TestSerializer {
             UUID.randomUUID().toString(),
             List.of(
                 new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-                new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+                new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.MASTERCARD)
             ),
             UUID.randomUUID().toString(),
             true, false
@@ -57,6 +59,7 @@ public class TestSerializer {
             {new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
             {new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
             {new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")},
+            {new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.UNION_PAY)},
         };
     }
 
