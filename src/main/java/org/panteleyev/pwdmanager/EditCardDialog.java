@@ -4,7 +4,6 @@
  */
 package org.panteleyev.pwdmanager;
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -169,21 +168,21 @@ final class EditCardDialog extends BaseDialog<Card> {
         fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         fieldNameColumn.setCellValueFactory(p -> p.getValue().nameProperty());
 
-        var fieldTypeColumn = new TableColumn<EditableField, EditableField>();
+        var fieldTypeColumn = new TableColumn<EditableField, FieldType>();
         fieldTypeColumn.setSortable(false);
         fieldTypeColumn.setResizable(false);
         fieldTypeColumn.setReorderable(false);
         fieldTypeColumn.setStyle("-fx-alignment: CENTER;");
         fieldTypeColumn.setCellFactory(column -> new EditRecordFieldTypeCell());
-        fieldTypeColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue()));
+        fieldTypeColumn.setCellValueFactory(p -> p.getValue().typeProperty());
 
-        var fieldValueColumn = new TableColumn<EditableField, EditableField>();
+        var fieldValueColumn = new TableColumn<EditableField, Object>();
         fieldValueColumn.setSortable(false);
         fieldValueColumn.setResizable(false);
         fieldValueColumn.setReorderable(false);
         fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
         fieldValueColumn.setCellFactory(column -> new EditRecordFieldValueCell());
-        fieldValueColumn.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue()));
+        fieldValueColumn.setCellValueFactory(p -> p.getValue().valueProperty());
 
         var w = cardContentView.widthProperty().subtract(5);
         fieldNameColumn.prefWidthProperty().bind(w.multiply(0.33));

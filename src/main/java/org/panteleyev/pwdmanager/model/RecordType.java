@@ -6,6 +6,7 @@ package org.panteleyev.pwdmanager.model;
 
 import javafx.scene.image.Image;
 import org.panteleyev.pwdmanager.bundles.RecordTypeBundle;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
@@ -37,7 +38,7 @@ public enum RecordType {
         new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_CARD_PROVIDER), ""),
         new Field(FieldType.CARD_TYPE, fxString(UI_BUNDLE, I18N_CARD_TYPE), CardType.OTHER),
         new Field(FieldType.CREDIT_CARD_NUMBER, fxString(UI_BUNDLE, I18N_CARD_NUMBER), ""),
-        new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_EXPIRATION_DATE), ""),
+        new Field(FieldType.EXPIRATION_MONTH, fxString(UI_BUNDLE, I18N_EXPIRATION_DATE), LocalDate.now()),
         new Field(FieldType.PIN, "PIN", ""),
         new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_NAME_ON_CARD), ""),
         new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_PHONE_NUMBER), ""),

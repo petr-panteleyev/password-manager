@@ -8,17 +8,18 @@ import javafx.application.Platform;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import org.panteleyev.pwdmanager.EditableField;
 import org.panteleyev.pwdmanager.model.CardType;
+import java.time.LocalDate;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
-public class EditRecordFieldValueCell extends TableCell<EditableField, EditableField> {
+public class EditRecordFieldValueCell extends TableCell<EditableField, Object> {
     private final TextField textField = new TextField();
     private final ComboBox<CardType> cardTypeComboBox = comboBox(CardType.values(),
         b -> b.withDefaultString("-")
@@ -26,13 +27,12 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, EditableF
             .withImageConverter(CardType::getImage)
             .withImageDimension(new Dimension2D(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE))
     );
+    private final DatePicker datePicker = new DatePicker();
 
     public EditRecordFieldValueCell() {
         textField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                var item = getItem();
-                item.valueProperty().set(textField.getText());
-                commitEdit(item);
+                commitEdit(textField.getText());
                 event.consume();
             } else if (event.getCode() == KeyCode.ESCAPE) {
                 cancelEdit();
@@ -42,9 +42,14 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, EditableF
 
         cardTypeComboBox.setOnAction(event -> {
             var selected = cardTypeComboBox.getSelectionModel().getSelectedItem();
-            var item = getItem();
-            item.valueProperty().set(selected);
-            commitEdit(item);
+            commitEdit(selected);
+            event.consume();
+        });
+
+        datePicker.getEditor().setEditable(false);
+        datePicker.setOnAction(event -> {
+            var date = datePicker.getValue();
+            commitEdit(date);
             event.consume();
         });
     }
@@ -54,12 +59,15 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, EditableF
         super.startEdit();
         var item = getItem();
         // TODO: reimplement with switch pattern matching when available
-        if (item.getValue() instanceof CardType cardType) {
+        if (item instanceof CardType cardType) {
             cardTypeComboBox.getSelectionModel().select(cardType);
             setGraphic(cardTypeComboBox);
+        } else if (item instanceof LocalDate localDate) {
+            datePicker.setValue(localDate);
+            setGraphic(datePicker);
         } else {
             setGraphic(textField);
-            textField.setText(item.getValue().toString());
+            textField.setText(item.toString());
             Platform.runLater(() -> {
                 textField.requestFocus();
                 textField.selectAll();
@@ -71,46 +79,50 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, EditableF
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setupCellView(getItem());
+        setupCellView();
     }
 
     @Override
-    protected void updateItem(EditableField field, boolean empty) {
-        super.updateItem(field, empty);
+    protected void updateItem(Object value, boolean empty) {
+        super.updateItem(value, empty);
 
-        if (field == null || empty) {
+        if (value == null || empty) {
             setText(null);
             setGraphic(null);
         } else {
             if (isEditing()) {
                 // TODO: reimplement with switch pattern matching when available
-                if (field.getValue() instanceof CardType cardType) {
+                if (value instanceof CardType cardType) {
                     cardTypeComboBox.getSelectionModel().select(cardType);
                     setGraphic(cardTypeComboBox);
+                } else if (value instanceof LocalDate localDate) {
+                    datePicker.setValue(localDate);
+                    setGraphic(datePicker);
                 } else {
-                    textField.setText(field.getValue().toString());
+                    textField.setText(value.toString());
                     setGraphic(textField);
                 }
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             } else {
-                setupCellView(field);
+                setupCellView();
             }
         }
     }
 
-    private String getString() {
-        return getItem() == null ? "" : getItem().getValue().toString();
-    }
-
-    private void setupCellView(EditableField field) {
+    private void setupCellView() {
+        var field = getTableRow().getItem();
+        if (field == null) {
+            return;
+        }
+        var value = field.getValue();
         // TODO: reimplement with switch pattern matching when available
-        if (field.getValue() instanceof CardType cardType) {
+        if (value instanceof CardType cardType) {
             setGraphic(imageView(cardType.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
             setText(cardType.getName());
             setContentDisplay(ContentDisplay.LEFT);
         } else {
             setGraphic(null);
-            setText(field.getValue().toString());
+            setText(field.toField().getValueAsString());
             setContentDisplay(ContentDisplay.TEXT_ONLY);
         }
     }

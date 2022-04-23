@@ -28,7 +28,7 @@ public final class EditableField {
         value.set(field.value());
     }
 
-    Field toField() {
+    public Field toField() {
         return new Field(type.get(), name.get(), value.get());
     }
 

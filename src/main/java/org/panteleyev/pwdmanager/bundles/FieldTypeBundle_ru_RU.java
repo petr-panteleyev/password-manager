@@ -7,7 +7,9 @@ package org.panteleyev.pwdmanager.bundles;
 import java.util.ListResourceBundle;
 import static org.panteleyev.pwdmanager.model.FieldType.CARD_TYPE;
 import static org.panteleyev.pwdmanager.model.FieldType.CREDIT_CARD_NUMBER;
+import static org.panteleyev.pwdmanager.model.FieldType.DATE;
 import static org.panteleyev.pwdmanager.model.FieldType.EMAIL;
+import static org.panteleyev.pwdmanager.model.FieldType.EXPIRATION_MONTH;
 import static org.panteleyev.pwdmanager.model.FieldType.HIDDEN;
 import static org.panteleyev.pwdmanager.model.FieldType.LINK;
 import static org.panteleyev.pwdmanager.model.FieldType.LONG_PASSWORD;
@@ -30,7 +32,9 @@ public class FieldTypeBundle_ru_RU extends ListResourceBundle {
             {SHORT_PASSWORD.name(), "Короткий пароль"},
             {STRING.name(), "Строка"},
             {UNIX_PASSWORD.name(), "Пароль UNIX"},
-            {CARD_TYPE.name(), "Тип карты"}
+            {CARD_TYPE.name(), "Тип карты"},
+            {DATE.name(), "Дата"},
+            {EXPIRATION_MONTH.name(), "Месяц окончания"}
         };
     }
 }
