@@ -21,8 +21,14 @@ public final class PasswordManagerApplication extends Application {
     private static final String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
     private static final String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
 
+    private static PasswordManagerApplication application;
+
     public static void main(String[] args) {
         launch(args);
+    }
+
+    public PasswordManagerApplication() {
+        application = this;
     }
 
     @Override
@@ -45,6 +51,12 @@ public final class PasswordManagerApplication extends Application {
 
         new MainWindowController(stage);
         stage.show();
+    }
+
+    public static void showDocument(String uri) {
+        if (application != null) {
+            application.getHostServices().showDocument(uri);
+        }
     }
 
     private static void uncaughtException(Throwable e) {

@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>22.3.0</version>
+    <version>22.3.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -162,6 +162,7 @@
                     <execution>
                         <id>linux</id>
                         <configuration>
+                            <type>APP_IMAGE</type>
                             <icon>icons/icon.png</icon>
                         </configuration>
                     </execution>

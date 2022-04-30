@@ -25,14 +25,14 @@ import org.panteleyev.pwdmanager.model.CardType;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Picture;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+
 import java.util.List;
+
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.MASK;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
+import static org.panteleyev.pwdmanager.PasswordManagerApplication.showDocument;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_NAME;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -47,7 +47,7 @@ final class CardViewer extends BorderPane {
 
     private final GridPane grid = new GridPane();
     private final Label noteLabel = label(fxString(UI_BUNDLE, I18N_NOTES),
-        new ImageView(Picture.NOTE.getImage()));
+            new ImageView(Picture.NOTE.getImage()));
     private final Label noteViewer = new Label();
 
     CardViewer() {
@@ -69,9 +69,9 @@ final class CardViewer extends BorderPane {
         grid.setFocusTraversable(false);
 
         var vBox = new VBox(
-            grid,
-            noteLabel,
-            noteViewer
+                grid,
+                noteLabel,
+                noteViewer
         );
 
         VBox.setMargin(grid, new Insets(10, 5, 10, 5));
@@ -105,7 +105,7 @@ final class CardViewer extends BorderPane {
                 case CARD_TYPE -> {
                     var cardType = (CardType) field.getValue();
                     valueLabel = new Label(cardType.getName(),
-                        imageView(cardType.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
+                            imageView(cardType.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
                 }
                 default -> {
                     valueLabel = new Label(field.getType().isMasked() ? MASK : field.getValueAsString());
@@ -135,11 +135,7 @@ final class CardViewer extends BorderPane {
     }
 
     private void onHyperlinkClick(String url) {
-        try {
-            java.awt.Desktop.getDesktop().browse(new URI(url));
-        } catch (URISyntaxException | IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        showDocument(url);
     }
 
     private void onContentViewDoubleClick(FieldWrapper field, Labeled label) {
