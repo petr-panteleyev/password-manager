@@ -87,4 +87,5 @@ public interface Internationalization {
     String I18N_UPPER_CASE = "I18N_UPPER_CASE";
     String I18N_VALID_UNTIL = "I18N_VALID_UNTIL";
     String I18N_VIEW = "I18N_VIEW";
+    String I18N_CREATE_DESKTOP_ENTRY = "I18N_CREATE_DESKTOP_ENTRY";
 }

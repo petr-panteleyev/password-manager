@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>22.3.1</version>
+    <version>22.3.2</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -29,6 +29,7 @@
         <!-- Dependencies -->
         <javaFxVersion>18</javaFxVersion>
         <javaFxHelpersVersion>1.10.0</javaFxHelpersVersion>
+        <javaFreeDesktopVersion>0.1.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.1</controlsFxVersion>
         <testNgVersion>7.5</testNgVersion>
     </properties>
@@ -64,6 +65,11 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>freedesktop</artifactId>
+            <version>${javaFreeDesktopVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>

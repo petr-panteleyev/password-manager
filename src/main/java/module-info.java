@@ -12,6 +12,7 @@ open module password.manager {
     requires javafx.graphics;
 
     requires org.panteleyev.fx;
+    requires org.panteleyev.freedesktop;
 
     requires org.controlsfx.controls;
 }
