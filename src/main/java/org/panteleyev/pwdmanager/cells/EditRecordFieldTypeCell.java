@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.cells;
 
@@ -10,7 +10,9 @@ import javafx.scene.control.TableCell;
 import org.panteleyev.pwdmanager.EditableField;
 import org.panteleyev.pwdmanager.model.CardType;
 import org.panteleyev.pwdmanager.model.FieldType;
+
 import java.time.LocalDate;
+
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 
 public class EditRecordFieldTypeCell extends TableCell<EditableField, FieldType> {

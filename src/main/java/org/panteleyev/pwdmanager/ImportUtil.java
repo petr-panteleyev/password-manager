@@ -1,28 +1,30 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
 import org.panteleyev.pwdmanager.model.WalletRecord;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public interface ImportUtil {
 
-    static List<ImportRecord> calculateImport(Collection<? extends WalletRecord> existing, Collection<? extends WalletRecord> toImport) {
+    static List<ImportRecord> calculateImport(Collection<? extends WalletRecord> existing, Collection<?
+            extends WalletRecord> toImport) {
         var result = new ArrayList<ImportRecord>(toImport.size());
         for (var card : toImport) {
             existing.stream()
-                .filter(x -> x.uuid().equals(card.uuid()))
-                .findAny()
-                .ifPresentOrElse(
-                    found -> processUpdate(result, found, card),
-                    () -> processAddition(result, card)
-                );
+                    .filter(x -> x.uuid().equals(card.uuid()))
+                    .findAny()
+                    .ifPresentOrElse(
+                            found -> processUpdate(result, found, card),
+                            () -> processAddition(result, card)
+                    );
         }
         return result;
     }
@@ -30,7 +32,7 @@ public interface ImportUtil {
     private static void processUpdate(List<ImportRecord> importRecords, WalletRecord existing, WalletRecord toImport) {
         if (existing.modified() < toImport.modified()) {
             var action = existing.active() == toImport.active() ?
-                ImportAction.REPLACE : toImport.active() ? ImportAction.RESTORE : ImportAction.DELETE;
+                    ImportAction.REPLACE : toImport.active() ? ImportAction.RESTORE : ImportAction.DELETE;
             importRecords.add(new ImportRecord(action, existing, toImport));
         }
     }

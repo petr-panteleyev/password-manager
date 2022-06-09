@@ -1,6 +1,6 @@
 # Password Manager
 
-[![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
+[![GitHub](https://img.shields.io/github/license/petr-panteleyev/password-manager)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-18-orange?logo=java)](https://jdk.java.net/18/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-18-orange?logo=java)](https://openjfx.io/)
 

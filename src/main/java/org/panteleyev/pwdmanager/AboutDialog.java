@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -9,7 +9,9 @@ import javafx.scene.image.ImageView;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.model.Picture;
+
 import java.time.LocalDate;
+
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -38,17 +40,17 @@ final class AboutDialog extends BaseDialog<Object> {
         aboutLabel.getStyleClass().add(STYLE_ABOUT_LABEL);
 
         var vBox = vBox(BIG_SPACING,
-            vBox(SMALL_SPACING,
-                aboutLabel,
-                label("Built on " + fxString(BUILD_INFO_BUNDLE, "timestamp"))
-            ),
-            vBox(SMALL_SPACING,
-                label("Runtime version: " + RUNTIME),
-                label("VM: " + VM)
-            ),
-            vBox(SMALL_SPACING,
-                label("Copyright (c) 2016, " + YEAR + ", Petr Panteleyev")
-            )
+                vBox(SMALL_SPACING,
+                        aboutLabel,
+                        label("Built on " + fxString(BUILD_INFO_BUNDLE, "timestamp"))
+                ),
+                vBox(SMALL_SPACING,
+                        label("Runtime version: " + RUNTIME),
+                        label("VM: " + VM)
+                ),
+                vBox(SMALL_SPACING,
+                        label("Copyright © 2017-" + YEAR + " Petr Panteleyev")
+                )
         );
 
         getDialogPane().setContent(vBox);

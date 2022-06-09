@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.cells;
 
@@ -14,7 +14,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.panteleyev.pwdmanager.EditableField;
 import org.panteleyev.pwdmanager.model.CardType;
+
 import java.time.LocalDate;
+
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
@@ -22,10 +24,10 @@ import static org.panteleyev.pwdmanager.model.Picture.imageView;
 public class EditRecordFieldValueCell extends TableCell<EditableField, Object> {
     private final TextField textField = new TextField();
     private final ComboBox<CardType> cardTypeComboBox = comboBox(CardType.values(),
-        b -> b.withDefaultString("-")
-            .withStringConverter(CardType::getName)
-            .withImageConverter(CardType::getImage)
-            .withImageDimension(new Dimension2D(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE))
+            b -> b.withDefaultString("-")
+                    .withStringConverter(CardType::getName)
+                    .withImageConverter(CardType::getImage)
+                    .withImageDimension(new Dimension2D(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE))
     );
     private final DatePicker datePicker = new DatePicker();
 

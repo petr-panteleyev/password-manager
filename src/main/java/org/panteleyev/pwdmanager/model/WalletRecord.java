@@ -1,10 +1,11 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
 
 import javafx.scene.input.DataFormat;
+
 import java.util.Comparator;
 import java.util.UUID;
 

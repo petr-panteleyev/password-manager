@@ -1,12 +1,14 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.generator;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
 import java.util.List;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -16,10 +18,10 @@ public class TestGenerator {
     @DataProvider
     public Object[][] dataProvider() {
         return new Object[][]{
-            {new GeneratorOptions(true, true, true, true, 32)},
-            {new GeneratorOptions(true, true, true, true, 32)},
-            {new GeneratorOptions(false, false, true, false, 4)},
-            {new GeneratorOptions(false, false, true, false, 4)},
+                {new GeneratorOptions(true, true, true, true, 32)},
+                {new GeneratorOptions(true, true, true, true, 32)},
+                {new GeneratorOptions(false, false, true, false, 4)},
+                {new GeneratorOptions(false, false, true, false, 4)},
         };
     }
 

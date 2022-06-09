@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -22,9 +22,11 @@ import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.options.FontOption;
+
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.BoxFactory.hBox;
@@ -125,14 +127,14 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
 
         lengthComboBox.getItems().addAll(4, 6, 8, 16, 24, 32);
         typeComboBox.setItems(
-            observableArrayList(
-                PASSWORD_DEFAULTS.keySet().stream()
-                    .sorted()
-                    .toList()
-            )
+                observableArrayList(
+                        PASSWORD_DEFAULTS.keySet().stream()
+                                .sorted()
+                                .toList()
+                )
         );
         typeComboBox.getSelectionModel().selectedItemProperty().addListener(
-            (observableValue, oldValue, newValue) -> updatePasswordControls(newValue));
+                (observableValue, oldValue, newValue) -> updatePasswordControls(newValue));
         typeComboBox.getSelectionModel().selectFirst();
 
         EventHandler<ActionEvent> updatePasswordOptionsCopy = event -> onUpdatePasswordOptions();
@@ -143,52 +145,64 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
         lengthComboBox.setOnAction(updatePasswordOptionsCopy);
 
         var vBox = vBox(BIG_SPACING,
-            hBox(SMALL_SPACING, typeComboBox),
-            hBox(SMALL_SPACING, upperCaseCheckBox, lowerCaseCheckBox, digitsCheckBox, symbolsCheckBox),
-            hBox(SMALL_SPACING, label(fxString(UI_BUNDLE, I18N_LENGTH, COLON)), lengthComboBox)
+                hBox(SMALL_SPACING, typeComboBox),
+                hBox(SMALL_SPACING, upperCaseCheckBox, lowerCaseCheckBox, digitsCheckBox, symbolsCheckBox),
+                hBox(SMALL_SPACING, label(fxString(UI_BUNDLE, I18N_LENGTH, COLON)), lengthComboBox)
         );
         vBox.setPadding(new Insets(BIG_SPACING, 0, BIG_SPACING, 0));
 
         getDialogPane().setContent(
-            new TabPane(
-                newTab(UI_BUNDLE, I18N_PASSWORDS, false, vBox),
-                newTab(UI_BUNDLE, I18N_FONTS, false,
-                    vBox(10,
-                        titledPane(fxString(UI_BUNDLE, I18N_CONTROLS),
-                            gridPane(List.of(
-                                gridRow(label(fxString(UI_BUNDLE, I18N_TEXT, COLON)), controlsFontField,
-                                    button(ELLIPSIS, actionEvent -> onFontSelected(controlsFontField))),
-                                gridRow(label(fxString(UI_BUNDLE, I18N_MENU, COLON)), menuFontField,
-                                    button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
-                            ), b -> b.withStyle(STYLE_GRID_PANE))
+                new TabPane(
+                        newTab(UI_BUNDLE, I18N_PASSWORDS, false, vBox),
+                        newTab(UI_BUNDLE, I18N_FONTS, false,
+                                vBox(10,
+                                        titledPane(fxString(UI_BUNDLE, I18N_CONTROLS),
+                                                gridPane(List.of(
+                                                        gridRow(label(fxString(UI_BUNDLE, I18N_TEXT, COLON)),
+                                                                controlsFontField,
+                                                                button(ELLIPSIS,
+                                                                        actionEvent -> onFontSelected(controlsFontField))),
+                                                        gridRow(label(fxString(UI_BUNDLE, I18N_MENU, COLON)),
+                                                                menuFontField,
+                                                                button(ELLIPSIS,
+                                                                        actionEvent -> onFontSelected(menuFontField)))
+                                                ), b -> b.withStyle(STYLE_GRID_PANE))
+                                        ),
+                                        titledPane(fxString(UI_BUNDLE, I18N_DIALOGS),
+                                                gridPane(List.of(
+                                                                gridRow(dialogFontField,
+                                                                        button(ELLIPSIS,
+                                                                                actionEvent -> onFontSelected(dialogFontField)))
+                                                        ), b -> b.withStyle(STYLE_GRID_PANE)
+                                                )
+                                        )
+                                )
                         ),
-                        titledPane(fxString(UI_BUNDLE, I18N_DIALOGS),
-                            gridPane(List.of(
-                                gridRow(dialogFontField,
-                                    button(ELLIPSIS, actionEvent -> onFontSelected(dialogFontField)))
-                                ), b -> b.withStyle(STYLE_GRID_PANE)
-                            )
+                        newTab(UI_BUNDLE, I18N_COLORS, false,
+                                gridPane(List.of(
+                                        gridRow(SKIP,
+                                                label(fxString(UI_BUNDLE, I18N_FOREGROUND)), label(fxString(UI_BUNDLE
+                                                        , I18N_BACKGROUND))),
+                                        gridRow(label(fxString(UI_BUNDLE, I18N_FAVORITE, COLON)),
+                                                favoriteForegroundColorPicker, favoriteBackgroundColorPicker),
+                                        gridRow(label(fxString(UI_BUNDLE, I18N_DELETED, COLON)),
+                                                deletedForegroundColorPicker, deletedBackgroundColorPicker),
+                                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_NAME, COLON)),
+                                                fieldNameColorPicker),
+                                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_VALUE, COLON)),
+                                                fieldValueColorPicker),
+                                        gridRow(SKIP, label(fxString(UI_BUNDLE, I18N_IMPORT))),
+                                        gridRow(label(fxString(ImportAction.ADD.toString(), COLON)),
+                                                actionAddColorPicker),
+                                        gridRow(label(fxString(ImportAction.REPLACE.toString(), COLON)),
+                                                actionReplaceColorPicker),
+                                        gridRow(label(fxString(ImportAction.DELETE.toString(), COLON)),
+                                                actionDeleteColorPicker),
+                                        gridRow(label(fxString(ImportAction.RESTORE.toString(), COLON)),
+                                                actionRestoreColorPicker)
+                                ), b -> b.withStyle(STYLE_GRID_PANE))
                         )
-                    )
-                ),
-                newTab(UI_BUNDLE, I18N_COLORS, false,
-                    gridPane(List.of(
-                        gridRow(SKIP,
-                            label(fxString(UI_BUNDLE, I18N_FOREGROUND)), label(fxString(UI_BUNDLE, I18N_BACKGROUND))),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_FAVORITE, COLON)),
-                            favoriteForegroundColorPicker, favoriteBackgroundColorPicker),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_DELETED, COLON)),
-                            deletedForegroundColorPicker, deletedBackgroundColorPicker),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_NAME, COLON)), fieldNameColorPicker),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_VALUE, COLON)), fieldValueColorPicker),
-                        gridRow(SKIP, label(fxString(UI_BUNDLE, I18N_IMPORT))),
-                        gridRow(label(fxString(ImportAction.ADD.toString(), COLON)), actionAddColorPicker),
-                        gridRow(label(fxString(ImportAction.REPLACE.toString(), COLON)), actionReplaceColorPicker),
-                        gridRow(label(fxString(ImportAction.DELETE.toString(), COLON)), actionDeleteColorPicker),
-                        gridRow(label(fxString(ImportAction.RESTORE.toString(), COLON)), actionRestoreColorPicker)
-                    ), b -> b.withStyle(STYLE_GRID_PANE))
                 )
-            )
         );
 
         setResultConverter(buttonType -> {
@@ -236,7 +250,7 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
     private void makePasswordOptionsLocalCopy() {
         for (var type : FieldType.values()) {
             Options.getPasswordOptions(type).ifPresent(
-                options -> passwordOptionsCopy.put(type, options)
+                    options -> passwordOptionsCopy.put(type, options)
             );
         }
     }
@@ -251,19 +265,19 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
 
     private GeneratorOptions buildOptions() {
         return new GeneratorOptions(
-            upperCaseCheckBox.isSelected(),
-            lowerCaseCheckBox.isSelected(),
-            digitsCheckBox.isSelected(),
-            symbolsCheckBox.isSelected(),
-            lengthComboBox.getSelectionModel().getSelectedItem()
+                upperCaseCheckBox.isSelected(),
+                lowerCaseCheckBox.isSelected(),
+                digitsCheckBox.isSelected(),
+                symbolsCheckBox.isSelected(),
+                lengthComboBox.getSelectionModel().getSelectedItem()
         );
     }
 
     private void onFontSelected(TextField field) {
         var font = (Font) field.getUserData();
         new FontSelectorDialog(font)
-            .showAndWait()
-            .ifPresent(newFont -> setupFontField(field, newFont));
+                .showAndWait()
+                .ifPresent(newFont -> setupFontField(field, newFont));
     }
 
     private void loadFont(FontOption option, TextField field) {
@@ -273,6 +287,6 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
     private void setupFontField(TextField field, Font font) {
         field.setUserData(font);
         field.setText(String.format("%s %s, %d",
-            font.getFamily(), font.getStyle(), (int) font.getSize()));
+                font.getFamily(), font.getStyle(), (int) font.getSize()));
     }
 }

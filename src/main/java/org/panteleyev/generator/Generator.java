@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.generator;
 
@@ -12,25 +12,25 @@ public class Generator {
     private static final int MIN_LENGTH = 4;
 
     static final List<Character> UPPER_CASE_CHARS = List.of(
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-        'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     );
 
     static final List<Character> LOWER_CASE_CHARS = List.of(
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
     );
 
     static final List<Character> DIGITS = List.of(
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     );
 
     static final List<Character> SYMBOLS = List.of(
-        '@', '#', '$', '%', '&', '*', '(', ')', '-', '+', '=', '^', '.', ','
+            '@', '#', '$', '%', '&', '*', '(', ')', '-', '+', '=', '^', '.', ','
     );
 
     static final List<Character> BAD_LETTERS = List.of(
-        'I', 'l', 'O', '0'
+            'I', 'l', 'O', '0'
     );
 
     private static record Bucket(List<Character> chars, boolean used) {
@@ -62,13 +62,13 @@ public class Generator {
         }
 
         var usedBuckets = Stream.of(
-                new Bucket(UPPER_CASE_CHARS, options.upperCase()),
-                new Bucket(LOWER_CASE_CHARS, options.lowerCase()),
-                new Bucket(DIGITS, options.digits()),
-                new Bucket(SYMBOLS, options.symbols())
-            )
-            .filter(Bucket::used)
-            .toList();
+                        new Bucket(UPPER_CASE_CHARS, options.upperCase()),
+                        new Bucket(LOWER_CASE_CHARS, options.lowerCase()),
+                        new Bucket(DIGITS, options.digits()),
+                        new Bucket(SYMBOLS, options.symbols())
+                )
+                .filter(Bucket::used)
+                .toList();
 
         if (usedBuckets.isEmpty()) {
             throw new IllegalArgumentException("At least one character set must be selected");

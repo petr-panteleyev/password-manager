@@ -1,12 +1,13 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.RecordType;
+
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxUtils.COLON;
@@ -38,9 +39,9 @@ final class CardDialog extends RecordDialog {
             if (OK.equals(buttonType)) {
                 var type = getTypeList().getSelectionModel().getSelectedItem();
                 return new Card(
-                    getNameEdit().getText(),
-                    getPictureList().getSelectionModel().getSelectedItem(),
-                    type.getFieldSet()
+                        getNameEdit().getText(),
+                        getPictureList().getSelectionModel().getSelectedItem(),
+                        type.getFieldSet()
                 );
             } else {
                 return null;

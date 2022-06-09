@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -29,8 +29,10 @@ import org.panteleyev.pwdmanager.cells.EditRecordFieldValueCell;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Picture;
+
 import java.util.List;
 import java.util.Optional;
+
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.newTab;
 import static org.panteleyev.fx.FxUtils.COLON;
@@ -68,30 +70,30 @@ final class EditCardDialog extends BaseDialog<Card> {
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
     private final MenuItem generateMenuItem = menuItem(fxString(UI_BUNDLE, I18N_GENERATE), SHORTCUT_G,
-        a -> onGeneratePassword());
+            a -> onGeneratePassword());
 
     EditCardDialog(Card card) {
         super(options().getDialogCssFileUrl());
         setResizable(true);
 
         editableFields = FXCollections.observableArrayList(
-            card.fields().stream()
-                .map(EditableField::new)
-                .toList()
+                card.fields().stream()
+                        .map(EditableField::new)
+                        .toList()
         );
 
         setTitle(UI_BUNDLE.getString(I18N_CARD));
 
         cardContentView.getColumns().setAll(
-            createEditorColumns()
+                createEditorColumns()
         );
 
         var contextMenu = createContextMenu();
         contextMenu.setOnShowing(event ->
-            generateMenuItem.setDisable(getSelectedField()
-                .map(EditableField::getType)
-                .flatMap(Options::getPasswordOptions)
-                .isEmpty())
+                generateMenuItem.setDisable(getSelectedField()
+                        .map(EditableField::getType)
+                        .flatMap(Options::getPasswordOptions)
+                        .isEmpty())
         );
 
         cardContentView.setContextMenu(contextMenu);
@@ -100,10 +102,10 @@ final class EditCardDialog extends BaseDialog<Card> {
         var pane = new BorderPane(cardContentView);
 
         var optionsPane = gridPane(
-            List.of(
-                gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), cardNameEdit),
-                gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
-            ), b -> b.withStyle(STYLE_GRID_PANE)
+                List.of(
+                        gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), cardNameEdit),
+                        gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
+                ), b -> b.withStyle(STYLE_GRID_PANE)
         );
         optionsPane.setPadding(new Insets(5, 5, 5, 5));
         GridPane.setHgrow(cardNameEdit, Priority.ALWAYS);
@@ -111,9 +113,9 @@ final class EditCardDialog extends BaseDialog<Card> {
         var noteEditor = new TextArea();
 
         var tabPane = new TabPane(
-            newTab(UI_BUNDLE, I18M_FIELDS, false, pane),
-            newTab(UI_BUNDLE, I18N_NOTES, false, noteEditor),
-            newTab(UI_BUNDLE, I18N_PROPERTIES, false, optionsPane));
+                newTab(UI_BUNDLE, I18M_FIELDS, false, pane),
+                newTab(UI_BUNDLE, I18N_NOTES, false, noteEditor),
+                newTab(UI_BUNDLE, I18N_PROPERTIES, false, optionsPane));
 
         getDialogPane().setContent(tabPane);
         createDefaultButtons(UI_BUNDLE);
@@ -129,16 +131,16 @@ final class EditCardDialog extends BaseDialog<Card> {
         setResultConverter(buttonType -> {
             if (OK.equals(buttonType)) {
                 return new Card(
-                    card.uuid(),
-                    System.currentTimeMillis(),
-                    pictureList.getSelectionModel().getSelectedItem(),
-                    cardNameEdit.getText(),
-                    editableFields.stream()
-                        .map(EditableField::toField)
-                        .toList(),
-                    noteEditor.getText(),
-                    card.favorite(),
-                    card.active()
+                        card.uuid(),
+                        System.currentTimeMillis(),
+                        pictureList.getSelectionModel().getSelectedItem(),
+                        cardNameEdit.getText(),
+                        editableFields.stream()
+                                .map(EditableField::toField)
+                                .toList(),
+                        noteEditor.getText(),
+                        card.favorite(),
+                        card.active()
                 );
             } else {
                 return null;
@@ -148,14 +150,14 @@ final class EditCardDialog extends BaseDialog<Card> {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-            menuItem(fxString(UI_BUNDLE, I18N_ADD), SHORTCUT_N, a -> onNewField()),
-            new SeparatorMenuItem(),
-            menuItem(fxString(UI_BUNDLE, I18N_DELETE), DELETE, a -> onDeleteField()),
-            new SeparatorMenuItem(),
-            generateMenuItem,
-            new SeparatorMenuItem(),
-            menuItem(fxString(UI_BUNDLE, I18N_UP), SHORTCUT_U, a -> onFieldUp()),
-            menuItem(fxString(UI_BUNDLE, I18N_DOWN), SHORTCUT_D, a -> onFieldDown())
+                menuItem(fxString(UI_BUNDLE, I18N_ADD), SHORTCUT_N, a -> onNewField()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI_BUNDLE, I18N_DELETE), DELETE, a -> onDeleteField()),
+                new SeparatorMenuItem(),
+                generateMenuItem,
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI_BUNDLE, I18N_UP), SHORTCUT_U, a -> onFieldUp()),
+                menuItem(fxString(UI_BUNDLE, I18N_DOWN), SHORTCUT_D, a -> onFieldDown())
         );
     }
 

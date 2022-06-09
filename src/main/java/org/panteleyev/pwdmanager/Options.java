@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -14,6 +14,7 @@ import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.options.ColorOption;
 import org.panteleyev.pwdmanager.options.FontOption;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.Preferences;
+
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
@@ -72,14 +74,14 @@ public final class Options {
     private static final Options OPTIONS = new Options();
 
     static final Map<FieldType, GeneratorOptions> PASSWORD_DEFAULTS = Map.ofEntries(
-        entry(FieldType.PIN,
-            new GeneratorOptions(false, false, true, false, 4)),
-        entry(FieldType.UNIX_PASSWORD,
-            new GeneratorOptions(true, true, true, true, 8)),
-        entry(FieldType.SHORT_PASSWORD,
-            new GeneratorOptions(true, true, true, true, 16)),
-        entry(FieldType.LONG_PASSWORD,
-            new GeneratorOptions(true, true, true, true, 32))
+            entry(FieldType.PIN,
+                    new GeneratorOptions(false, false, true, false, 4)),
+            entry(FieldType.UNIX_PASSWORD,
+                    new GeneratorOptions(true, true, true, true, 8)),
+            entry(FieldType.SHORT_PASSWORD,
+                    new GeneratorOptions(true, true, true, true, 16)),
+            entry(FieldType.LONG_PASSWORD,
+                    new GeneratorOptions(true, true, true, true, 32))
     );
     private static final Map<FieldType, GeneratorOptions> PASSWORD_OPTIONS = new HashMap<>(PASSWORD_DEFAULTS);
 
@@ -96,13 +98,13 @@ public final class Options {
 
     public void initialize() {
         var settingsDirectory = initDirectory(
-            new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY),
-            "Options"
+                new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY),
+                "Options"
         );
 
         initDirectory(
-            new File(settingsDirectory, "logs"),
-            "Logs"
+                new File(settingsDirectory, "logs"),
+                "Logs"
         );
 
         mainCssFile = new File(settingsDirectory, "main.css");
@@ -129,9 +131,9 @@ public final class Options {
 
             var style = prefs.get("style", DEFAULT_FONT_STYLE);
             var font = Font.font(prefs.get("family", DEFAULT_FONT_FAMILY),
-                style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
-                style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
-                prefs.getDouble("size", DEFAULT_FONT_SIZE));
+                    style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
+                    style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
+                    prefs.getDouble("size", DEFAULT_FONT_SIZE));
 
             option.setFont(font);
         }
@@ -148,27 +150,27 @@ public final class Options {
 
     public void generateCssFiles() {
         var dataModel = Map.ofEntries(
-            entry("controlsFontFamily", FontOption.CONTROLS_FONT.getFont().getFamily()),
-            entry("controlsFontSize", (int) FontOption.CONTROLS_FONT.getFont().getSize()),
-            entry("menuFontFamily", FontOption.MENU_FONT.getFont().getFamily()),
-            entry("menuFontSize", (int) FontOption.MENU_FONT.getFont().getSize()),
-            // dialogs
-            entry("dialogFontFamily", FontOption.DIALOG_FONT.getFont().getFamily()),
-            entry("dialogFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize()),
-            entry("aboutLabelFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() * 2),
-            entry("aboutLabelSmallFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() + 2),
-            // Colors
-            entry("favoriteColor", ColorOption.FAVORITE.getWebString()),
-            entry("favoriteBackground", ColorOption.FAVORITE_BACKGROUND.getWebString()),
-            entry("deletedColor", ColorOption.DELETED.getWebString()),
-            entry("deletedBackground", ColorOption.DELETED_BACKGROUND.getWebString()),
-            entry("fieldNameColor", ColorOption.FIELD_NAME.getWebString()),
-            entry("fieldValueColor", ColorOption.FIELD_VALUE.getWebString()),
-            entry("hyperLinkColor", ColorOption.HYPERLINK.getWebString()),
-            entry("actionAddColor", ColorOption.ACTION_ADD.getWebString()),
-            entry("actionReplaceColor", ColorOption.ACTION_REPLACE.getWebString()),
-            entry("actionDeleteColor", ColorOption.ACTION_DELETE.getWebString()),
-            entry("actionRestoreColor", ColorOption.ACTION_RESTORE.getWebString())
+                entry("controlsFontFamily", FontOption.CONTROLS_FONT.getFont().getFamily()),
+                entry("controlsFontSize", (int) FontOption.CONTROLS_FONT.getFont().getSize()),
+                entry("menuFontFamily", FontOption.MENU_FONT.getFont().getFamily()),
+                entry("menuFontSize", (int) FontOption.MENU_FONT.getFont().getSize()),
+                // dialogs
+                entry("dialogFontFamily", FontOption.DIALOG_FONT.getFont().getFamily()),
+                entry("dialogFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize()),
+                entry("aboutLabelFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() * 2),
+                entry("aboutLabelSmallFontSize", (int) FontOption.DIALOG_FONT.getFont().getSize() + 2),
+                // Colors
+                entry("favoriteColor", ColorOption.FAVORITE.getWebString()),
+                entry("favoriteBackground", ColorOption.FAVORITE_BACKGROUND.getWebString()),
+                entry("deletedColor", ColorOption.DELETED.getWebString()),
+                entry("deletedBackground", ColorOption.DELETED_BACKGROUND.getWebString()),
+                entry("fieldNameColor", ColorOption.FIELD_NAME.getWebString()),
+                entry("fieldValueColor", ColorOption.FIELD_VALUE.getWebString()),
+                entry("hyperLinkColor", ColorOption.HYPERLINK.getWebString()),
+                entry("actionAddColor", ColorOption.ACTION_ADD.getWebString()),
+                entry("actionReplaceColor", ColorOption.ACTION_REPLACE.getWebString()),
+                entry("actionDeleteColor", ColorOption.ACTION_DELETE.getWebString()),
+                entry("actionRestoreColor", ColorOption.ACTION_RESTORE.getWebString())
         );
 
         try (var w = new FileWriter(mainCssFile)) {
@@ -283,11 +285,11 @@ public final class Options {
                 var node = root.node(nodeName);
 
                 PASSWORD_OPTIONS.put(type, new GeneratorOptions(
-                    node.getBoolean(UPPER_CASE_PREF, defaults.upperCase()),
-                    node.getBoolean(LOWER_CASE_PREF, defaults.lowerCase()),
-                    node.getBoolean(DIGITS_PREF, defaults.digits()),
-                    node.getBoolean(SYMBOLS_PREF, defaults.symbols()),
-                    node.getInt(LENGTH_PREF, defaults.length())
+                        node.getBoolean(UPPER_CASE_PREF, defaults.upperCase()),
+                        node.getBoolean(LOWER_CASE_PREF, defaults.lowerCase()),
+                        node.getBoolean(DIGITS_PREF, defaults.digits()),
+                        node.getBoolean(SYMBOLS_PREF, defaults.symbols()),
+                        node.getInt(LENGTH_PREF, defaults.length())
                 ));
             }
         } catch (Exception ex) {

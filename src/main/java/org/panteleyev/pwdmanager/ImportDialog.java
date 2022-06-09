@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -16,6 +16,7 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -46,10 +48,10 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private static final Map<ImportAction, String> STYLE_MAP = Map.of(
-        ImportAction.ADD, STYLE_ACTION_ADD,
-        ImportAction.REPLACE, STYLE_ACTION_REPLACE,
-        ImportAction.DELETE, STYLE_ACTION_DELETE,
-        ImportAction.RESTORE, STYLE_ACTION_RESTORE
+            ImportAction.ADD, STYLE_ACTION_ADD,
+            ImportAction.REPLACE, STYLE_ACTION_REPLACE,
+            ImportAction.DELETE, STYLE_ACTION_DELETE,
+            ImportAction.RESTORE, STYLE_ACTION_RESTORE
     );
 
     private final ObservableList<ImportRecord> importRecords = FXCollections.observableArrayList();
@@ -98,26 +100,26 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         tableView.setRowFactory(t -> new ImportRow());
 
         tableView.getColumns().setAll(List.of(
-            tableColumn(fxString(UI_BUNDLE, I18N_TITLE), b ->
-                b.withPropertyCallback(r -> r.cardToImport().name())
-                    .withWidthBinding(w.multiply(0.35))
-            ),
-            tableColumn(fxString(UI_BUNDLE, I18N_UPDATED), (TableColumnBuilder<ImportRecord, Long> b) ->
-                b.withPropertyCallback(r -> r.cardToImport().modified())
-                    .withCellFactory(x -> new TimestampCell())
-                    .withWidthBinding(w.multiply(0.35))
-            ),
-            tableColumn(fxString(UI_BUNDLE, I18N_ACTION),
-                b -> b.withPropertyCallback(ImportRecord::getEffectiveAction)
-                    .withWidthBinding(w.multiply(0.27))
-            )
+                tableColumn(fxString(UI_BUNDLE, I18N_TITLE), b ->
+                        b.withPropertyCallback(r -> r.cardToImport().name())
+                                .withWidthBinding(w.multiply(0.35))
+                ),
+                tableColumn(fxString(UI_BUNDLE, I18N_UPDATED), (TableColumnBuilder<ImportRecord, Long> b) ->
+                        b.withPropertyCallback(r -> r.cardToImport().modified())
+                                .withCellFactory(x -> new TimestampCell())
+                                .withWidthBinding(w.multiply(0.35))
+                ),
+                tableColumn(fxString(UI_BUNDLE, I18N_ACTION),
+                        b -> b.withPropertyCallback(ImportRecord::getEffectiveAction)
+                                .withWidthBinding(w.multiply(0.27))
+                )
         ));
 
         setResultConverter(buttonType -> {
             if (OK.equals(buttonType)) {
                 return importRecords.stream()
-                    .filter(ImportRecord::approved)
-                    .toList();
+                        .filter(ImportRecord::approved)
+                        .toList();
             } else {
                 return Collections.emptyList();
             }
@@ -145,15 +147,15 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
 
     private ContextMenu createContextMenu() {
         var toggleMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SKIP), false,
-            SHORTCUT_P, event -> onToggleApproval());
+                SHORTCUT_P, event -> onToggleApproval());
         toggleMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
 
         var menu = new ContextMenu(
-            toggleMenuItem
+                toggleMenuItem
         );
 
         menu.setOnShowing(e -> toggleMenuItem.setSelected(
-            getSelectedItem().map(r -> !r.approved()).orElse(false))
+                getSelectedItem().map(r -> !r.approved()).orElse(false))
         );
 
         return menu;

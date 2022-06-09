@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.Map;
+
 import static java.util.Objects.requireNonNull;
 
 final class TemplateEngine {
@@ -41,7 +42,7 @@ final class TemplateEngine {
 
     public void process(Template template, Map<String, ?> model, Writer out) {
         try (var in = new BufferedReader(new InputStreamReader(
-            requireNonNull(getClass().getResourceAsStream(TEMPLATE_PATH + template.getFileName())))
+                requireNonNull(getClass().getResourceAsStream(TEMPLATE_PATH + template.getFileName())))
         )) {
             while (in.ready()) {
                 var string = in.readLine();

@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -14,6 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -27,6 +28,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
 final class Serializer {
@@ -64,8 +66,7 @@ final class Serializer {
     private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
 
     static void serialize(OutputStream out, List<WalletRecord> records) throws ParserConfigurationException,
-        TransformerException
-    {
+            TransformerException {
         var docBuilder = DOC_FACTORY.newDocumentBuilder();
 
         var doc = docBuilder.newDocument();
@@ -79,7 +80,7 @@ final class Serializer {
 
         for (var r : records) {
             recordsElement.appendChild(
-                serializeRecord(doc, r)
+                    serializeRecord(doc, r)
             );
         }
 
@@ -91,8 +92,7 @@ final class Serializer {
     }
 
     static void deserialize(InputStream in, List<WalletRecord> list) throws ParserConfigurationException,
-        SAXException, IOException
-    {
+            SAXException, IOException {
         var docBuilder = DOC_FACTORY.newDocumentBuilder();
 
         var doc = docBuilder.parse(in);
@@ -123,7 +123,7 @@ final class Serializer {
 
                 for (var f : fields) {
                     fieldsElement.appendChild(
-                        serializeField(doc, f)
+                            serializeField(doc, f)
                     );
                 }
             }

@@ -1,12 +1,12 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.cells;
 
 import javafx.scene.control.ListCell;
-import javafx.scene.image.ImageView;
 import org.panteleyev.pwdmanager.model.WalletRecord;
+
 import static org.panteleyev.pwdmanager.Styles.STYLE_DELETED;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FAVORITE;
 import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;

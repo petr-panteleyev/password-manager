@@ -1,18 +1,18 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
 
 import java.util.UUID;
 
 public record Note(
-    UUID uuid,
-    String name,
-    String note,
-    boolean favorite,
-    boolean active,
-    long modified
+        UUID uuid,
+        String name,
+        String note,
+        boolean favorite,
+        boolean active,
+        long modified
 ) implements WalletRecord {
 
     public Note(String name) {

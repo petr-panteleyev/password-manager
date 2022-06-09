@@ -1,10 +1,11 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
 
-public record ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport, boolean approved) {
+public record ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport,
+                           boolean approved) {
 
     public ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport) {
         this(action, existingCard, cardToImport, true);

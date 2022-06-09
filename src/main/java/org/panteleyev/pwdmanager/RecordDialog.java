@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -16,7 +16,9 @@ import org.panteleyev.pwdmanager.cells.CardTypeListCell;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Picture;
 import org.panteleyev.pwdmanager.model.RecordType;
+
 import java.util.List;
+
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -45,11 +47,11 @@ abstract class RecordDialog extends BaseDialog<Card> {
         typeList.setOnAction(event -> onCardTypeSelected());
 
         getDialogPane().setContent(gridPane(
-            List.of(
-                gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit),
-                gridRow(typeLabel, typeList),
-                gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
-            ), b -> b.withStyle(STYLE_GRID_PANE)
+                List.of(
+                        gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit),
+                        gridRow(typeLabel, typeList),
+                        gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
+                ), b -> b.withStyle(STYLE_GRID_PANE)
         ));
     }
 
@@ -78,7 +80,7 @@ abstract class RecordDialog extends BaseDialog<Card> {
 
     void setupValidator() {
         validation.registerValidator(nameEdit, (Control c, String value) ->
-            ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }
 

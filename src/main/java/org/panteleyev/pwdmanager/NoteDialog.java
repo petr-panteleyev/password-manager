@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -11,7 +11,9 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Note;
+
 import java.util.List;
+
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.textField;
 import static org.panteleyev.fx.FxUtils.COLON;
@@ -36,8 +38,8 @@ final class NoteDialog extends BaseDialog<Note> {
         setTitle(UI_BUNDLE.getString(I18N_NOTE));
 
         getDialogPane().setContent(gridPane(
-            List.of(gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit)),
-            b -> b.withStyle(STYLE_GRID_PANE)
+                List.of(gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit)),
+                b -> b.withStyle(STYLE_GRID_PANE)
         ));
         createDefaultButtons(UI_BUNDLE);
 
@@ -48,7 +50,7 @@ final class NoteDialog extends BaseDialog<Note> {
 
     private void setupValidator() {
         validation.registerValidator(nameEdit, (Control c, String value) ->
-            ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }
 }

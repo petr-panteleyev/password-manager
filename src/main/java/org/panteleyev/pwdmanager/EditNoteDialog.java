@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -16,6 +16,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.pwdmanager.model.Note;
+
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxFactory.textField;
@@ -59,8 +60,8 @@ final class EditNoteDialog extends BaseDialog<Note> {
         noteEdit.setText(note.note());
 
         setResultConverter(buttonType -> OK.equals(buttonType) ?
-            new Note(note.uuid(), nameEdit.getText(), noteEdit.getText(), note.favorite())
-            : null);
+                new Note(note.uuid(), nameEdit.getText(), noteEdit.getText(), note.favorite())
+                : null);
 
         Platform.runLater(this::setupValidator);
         Platform.runLater(nameEdit::requestFocus);
@@ -68,7 +69,7 @@ final class EditNoteDialog extends BaseDialog<Note> {
 
     private void setupValidator() {
         validation.registerValidator(nameEdit, (Control c, String value) ->
-            ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
+                ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }
 }

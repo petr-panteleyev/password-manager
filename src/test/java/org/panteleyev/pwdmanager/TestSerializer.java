@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
@@ -13,10 +13,12 @@ import org.panteleyev.pwdmanager.model.Picture;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.List;
 import java.util.UUID;
+
 import static org.testng.Assert.assertEquals;
 
 public class TestSerializer {
@@ -31,17 +33,17 @@ public class TestSerializer {
     @Test
     public void testCardSerialization() {
         var card = new Card(
-            UUID.randomUUID(),
-            System.currentTimeMillis(),
-            Picture.AMEX,
-            UUID.randomUUID().toString(),
-            List.of(
-                new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-                new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
-                new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.MASTERCARD)
-            ),
-            UUID.randomUUID().toString(),
-            true, false
+                UUID.randomUUID(),
+                System.currentTimeMillis(),
+                Picture.AMEX,
+                UUID.randomUUID().toString(),
+                List.of(
+                        new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+                        new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+                        new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.MASTERCARD)
+                ),
+                UUID.randomUUID().toString(),
+                true, false
         );
 
         var doc = docBuilder.newDocument();
@@ -56,10 +58,10 @@ public class TestSerializer {
     @DataProvider(name = "testFieldToFromJson")
     public Object[][] testFieldToFromJsonDataProvider() {
         return new Object[][]{
-            {new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
-            {new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
-            {new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")},
-            {new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.UNION_PAY)},
+                {new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
+                {new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
+                {new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")},
+                {new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.UNION_PAY)},
         };
     }
 

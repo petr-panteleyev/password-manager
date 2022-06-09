@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2020 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.crypto;
 
@@ -16,7 +16,8 @@ import java.util.function.Function;
 public interface AES {
     /**
      * Encrypt string.
-     * @param str string
+     *
+     * @param str      string
      * @param password password
      * @return encrypted bytes
      */
@@ -26,7 +27,8 @@ public interface AES {
 
     /**
      * Encrypt byte array.
-     * @param src byte array
+     *
+     * @param src      byte array
      * @param password password
      * @return encrypted bytes
      */
@@ -34,18 +36,20 @@ public interface AES {
 
     /**
      * Encrypt bytes and write the result into the stream.
-     * @param src bytes to encrypt
+     *
+     * @param src      bytes to encrypt
      * @param password password
-     * @param out stream
+     * @param out      stream
      * @throws IOException in case of error
      */
     void encrypt(byte[] src, String password, OutputStream out) throws IOException;
 
     /**
      * Encrypt string and write the result into the stream.
-     * @param str string to encrypt
+     *
+     * @param str      string to encrypt
      * @param password password
-     * @param out stream
+     * @param out      stream
      * @throws IOException in case of error
      */
     default void encrypt(String str, String password, OutputStream out) throws IOException {
@@ -54,7 +58,8 @@ public interface AES {
 
     /**
      * Decrypt byte array.
-     * @param bytes bytes to decrypt
+     *
+     * @param bytes    bytes to decrypt
      * @param password password to decrypt
      * @return decrypted bytes
      */
@@ -62,7 +67,8 @@ public interface AES {
 
     /**
      * Decrypt string
-     * @param bytes bytes to decrypt
+     *
+     * @param bytes    bytes to decrypt
      * @param password password to decrypt
      * @return decrypted bytes
      */
@@ -70,7 +76,8 @@ public interface AES {
 
     /**
      * Decrypt input stream. Stream must be obtained via {@link #getInputStream(InputStream, String)}.
-     * @param in stream to decrypt
+     *
+     * @param in       stream to decrypt
      * @param password password to decrypt
      * @return decrypted bytes
      * @throws IOException in case of error
@@ -84,6 +91,7 @@ public interface AES {
     /**
      * Default 256-bit key generator. This implementation uses SHA-256 message
      * digest algorithm.
+     *
      * @param password password string
      * @return key bytes
      */
@@ -94,6 +102,7 @@ public interface AES {
     /**
      * Default 128-bit key generator. This implementation uses MD5 message digest
      * algorithm.
+     *
      * @param password password string
      * @return key bytes
      */
@@ -103,6 +112,7 @@ public interface AES {
 
     /**
      * Return AES instance with specified key generation function.
+     *
      * @param keyGen key generation function
      * @return in case of error
      */
@@ -114,6 +124,7 @@ public interface AES {
      * Return AES instance with default 256-bit key generation function.
      * Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
      * for the appropriate JRE must be installed to use 256-bit keys.
+     *
      * @return AES instance
      */
     static AES aes256() {
@@ -122,6 +133,7 @@ public interface AES {
 
     /**
      * Return AES instance with default 128-bit key generation function.
+     *
      * @return in case of error
      */
     static AES aes128() {

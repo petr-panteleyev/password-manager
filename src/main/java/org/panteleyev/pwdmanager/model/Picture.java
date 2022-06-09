@@ -1,6 +1,6 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
 
@@ -9,8 +9,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.panteleyev.pwdmanager.cells.PictureListCell;
+
 import java.util.Arrays;
 import java.util.Comparator;
+
 import static java.util.Objects.requireNonNull;
 
 @SuppressWarnings("unused")
@@ -108,7 +110,7 @@ public enum Picture {
         comboBox.setCellFactory(p -> new PictureListCell());
         comboBox.setButtonCell(new PictureListCell());
         comboBox.setItems(FXCollections.observableArrayList(
-            Arrays.stream(Picture.values()).sorted(Comparator.comparing(Enum::name)).toList())
+                Arrays.stream(Picture.values()).sorted(Comparator.comparing(Enum::name)).toList())
         );
     }
 
