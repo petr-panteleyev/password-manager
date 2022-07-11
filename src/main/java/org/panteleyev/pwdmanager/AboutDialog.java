@@ -17,7 +17,7 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ABOUT_LABEL;
@@ -29,7 +29,7 @@ final class AboutDialog extends BaseDialog<Object> {
     private static final String VM = System.getProperty("java.vm.name") + " by " + System.getProperty("java.vm.vendor");
 
     AboutDialog(Controller owner) {
-        super(owner, options().getAboutDialogCssFileUrl());
+        super(owner, settings().getAboutDialogCssFileUrl());
 
         setHeaderText(APP_TITLE);
         setGraphic(new ImageView(Picture.WALLET.getBigImage()));

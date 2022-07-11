@@ -42,7 +42,7 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_G;
@@ -73,7 +73,7 @@ final class EditCardDialog extends BaseDialog<Card> {
             a -> onGeneratePassword());
 
     EditCardDialog(Card card) {
-        super(options().getDialogCssFileUrl());
+        super(settings().getDialogCssFileUrl());
         setResizable(true);
 
         editableFields = FXCollections.observableArrayList(
@@ -92,7 +92,7 @@ final class EditCardDialog extends BaseDialog<Card> {
         contextMenu.setOnShowing(event ->
                 generateMenuItem.setDisable(getSelectedField()
                         .map(EditableField::getType)
-                        .flatMap(Options::getPasswordOptions)
+                        .flatMap(settings()::getPasswordOptions)
                         .isEmpty())
         );
 
@@ -212,7 +212,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     }
 
     private void onGeneratePassword() {
-        getSelectedField().ifPresent(sel -> Options.getPasswordOptions(sel.getType()).ifPresent(options -> {
+        getSelectedField().ifPresent(sel -> settings().getPasswordOptions(sel.getType()).ifPresent(options -> {
             var password = new Generator().generate(options);
             sel.valueProperty().set(password);
         }));

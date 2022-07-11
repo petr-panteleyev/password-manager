@@ -1,5 +1,5 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
-final class TemplateEngine {
+public final class TemplateEngine {
     public enum Template {
         MAIN_CSS("main.css"),
         DIALOG_CSS("dialog.css"),
@@ -52,6 +52,7 @@ final class TemplateEngine {
                 out.append(string);
                 out.append('\n');
             }
+            out.flush();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

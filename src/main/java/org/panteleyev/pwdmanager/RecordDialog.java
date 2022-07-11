@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -25,7 +25,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ICON;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
@@ -40,7 +40,7 @@ abstract class RecordDialog extends BaseDialog<Card> {
     private final Label typeLabel = label(fxString(UI_BUNDLE, I18N_TYPE, COLON));
 
     RecordDialog() {
-        super(options().getDialogCssFileUrl());
+        super(settings().getDialogCssFileUrl());
 
         nameEdit.setPrefColumnCount(25);
 

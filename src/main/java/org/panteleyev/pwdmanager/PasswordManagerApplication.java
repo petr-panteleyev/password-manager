@@ -9,19 +9,32 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.pwdmanager.model.Picture;
 
+import java.io.ByteArrayInputStream;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static java.lang.Thread.setDefaultUncaughtExceptionHandler;
-import static java.util.logging.LogManager.getLogManager;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.files;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 
 public final class PasswordManagerApplication extends Application {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
-    private static final String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
-    private static final String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
+
+    private final static String LOG_PROPERTIES = """
+            handlers                                = java.util.logging.FileHandler
+                        
+            java.util.logging.FileHandler.level     = ALL
+            java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
+            java.util.logging.FileHandler.pattern   = %FILE_PATTERN%
+            java.util.logging.FileHandler.append    = true
+                        
+            java.util.logging.SimpleFormatter.format = %1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n
+            """;
+
 
     private static PasswordManagerApplication application;
 
@@ -35,16 +48,14 @@ public final class PasswordManagerApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        options().initialize();
-        options().loadFontOptions();
-        options().loadColorOptions();
-        options().generateCssFiles();
+        files().initialize();
+        settings().load();
 
-        var formatProperty = System.getProperty(FORMAT_PROP);
-        if (formatProperty == null) {
-            System.setProperty(FORMAT_PROP, FORMAT);
+        var logProperties = LOG_PROPERTIES.replace("%FILE_PATTERN%",
+                files().getLogDirectory().resolve("PasswordManager.log").toString());
+        try (var inputStream = new ByteArrayInputStream(logProperties.getBytes(UTF_8))) {
+            LogManager.getLogManager().readConfiguration(inputStream);
         }
-        getLogManager().readConfiguration(getClass().getResourceAsStream("/logger.properties"));
 
         setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 

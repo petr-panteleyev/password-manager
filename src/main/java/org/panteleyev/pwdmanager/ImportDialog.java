@@ -1,5 +1,5 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -32,7 +32,7 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_P;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_ADD;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_DELETE;
@@ -85,7 +85,7 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     }
 
     public ImportDialog(Controller owner, List<ImportRecord> importRecords) {
-        super(owner, options().getDialogCssFileUrl());
+        super(owner, settings().getDialogCssFileUrl());
         this.importRecords.addAll(importRecords);
 
         setTitle(UI_BUNDLE.getString(I18N_IMPORT));

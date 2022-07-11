@@ -1,8 +1,8 @@
 /*
- Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.settings;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,7 +21,6 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.ImportAction;
-import org.panteleyev.pwdmanager.options.FontOption;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -43,8 +42,7 @@ import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.Options.PASSWORD_DEFAULTS;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -68,21 +66,8 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASSWO
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SYMBOLS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TEXT;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPPER_CASE;
-import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_ADD;
-import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_DELETE;
-import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_REPLACE;
-import static org.panteleyev.pwdmanager.options.ColorOption.ACTION_RESTORE;
-import static org.panteleyev.pwdmanager.options.ColorOption.DELETED;
-import static org.panteleyev.pwdmanager.options.ColorOption.DELETED_BACKGROUND;
-import static org.panteleyev.pwdmanager.options.ColorOption.FAVORITE;
-import static org.panteleyev.pwdmanager.options.ColorOption.FAVORITE_BACKGROUND;
-import static org.panteleyev.pwdmanager.options.ColorOption.FIELD_NAME;
-import static org.panteleyev.pwdmanager.options.ColorOption.FIELD_VALUE;
-import static org.panteleyev.pwdmanager.options.FontOption.CONTROLS_FONT;
-import static org.panteleyev.pwdmanager.options.FontOption.DIALOG_FONT;
-import static org.panteleyev.pwdmanager.options.FontOption.MENU_FONT;
 
-final class OptionsDialog extends BaseDialog<ButtonType> {
+public final class SettingsDialog extends BaseDialog<ButtonType> {
     private final ComboBox<FieldType> typeComboBox = new ComboBox<>();
 
     private final CheckBox digitsCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_DIGITS));
@@ -96,43 +81,39 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
     private final TextField menuFontField = textField(20);
     private final TextField dialogFontField = textField(20);
     // Colors
-    private final ColorPicker favoriteForegroundColorPicker = new ColorPicker(FAVORITE.getColor());
-    private final ColorPicker favoriteBackgroundColorPicker = new ColorPicker(FAVORITE_BACKGROUND.getColor());
-    private final ColorPicker deletedForegroundColorPicker = new ColorPicker(DELETED.getColor());
-    private final ColorPicker deletedBackgroundColorPicker = new ColorPicker(DELETED_BACKGROUND.getColor());
-    private final ColorPicker fieldNameColorPicker = new ColorPicker(FIELD_NAME.getColor());
-    private final ColorPicker fieldValueColorPicker = new ColorPicker(FIELD_VALUE.getColor());
-    private final ColorPicker actionAddColorPicker = new ColorPicker(ACTION_ADD.getColor());
-    private final ColorPicker actionReplaceColorPicker = new ColorPicker(ACTION_REPLACE.getColor());
-    private final ColorPicker actionDeleteColorPicker = new ColorPicker(ACTION_DELETE.getColor());
-    private final ColorPicker actionRestoreColorPicker = new ColorPicker(ACTION_RESTORE.getColor());
+    private final ColorPicker favoriteForegroundColorPicker = new ColorPicker(settings().getColor(ColorName.FAVORITE));
+    private final ColorPicker favoriteBackgroundColorPicker =
+            new ColorPicker(settings().getColor(ColorName.FAVORITE_BACKGROUND));
+    private final ColorPicker deletedForegroundColorPicker = new ColorPicker(settings().getColor(ColorName.DELETED));
+    private final ColorPicker deletedBackgroundColorPicker =
+            new ColorPicker(settings().getColor(ColorName.DELETED_BACKGROUND));
+    private final ColorPicker fieldNameColorPicker = new ColorPicker(settings().getColor(ColorName.FIELD_NAME));
+    private final ColorPicker fieldValueColorPicker = new ColorPicker(settings().getColor(ColorName.FIELD_VALUE));
+    private final ColorPicker actionAddColorPicker = new ColorPicker(settings().getColor(ColorName.ACTION_ADD));
+    private final ColorPicker actionReplaceColorPicker = new ColorPicker(settings().getColor(ColorName.ACTION_REPLACE));
+    private final ColorPicker actionDeleteColorPicker = new ColorPicker(settings().getColor(ColorName.ACTION_DELETE));
+    private final ColorPicker actionRestoreColorPicker = new ColorPicker(settings().getColor(ColorName.ACTION_RESTORE));
 
     private final Map<FieldType, GeneratorOptions> passwordOptionsCopy = new EnumMap<>(FieldType.class);
 
-    public OptionsDialog(Controller owner) {
-        super(owner, options().getDialogCssFileUrl());
+    public SettingsDialog(Controller owner) {
+        super(owner, settings().getDialogCssFileUrl());
         setTitle(fxString(UI_BUNDLE, I18N_OPTIONS));
 
         controlsFontField.setEditable(false);
         menuFontField.setEditable(false);
         dialogFontField.setEditable(false);
 
-        loadFont(CONTROLS_FONT, controlsFontField);
-        loadFont(MENU_FONT, menuFontField);
-        loadFont(FontOption.DIALOG_FONT, dialogFontField);
+        loadFont(FontName.CONTROLS_FONT, controlsFontField);
+        loadFont(FontName.MENU_FONT, menuFontField);
+        loadFont(FontName.DIALOG_FONT, dialogFontField);
 
         createDefaultButtons(UI_BUNDLE, new ValidationSupport().invalidProperty());
 
         makePasswordOptionsLocalCopy();
 
         lengthComboBox.getItems().addAll(4, 6, 8, 16, 24, 32);
-        typeComboBox.setItems(
-                observableArrayList(
-                        PASSWORD_DEFAULTS.keySet().stream()
-                                .sorted()
-                                .toList()
-                )
-        );
+        typeComboBox.setItems(observableArrayList(settings().getPasswordFieldTypes()));
         typeComboBox.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, oldValue, newValue) -> updatePasswordControls(newValue));
         typeComboBox.getSelectionModel().selectFirst();
@@ -207,28 +188,29 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
 
         setResultConverter(buttonType -> {
             if (OK.equals(buttonType)) {
-                Options.setPasswordOptions(passwordOptionsCopy);
-                Options.saveOptions();
+                settings().update(settings -> {
+                    // Fonts
+                    settings.setFont(FontName.CONTROLS_FONT, (Font) controlsFontField.getUserData());
+                    settings.setFont(FontName.MENU_FONT, (Font) menuFontField.getUserData());
+                    settings.setFont(FontName.DIALOG_FONT, (Font) dialogFontField.getUserData());
 
-                // Fonts
-                Options.setFont(CONTROLS_FONT, (Font) controlsFontField.getUserData());
-                Options.setFont(MENU_FONT, (Font) menuFontField.getUserData());
-                Options.setFont(DIALOG_FONT, (Font) dialogFontField.getUserData());
+                    // Colors
+                    settings.setColor(ColorName.FAVORITE, favoriteForegroundColorPicker.getValue());
+                    settings.setColor(ColorName.FAVORITE_BACKGROUND, favoriteBackgroundColorPicker.getValue());
+                    settings.setColor(ColorName.DELETED, deletedForegroundColorPicker.getValue());
+                    settings.setColor(ColorName.DELETED_BACKGROUND, deletedBackgroundColorPicker.getValue());
+                    settings.setColor(ColorName.FIELD_NAME, fieldNameColorPicker.getValue());
+                    settings.setColor(ColorName.FIELD_VALUE, fieldValueColorPicker.getValue());
+                    settings.setColor(ColorName.ACTION_ADD, actionAddColorPicker.getValue());
+                    settings.setColor(ColorName.ACTION_REPLACE, actionReplaceColorPicker.getValue());
+                    settings.setColor(ColorName.ACTION_DELETE, actionDeleteColorPicker.getValue());
+                    settings.setColor(ColorName.ACTION_RESTORE, actionRestoreColorPicker.getValue());
 
-                // Colors
-                Options.setColor(FAVORITE, favoriteForegroundColorPicker.getValue());
-                Options.setColor(FAVORITE_BACKGROUND, favoriteBackgroundColorPicker.getValue());
-                Options.setColor(DELETED, deletedForegroundColorPicker.getValue());
-                Options.setColor(DELETED_BACKGROUND, deletedBackgroundColorPicker.getValue());
-                Options.setColor(FIELD_NAME, fieldNameColorPicker.getValue());
-                Options.setColor(FIELD_VALUE, fieldValueColorPicker.getValue());
-                Options.setColor(ACTION_ADD, actionAddColorPicker.getValue());
-                Options.setColor(ACTION_REPLACE, actionReplaceColorPicker.getValue());
-                Options.setColor(ACTION_DELETE, actionDeleteColorPicker.getValue());
-                Options.setColor(ACTION_RESTORE, actionRestoreColorPicker.getValue());
+                    settings.setPasswordOptions(passwordOptionsCopy);
+                });
 
-                options().generateCssFiles();
-                options().reloadCssFile();
+                settings().generateCssFiles();
+                settings().reloadCssFile();
             }
             return buttonType;
         });
@@ -249,7 +231,7 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
 
     private void makePasswordOptionsLocalCopy() {
         for (var type : FieldType.values()) {
-            Options.getPasswordOptions(type).ifPresent(
+            settings().getPasswordOptions(type).ifPresent(
                     options -> passwordOptionsCopy.put(type, options)
             );
         }
@@ -280,8 +262,8 @@ final class OptionsDialog extends BaseDialog<ButtonType> {
                 .ifPresent(newFont -> setupFontField(field, newFont));
     }
 
-    private void loadFont(FontOption option, TextField field) {
-        setupFontField(field, option.getFont());
+    private void loadFont(FontName option, TextField field) {
+        setupFontField(field, settings().getFont(option));
     }
 
     private void setupFontField(TextField field, Font font) {

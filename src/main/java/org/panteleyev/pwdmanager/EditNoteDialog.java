@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -24,7 +24,7 @@ import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.Options.options;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 
@@ -37,7 +37,7 @@ final class EditNoteDialog extends BaseDialog<Note> {
     private final Note note;
 
     EditNoteDialog(Note note) {
-        super(options().getDialogCssFileUrl());
+        super(settings().getDialogCssFileUrl());
         this.note = requireNonNull(note);
         initialize();
     }

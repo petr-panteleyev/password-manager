@@ -35,6 +35,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.crypto.AES;
 import org.panteleyev.freedesktop.Utility;
@@ -51,6 +52,7 @@ import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Note;
 import org.panteleyev.pwdmanager.model.RecordType;
 import org.panteleyev.pwdmanager.model.WalletRecord;
+import org.panteleyev.pwdmanager.settings.SettingsDialog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,10 +64,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import static java.util.Objects.requireNonNull;
-import static org.panteleyev.freedesktop.entry.LocaleString.localeString;
+import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -76,8 +77,8 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
-import static org.panteleyev.pwdmanager.Options.options;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
@@ -126,10 +127,6 @@ import static org.panteleyev.pwdmanager.model.Picture.imageView;
 final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
 
-    // Preferences
-    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
-    private static final String PREF_CURRENT_FILE = "current_file";
-
     private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
     private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
 
@@ -154,7 +151,7 @@ final class MainWindowController extends Controller {
     private final CardViewer cardContentView = new CardViewer();
 
     MainWindowController(Stage stage) {
-        super(stage, options().getMainCssFilePath());
+        super(stage, settings().getMainCssFilePath());
 
         sortedList.setComparator(COMPARE_BY_ACTIVE
                 .thenComparing(COMPARE_BY_FAVORITE)
@@ -163,10 +160,8 @@ final class MainWindowController extends Controller {
         filteredList.predicateProperty().bind(defaultFilter);
 
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
-        getStage().setOnHiding(event -> onWindowClosing());
 
-        Options.loadWindowDimensions(getStage());
-        Options.loadPasswordOptions();
+        settings().loadStageDimensions(this);
 
         initialize();
     }
@@ -318,8 +313,8 @@ final class MainWindowController extends Controller {
         if (fileName != null && !fileName.isEmpty()) {
             loadDocument(new File(fileName), false);
         } else {
-            var currentFilePath = PREFERENCES.get(PREF_CURRENT_FILE, null);
-            if (currentFilePath != null) {
+            var currentFilePath = settings().getCurrentFile();
+            if (!currentFilePath.isEmpty()) {
                 loadDocument(new File(currentFilePath), true);
             }
         }
@@ -351,7 +346,7 @@ final class MainWindowController extends Controller {
         if (currentFile.get() != null) {
             writeDocument();
         }
-        System.exit(0);
+        getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     private void onImportFile() {
@@ -597,7 +592,7 @@ final class MainWindowController extends Controller {
                 recordList.clear();
 
                 currentFile.set(file);
-                PREFERENCES.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
+                settings().setCurrentFile(currentFile.get().getAbsolutePath());
 
                 setTitle();
                 writeDocument();
@@ -622,7 +617,7 @@ final class MainWindowController extends Controller {
         if (!file.exists()) {
             currentFile.set(null);
             if (changeSettings) {
-                PREFERENCES.put(PREF_CURRENT_FILE, "");
+                settings().setCurrentFile("");
             }
             setTitle();
         } else {
@@ -643,7 +638,7 @@ final class MainWindowController extends Controller {
 
                     currentFile.set(file);
                     if (changeSettings) {
-                        PREFERENCES.put(PREF_CURRENT_FILE, currentFile.get().getAbsolutePath());
+                        settings().setCurrentFile(currentFile.get().getAbsolutePath());
                     }
 
                     setTitle();
@@ -690,12 +685,13 @@ final class MainWindowController extends Controller {
     }
 
     private void onOptions() {
-        new OptionsDialog(this).showAndWait();
+        new SettingsDialog(this).showAndWait();
     }
 
-    private void onWindowClosing() {
-        Options.saveWindowDimensions(getStage());
-        Options.saveOptions();
+    @Override
+    protected void onWindowHiding() {
+        super.onWindowHiding();
+        settings().saveWindowsSettings();
     }
 
     private void onShowDeletedItems(boolean show) {
@@ -721,14 +717,14 @@ final class MainWindowController extends Controller {
             var rootDir = execFile.getParentFile().getParentFile().getAbsolutePath();
 
             var desktopEntry = new DesktopEntryBuilder(DesktopEntryType.APPLICATION)
-                    .version(DesktopEntryBuilder.VERSION_1_0)
-                    .name(localeString("Password Manager"))
+                    .version(DesktopEntryBuilder.VERSION_1_5)
+                    .name("Password Manager")
                     .name(localeString("Менеджер паролей", "ru_RU"))
                     .categories(List.of(Category.UTILITY, Category.JAVA))
-                    .comment(localeString("Application to store passwords and other sensitive information"))
+                    .comment("Application to store passwords and other sensitive information")
                     .comment(localeString("Хранение паролей и другой секретной информации", "ru_RU"))
                     .exec("\"" + command + "\"")
-                    .icon(localeString(rootDir + "/lib/Password Manager.png"))
+                    .icon(rootDir + "/lib/Password Manager.png")
                     .build();
             desktopEntry.write("password-manager");
         });

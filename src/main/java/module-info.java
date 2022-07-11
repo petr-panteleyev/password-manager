@@ -3,7 +3,6 @@
  SPDX-License-Identifier: BSD-2-Clause
  */
 open module password.manager {
-    requires java.prefs;
     requires java.xml;
     requires java.logging;
     requires java.desktop;
