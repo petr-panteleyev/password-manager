@@ -9,26 +9,26 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>22.4.0</version>
+    <version>22.4.1</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>18</maven.compiler.release>
+        <maven.compiler.release>19</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
-        <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M6</mavenSurefirePluginVersion>
+        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
+        <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>18</javaFxVersion>
-        <javaFxHelpersVersion>1.10.0</javaFxHelpersVersion>
+        <javaFxVersion>19</javaFxVersion>
+        <javaFxHelpersVersion>1.11.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.1</controlsFxVersion>
         <testNgVersion>7.5</testNgVersion>

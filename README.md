@@ -1,9 +1,5 @@
 # Password Manager
 
-[![GitHub](https://img.shields.io/github/license/petr-panteleyev/password-manager)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-18-orange?logo=java)](https://jdk.java.net/18/)
-[![JavaFX](https://img.shields.io/badge/JavaFX-18-orange?logo=java)](https://openjfx.io/)
-
 Desktop application to store passwords, credit card numbers and other sensitive information. 
 Application uses 256-bit AES encryption.
 
@@ -16,7 +12,7 @@ to user account, operating system or hardware including RAM.
 
 ## Build
 
-Make sure ```JAVA_HOME``` is set to JDK 18.
+Make sure ```JAVA_HOME``` is set to JDK 19.
 
 Execute the following:
 ```shell script
