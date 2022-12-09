@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.generator;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class Generator {
+public final class Generator {
     private static final int MIN_LENGTH = 4;
 
     static final List<Character> UPPER_CASE_CHARS = List.of(
@@ -33,7 +33,7 @@ public class Generator {
             'I', 'l', 'O', '0'
     );
 
-    private static record Bucket(List<Character> chars, boolean used) {
+    private record Bucket(List<Character> chars, boolean used) {
         char getChar(int index) {
             return chars.get(index);
         }

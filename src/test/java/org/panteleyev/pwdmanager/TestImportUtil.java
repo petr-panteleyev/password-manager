@@ -1,22 +1,23 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
 import org.panteleyev.pwdmanager.model.Picture;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyList;
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestImportUtil {
     private static final int SIZE = 10;
@@ -75,32 +76,32 @@ public class TestImportUtil {
             )
     ).toList();
 
-    @DataProvider
-    public Object[][] dataProvider() {
-        return new Object[][]{
-                {CARDS, CARDS, emptyList()},
-                {REPLACE, CARDS, emptyList()},
-                {CARDS, REPLACE,
+    private static List<Arguments> dataProvider() {
+        return List.of(
+                Arguments.of(CARDS, CARDS, emptyList()),
+                Arguments.of(REPLACE, CARDS, emptyList()),
+                Arguments.of(CARDS, REPLACE,
                         IntStream.range(0, SIZE).mapToObj(
                                 x -> new ImportRecord(ImportAction.REPLACE, CARDS.get(x), REPLACE.get(x))
                         ).toList()
-                },
-                {CARDS, ADD,
+                ),
+                Arguments.of(CARDS, ADD,
                         IntStream.range(0, NEW_SIZE).mapToObj(
                                 x -> new ImportRecord(ImportAction.ADD, null, ADD.get(x))
                         ).toList()
-                },
-                {CARDS, DELETE,
+                ),
+                Arguments.of(CARDS, DELETE,
                         IntStream.range(0, DELETE_SIZE).mapToObj(
                                 x -> new ImportRecord(ImportAction.DELETE, CARDS.get(x), DELETE.get(x))
                         ).toList()
-                }
-        };
+                )
+        );
     }
 
-    @Test(dataProvider = "dataProvider")
+    @ParameterizedTest
+    @MethodSource("dataProvider")
     public void test(List<Card> cards, List<Card> toImport, List<ImportRecord> expected) {
         var actual = ImportUtil.calculateImport(cards, toImport);
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 }

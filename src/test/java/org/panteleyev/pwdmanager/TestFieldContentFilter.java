@@ -1,43 +1,43 @@
 /*
- Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
-import org.panteleyev.pwdmanager.model.FieldType;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.panteleyev.pwdmanager.model.FieldType.STRING;
 
-@Test
 public class TestFieldContentFilter {
 
     private static final Card CARD =
             new Card(UUID.randomUUID().toString(), null, List.of(
-                    new Field(FieldType.STRING, UUID.randomUUID().toString(), "value1"),
-                    new Field(FieldType.STRING, UUID.randomUUID().toString(), "Value1"),
-                    new Field(FieldType.STRING, UUID.randomUUID().toString(), "Value2"))
+                    new Field(STRING, UUID.randomUUID().toString(), "value1"),
+                    new Field(STRING, UUID.randomUUID().toString(), "Value1"),
+                    new Field(STRING, UUID.randomUUID().toString(), "Value2"))
             );
 
-    @DataProvider
-    public Object[][] dataProvider() {
-        return new Object[][]{
-                {CARD, "value", true},
-                {CARD, "value1", true},
-                {CARD, "ValUe", true},
-                {CARD, "ValUe3", false},
-        };
+    private static List<Arguments> dataProvider() {
+        return List.of(
+                Arguments.of(CARD, "value", true),
+                Arguments.of(CARD, "value1", true),
+                Arguments.of(CARD, "ValUe", true),
+                Arguments.of(CARD, "ValUe3", false)
+        );
     }
 
-    @Test(dataProvider = "dataProvider")
+    @ParameterizedTest
+    @MethodSource("dataProvider")
     public void test(Card card, String value, boolean expected) {
-        assertEquals(new FieldContentFilter(value).test(card), expected);
+        assertEquals(expected, new FieldContentFilter(value).test(card));
     }
 }

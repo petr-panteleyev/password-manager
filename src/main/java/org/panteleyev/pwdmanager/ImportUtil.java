@@ -1,5 +1,5 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public interface ImportUtil {
+final class ImportUtil {
+    private ImportUtil() {
+    }
 
     static List<ImportRecord> calculateImport(Collection<? extends WalletRecord> existing, Collection<?
             extends WalletRecord> toImport) {

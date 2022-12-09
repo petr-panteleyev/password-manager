@@ -6,14 +6,17 @@ package org.panteleyev.pwdmanager;
 
 import java.time.LocalDate;
 
-public interface StringUtil {
+public final class StringUtil {
+    private StringUtil() {
+    }
+
     /**
      * Parses {@link LocalDate} object from long value represented as {@link String}.
      *
      * @param value long value
      * @return local date
      */
-    static LocalDate parseLocalDate(String value) {
+    public static LocalDate parseLocalDate(String value) {
         if (value == null || value.isBlank()) {
             return LocalDate.now();
         }

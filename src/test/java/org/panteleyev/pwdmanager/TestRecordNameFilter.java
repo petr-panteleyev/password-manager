@@ -1,36 +1,36 @@
 /*
- Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.pwdmanager.filters.RecordNameFilter;
 import org.panteleyev.pwdmanager.model.Card;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Test
 public class TestRecordNameFilter {
     private static final Card CARD =
             new Card("Card Name", null, List.of());
 
-    @DataProvider
-    public Object[][] dataProvider() {
-        return new Object[][]{
-                {CARD, "Card", true},
-                {CARD, "Name", true},
-                {CARD, "card name", true},
-                {CARD, "D n", true},
-                {CARD, "ValUe3", false},
-        };
+    private static List<Arguments> dataProvider() {
+        return List.of(
+                Arguments.of(CARD, "Card", true),
+                Arguments.of(CARD, "Name", true),
+                Arguments.of(CARD, "card name", true),
+                Arguments.of(CARD, "D n", true),
+                Arguments.of(CARD, "ValUe3", false)
+        );
     }
 
-    @Test(dataProvider = "dataProvider")
+    @ParameterizedTest
+    @MethodSource("dataProvider")
     public void test(Card card, String value, boolean expected) {
-        assertEquals(new RecordNameFilter(value).test(card), expected);
+        assertEquals(expected, new RecordNameFilter(value).test(card));
     }
 }

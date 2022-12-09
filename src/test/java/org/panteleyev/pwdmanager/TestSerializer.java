@@ -4,30 +4,30 @@
  */
 package org.panteleyev.pwdmanager;
 
-import org.panteleyev.pwdmanager.model.Card;
-import org.panteleyev.pwdmanager.model.CardType;
-import org.panteleyev.pwdmanager.model.Field;
-import org.panteleyev.pwdmanager.model.FieldType;
-import org.panteleyev.pwdmanager.model.Note;
-import org.panteleyev.pwdmanager.model.Picture;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.panteleyev.pwdmanager.model.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.util.List;
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSerializer {
-    private DocumentBuilder docBuilder;
+    private static final DocumentBuilder DOCUMENT_BUILDER;
 
-    @BeforeClass
-    public void initFactory() throws Exception {
-        var docFactory = DocumentBuilderFactory.newInstance();
-        docBuilder = docFactory.newDocumentBuilder();
+    static {
+        try {
+            var docFactory = DocumentBuilderFactory.newInstance();
+            DOCUMENT_BUILDER = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Test
@@ -46,43 +46,43 @@ public class TestSerializer {
                 true, false
         );
 
-        var doc = docBuilder.newDocument();
+        var doc = DOCUMENT_BUILDER.newDocument();
 
         var e = Serializer.serializeRecord(doc, card);
 
         var restored = Serializer.deserializeCard(e);
 
-        assertEquals(restored, card);
+        assertEquals(card, restored);
     }
 
-    @DataProvider(name = "testFieldToFromJson")
-    public Object[][] testFieldToFromJsonDataProvider() {
-        return new Object[][]{
-                {new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
-                {new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())},
-                {new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")},
-                {new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.UNION_PAY)},
-        };
+    private static List<Arguments> dataProvider() {
+        return List.of(
+                Arguments.of(new Field(FieldType.STRING, UUID.randomUUID().toString(), UUID.randomUUID().toString())),
+                Arguments.of(new Field(FieldType.HIDDEN, UUID.randomUUID().toString(), UUID.randomUUID().toString())),
+                Arguments.of(new Field(FieldType.LINK, UUID.randomUUID().toString(), "1024")),
+                Arguments.of(new Field(FieldType.CARD_TYPE, UUID.randomUUID().toString(), CardType.UNION_PAY))
+        );
     }
 
-    @Test(dataProvider = "testFieldToFromJson")
+    @ParameterizedTest
+    @MethodSource("dataProvider")
     public void testFieldSerialization(Field field) {
-        var doc = docBuilder.newDocument();
+        var doc = DOCUMENT_BUILDER.newDocument();
 
         var e = Serializer.serializeField(doc, field);
         var restored = Serializer.deserializeField(e);
 
-        assertEquals(restored, field);
+        assertEquals(field, restored);
     }
 
     @Test
     public void testNoteSerialization() {
         var note = new Note(UUID.randomUUID().toString());
 
-        var doc = docBuilder.newDocument();
+        var doc = DOCUMENT_BUILDER.newDocument();
 
         var e = Serializer.serializeRecord(doc, note);
         var restored = Serializer.deserializeNote(e);
-        assertEquals(restored, note);
+        assertEquals(note, restored);
     }
 }

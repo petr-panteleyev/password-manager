@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>22.4.1</version>
+    <version>22.12.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -28,10 +28,10 @@
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>19</javaFxVersion>
-        <javaFxHelpersVersion>1.11.0</javaFxHelpersVersion>
+        <javaFxHelpersVersion>1.12.1</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
-        <controlsFxVersion>11.1.1</controlsFxVersion>
-        <testNgVersion>7.5</testNgVersion>
+        <controlsFxVersion>11.1.2</controlsFxVersion>
+        <jUnitVersion>5.9.1</jUnitVersion>
     </properties>
 
     <dependencies>
@@ -83,9 +83,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testNgVersion}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${jUnitVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

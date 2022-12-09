@@ -1,39 +1,39 @@
 /*
- Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.generator;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@Test
 public class TestGenerator {
 
-    @DataProvider
-    public Object[][] dataProvider() {
-        return new Object[][]{
-                {new GeneratorOptions(true, true, true, true, 32)},
-                {new GeneratorOptions(true, true, true, true, 32)},
-                {new GeneratorOptions(false, false, true, false, 4)},
-                {new GeneratorOptions(false, false, true, false, 4)},
-        };
+    private static List<Arguments> dataProvider() {
+        return List.of(
+                Arguments.of(new GeneratorOptions(true, true, true, true, 32)),
+                Arguments.of(new GeneratorOptions(true, true, true, true, 32)),
+                Arguments.of(new GeneratorOptions(false, false, true, false, 4)),
+                Arguments.of(new GeneratorOptions(false, false, true, false, 4))
+        );
     }
 
-    @Test(dataProvider = "dataProvider")
+    @ParameterizedTest
+    @MethodSource("dataProvider")
     public void testGenerator(GeneratorOptions options) {
         var password = new Generator().generate(options);
-        assertEquals(password.length(), options.length());
+        assertEquals(options.length(), password.length());
 
-        assertEquals(contains(password, Generator.UPPER_CASE_CHARS), options.upperCase());
-        assertEquals(contains(password, Generator.LOWER_CASE_CHARS), options.lowerCase());
-        assertEquals(contains(password, Generator.DIGITS), options.digits());
-        assertEquals(contains(password, Generator.SYMBOLS), options.symbols());
+        assertEquals(options.upperCase(), contains(password, Generator.UPPER_CASE_CHARS));
+        assertEquals(options.lowerCase(), contains(password, Generator.LOWER_CASE_CHARS));
+        assertEquals(options.digits(), contains(password, Generator.DIGITS));
+        assertEquals(options.symbols(), contains(password, Generator.SYMBOLS));
         assertFalse(contains(password, Generator.BAD_LETTERS));
     }
 

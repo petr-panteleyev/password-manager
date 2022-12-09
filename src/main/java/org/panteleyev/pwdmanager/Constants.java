@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -10,10 +10,13 @@ import java.util.ResourceBundle;
 
 import static java.util.ResourceBundle.getBundle;
 
-public interface Constants {
-    ResourceBundle BUILD_INFO_BUNDLE = getBundle("buildInfo");
-    ResourceBundle UI_BUNDLE = getBundle(UiBundle.class.getCanonicalName());
+public final class Constants {
+    public static final ResourceBundle BUILD_INFO_BUNDLE = getBundle("buildInfo");
+    public static final ResourceBundle UI_BUNDLE = getBundle(UiBundle.class.getCanonicalName());
 
-    String APP_TITLE = "Password Manager";
-    String MASK = "*****";
+    public static final String APP_TITLE = "Password Manager";
+    public static final String MASK = "*****";
+
+    private Constants() {
+    }
 }

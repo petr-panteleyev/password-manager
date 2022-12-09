@@ -18,14 +18,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
 
-public interface XMLUtils {
-    static Element appendElement(Element parent, String name) {
+public final class XMLUtils {
+    private XMLUtils() {
+    }
+
+    public static Element appendElement(Element parent, String name) {
         var element = parent.getOwnerDocument().createElement(name);
         parent.appendChild(element);
         return element;
     }
 
-    static Element createDocument(String rootElementName) {
+    public static Element createDocument(String rootElementName) {
         try {
             var docFactory = DocumentBuilderFactory.newInstance();
             var docBuilder = docFactory.newDocumentBuilder();
@@ -40,7 +43,7 @@ public interface XMLUtils {
         }
     }
 
-    static Element readDocument(InputStream in) {
+    public static Element readDocument(InputStream in) {
         try {
             var docFactory = DocumentBuilderFactory.newInstance();
             var docBuilder = docFactory.newDocumentBuilder();
@@ -51,7 +54,7 @@ public interface XMLUtils {
         }
     }
 
-    static void writeDocument(Document document, OutputStream outputStream) {
+    public static void writeDocument(Document document, OutputStream outputStream) {
         try {
             var transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -62,12 +65,12 @@ public interface XMLUtils {
         }
     }
 
-    static String getAttribute(Element element, String name, String defValue) {
+    public static String getAttribute(Element element, String name, String defValue) {
         var value = element.getAttribute(name);
         return value.isEmpty() ? defValue : value;
     }
 
-    static int getAttribute(Element element, String name, int defValue) {
+    public static int getAttribute(Element element, String name, int defValue) {
         var value = element.getAttribute(name);
         if (value.isBlank()) {
             return defValue;
@@ -76,7 +79,7 @@ public interface XMLUtils {
         }
     }
 
-    static double getAttribute(Element element, String name, double defValue) {
+    public static double getAttribute(Element element, String name, double defValue) {
         var value = element.getAttribute(name);
         if (value.isBlank()) {
             return defValue;
@@ -85,7 +88,7 @@ public interface XMLUtils {
         }
     }
 
-    static boolean getAttribute(Element element, String name, boolean defValue) {
+    public static boolean getAttribute(Element element, String name, boolean defValue) {
         var value = element.getAttribute(name);
         if (value.isBlank()) {
             return defValue;
@@ -94,7 +97,7 @@ public interface XMLUtils {
         }
     }
 
-    static void appendTextNode(Element e, String name, String value) {
+    public static void appendTextNode(Element e, String name, String value) {
         if (value == null) {
             return;
         }
@@ -106,7 +109,7 @@ public interface XMLUtils {
         child.appendChild(text);
     }
 
-    static void appendObjectTextNode(Element e, String name, Object value) {
+    public static void appendObjectTextNode(Element e, String name, Object value) {
         if (value instanceof String stringValue) {
             appendTextNode(e, name, stringValue);
         } else {
@@ -114,7 +117,7 @@ public interface XMLUtils {
         }
     }
 
-    static Optional<String> getStringNodeValue(Element parent, String tagName) {
+    public static Optional<String> getStringNodeValue(Element parent, String tagName) {
         var nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             var node = nodes.item(i);

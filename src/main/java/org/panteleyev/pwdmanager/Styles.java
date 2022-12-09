@@ -1,23 +1,26 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
-public interface Styles {
-    double BIG_SPACING = 10.0;
-    double SMALL_SPACING = 5.0;
+public final class Styles {
+    public static final double BIG_SPACING = 10.0;
+    public static final double SMALL_SPACING = 5.0;
 
-    String STYLE_GRID_PANE = "gridPane";
-    String STYLE_CARD_CONTENT_TITLE = "cardContentTitle";
-    String STYLE_ABOUT_LABEL = "aboutLabel";
-    String STYLE_FIELD_NAME = "fieldName";
-    String STYLE_FIELD_VALUE = "fieldValue";
-    String STYLE_FAVORITE = "favorite";
-    String STYLE_DELETED = "deleted";
+    public static final String STYLE_GRID_PANE = "gridPane";
+    public static final String STYLE_CARD_CONTENT_TITLE = "cardContentTitle";
+    public static final String STYLE_ABOUT_LABEL = "aboutLabel";
+    public static final String STYLE_FIELD_NAME = "fieldName";
+    public static final String STYLE_FIELD_VALUE = "fieldValue";
+    public static final String STYLE_FAVORITE = "favorite";
+    public static final String STYLE_DELETED = "deleted";
 
-    String STYLE_ACTION_ADD = "action-add";
-    String STYLE_ACTION_REPLACE = "action-replace";
-    String STYLE_ACTION_DELETE = "action-delete";
-    String STYLE_ACTION_RESTORE = "action-restore";
+    public static final String STYLE_ACTION_ADD = "action-add";
+    public static final String STYLE_ACTION_REPLACE = "action-replace";
+    public static final String STYLE_ACTION_DELETE = "action-delete";
+    public static final String STYLE_ACTION_RESTORE = "action-restore";
+
+    private Styles() {
+    }
 }
