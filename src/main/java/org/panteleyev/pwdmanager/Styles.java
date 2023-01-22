@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -13,9 +13,6 @@ public final class Styles {
     public static final String STYLE_ABOUT_LABEL = "aboutLabel";
     public static final String STYLE_FIELD_NAME = "fieldName";
     public static final String STYLE_FIELD_VALUE = "fieldValue";
-    public static final String STYLE_FAVORITE = "favorite";
-    public static final String STYLE_DELETED = "deleted";
-
     public static final String STYLE_ACTION_ADD = "action-add";
     public static final String STYLE_ACTION_REPLACE = "action-replace";
     public static final String STYLE_ACTION_DELETE = "action-delete";

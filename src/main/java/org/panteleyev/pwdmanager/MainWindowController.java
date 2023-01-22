@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -80,6 +80,7 @@ import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
@@ -217,7 +218,7 @@ final class MainWindowController extends Controller {
                         menuItem(fxString(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS),
                                 a -> onChangePassword(), currentFile.isNull()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), a -> onOptions()),
+                        menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), SHORTCUT_ALT_S, a -> onOptions()),
                         new SeparatorMenuItem(),
                         menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY), a -> onCreateDesktopEntry())
                 ),

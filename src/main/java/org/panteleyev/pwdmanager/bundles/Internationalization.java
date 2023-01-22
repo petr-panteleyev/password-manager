@@ -8,7 +8,7 @@ public final class Internationalization {
     public static final String I18N_ACTION = "I18N_ACTION";
     public static final String I18N_ADD = "I18N_ADD";
     public static final String I18N_BACKGROUND = "I18N_BACKGROUND";
-    public static final String I18N_CANCEL_BUTTON = "I18N_CANCEL_BUTTON";
+    public static final String I18N_CANCEL_BUTTON = "button.Cancel";
     public static final String I18N_CAR_BODY = "I18N_CAR_BODY";
     public static final String I18N_CARD = "I18N_CARD";
     public static final String I18N_CARD_NUMBER = "I18N_CARD_NUMBER";

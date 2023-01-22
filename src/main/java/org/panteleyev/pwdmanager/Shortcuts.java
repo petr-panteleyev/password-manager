@@ -7,6 +7,7 @@ package org.panteleyev.pwdmanager;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 
+import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.SHIFT_DOWN;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 
@@ -23,6 +24,7 @@ final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_U = new KeyCodeCombination(KeyCode.U, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_V = new KeyCodeCombination(KeyCode.V, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHIFT_DELETE = new KeyCodeCombination(KeyCode.DELETE, SHIFT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_S = new KeyCodeCombination(KeyCode.S, SHORTCUT_DOWN, ALT_DOWN);
 
     public static final KeyCodeCombination DELETE = new KeyCodeCombination(KeyCode.DELETE);
 

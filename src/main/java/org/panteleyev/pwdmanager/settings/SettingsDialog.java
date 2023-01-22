@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -31,13 +31,13 @@ import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxFactory.newTab;
 import static org.panteleyev.fx.FxFactory.textField;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.SKIP;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.TabFactory.tab;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
@@ -46,17 +46,13 @@ import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_BACKGROUND;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COLORS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONTROLS;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETED;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DIALOGS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DIGITS;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FAVORITE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_NAME;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FONTS;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FOREGROUND;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_LENGTH;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_LOWER_CASE;
@@ -81,12 +77,6 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
     private final TextField menuFontField = textField(20);
     private final TextField dialogFontField = textField(20);
     // Colors
-    private final ColorPicker favoriteForegroundColorPicker = new ColorPicker(settings().getColor(ColorName.FAVORITE));
-    private final ColorPicker favoriteBackgroundColorPicker =
-            new ColorPicker(settings().getColor(ColorName.FAVORITE_BACKGROUND));
-    private final ColorPicker deletedForegroundColorPicker = new ColorPicker(settings().getColor(ColorName.DELETED));
-    private final ColorPicker deletedBackgroundColorPicker =
-            new ColorPicker(settings().getColor(ColorName.DELETED_BACKGROUND));
     private final ColorPicker fieldNameColorPicker = new ColorPicker(settings().getColor(ColorName.FIELD_NAME));
     private final ColorPicker fieldValueColorPicker = new ColorPicker(settings().getColor(ColorName.FIELD_VALUE));
     private final ColorPicker actionAddColorPicker = new ColorPicker(settings().getColor(ColorName.ACTION_ADD));
@@ -134,8 +124,8 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
 
         getDialogPane().setContent(
                 new TabPane(
-                        newTab(UI_BUNDLE, I18N_PASSWORDS, false, vBox),
-                        newTab(UI_BUNDLE, I18N_FONTS, false,
+                        tab(fxString(UI_BUNDLE, I18N_PASSWORDS), false, vBox),
+                        tab(fxString(UI_BUNDLE, I18N_FONTS), false,
                                 vBox(10,
                                         titledPane(fxString(UI_BUNDLE, I18N_CONTROLS),
                                                 gridPane(List.of(
@@ -159,15 +149,8 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
                                         )
                                 )
                         ),
-                        newTab(UI_BUNDLE, I18N_COLORS, false,
+                        tab(fxString(UI_BUNDLE, I18N_COLORS), false,
                                 gridPane(List.of(
-                                        gridRow(SKIP,
-                                                label(fxString(UI_BUNDLE, I18N_FOREGROUND)), label(fxString(UI_BUNDLE
-                                                        , I18N_BACKGROUND))),
-                                        gridRow(label(fxString(UI_BUNDLE, I18N_FAVORITE, COLON)),
-                                                favoriteForegroundColorPicker, favoriteBackgroundColorPicker),
-                                        gridRow(label(fxString(UI_BUNDLE, I18N_DELETED, COLON)),
-                                                deletedForegroundColorPicker, deletedBackgroundColorPicker),
                                         gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_NAME, COLON)),
                                                 fieldNameColorPicker),
                                         gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_VALUE, COLON)),
@@ -195,10 +178,6 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
                     settings.setFont(FontName.DIALOG_FONT, (Font) dialogFontField.getUserData());
 
                     // Colors
-                    settings.setColor(ColorName.FAVORITE, favoriteForegroundColorPicker.getValue());
-                    settings.setColor(ColorName.FAVORITE_BACKGROUND, favoriteBackgroundColorPicker.getValue());
-                    settings.setColor(ColorName.DELETED, deletedForegroundColorPicker.getValue());
-                    settings.setColor(ColorName.DELETED_BACKGROUND, deletedBackgroundColorPicker.getValue());
                     settings.setColor(ColorName.FIELD_NAME, fieldNameColorPicker.getValue());
                     settings.setColor(ColorName.FIELD_VALUE, fieldValueColorPicker.getValue());
                     settings.setColor(ColorName.ACTION_ADD, actionAddColorPicker.getValue());

@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -57,10 +57,6 @@ public final class Settings {
                 entry("aboutLabelFontSize", (int) fontSettings.getFont(FontName.DIALOG_FONT).getSize() * 2),
                 entry("aboutLabelSmallFontSize", (int) fontSettings.getFont(FontName.DIALOG_FONT).getSize() + 2),
                 // Colors
-                entry("favoriteColor", colorSettings.getWebString(ColorName.FAVORITE)),
-                entry("favoriteBackground", colorSettings.getWebString(ColorName.FAVORITE_BACKGROUND)),
-                entry("deletedColor", colorSettings.getWebString(ColorName.DELETED)),
-                entry("deletedBackground", colorSettings.getWebString(ColorName.DELETED_BACKGROUND)),
                 entry("fieldNameColor", colorSettings.getWebString(ColorName.FIELD_NAME)),
                 entry("fieldValueColor", colorSettings.getWebString(ColorName.FIELD_VALUE)),
                 entry("hyperLinkColor", colorSettings.getWebString(ColorName.HYPERLINK)),
@@ -153,10 +149,6 @@ public final class Settings {
 
     public String getCurrentFile() {
         return generalSettings.get(GeneralSettings.Setting.CURRENT_FILE);
-    }
-
-    public void saveStageDimensions(Controller controller) {
-        windowsSettings.storeWindowDimensions(controller);
     }
 
     public void loadStageDimensions(Controller controller) {

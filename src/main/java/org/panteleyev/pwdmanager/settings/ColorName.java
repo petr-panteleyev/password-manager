@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -9,10 +9,6 @@ import javafx.scene.paint.Color;
 import java.util.Optional;
 
 public enum ColorName {
-    FAVORITE(Color.GREEN),
-    FAVORITE_BACKGROUND(Color.WHITE),
-    DELETED(Color.BLACK),
-    DELETED_BACKGROUND(Color.PINK),
     HYPERLINK(Color.BLUE),
     FIELD_NAME(Color.BLUE),
     FIELD_VALUE(Color.BLACK),

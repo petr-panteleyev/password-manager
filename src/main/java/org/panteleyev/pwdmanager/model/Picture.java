@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
@@ -34,6 +34,7 @@ public enum Picture {
     EDUCATION,
     EMAIL,
     FACEBOOK,
+    FAVORITES,
     FEMALE,
     FLICKR,
     FOLDER,
@@ -73,6 +74,7 @@ public enum Picture {
     STEAM,
     TELEGRAM,
     TRAIN,
+    TRASH,
     TWITTER,
     UNIONPAY,
     US,

@@ -48,6 +48,9 @@ https://iconarchive.com/show/plump-icons-by-zerode/Mail-icon.html
 ![facebook](src/main/resources/images/facebook.png)
 https://iconarchive.com/show/social-bookmark-icons-by-yootheme/social-facebook-box-blue-icon.html
 
+![favorites](src/main/resources/images/favorites.png)
+https://iconarchive.com/show/oxygen-icons-by-oxygen-icons.org/Places-favorites-icon.html
+
 ![female](src/main/resources/images/female.png)
 https://iconarchive.com/show/vista-people-icons-by-icons-land/Office-Customer-Female-Light-icon.html
 
@@ -155,6 +158,9 @@ https://iconarchive.com/show/enkel-icons-by-froyoshark/Telegram-icon.html
 
 ![train](src/main/resources/images/train.png)
 https://iconarchive.com/show/vista-artistic-icons-by-awicons/2-Hot-Train-icon.html
+
+![trash](src/main/resources/images/trash.png)
+https://iconarchive.com/show/qetto-2-icons-by-ampeross/trash-icon.html
 
 ![twitter](src/main/resources/images/twitter.png)
 https://iconarchive.com/show/flat-gradient-social-icons-by-limav/Twitter-icon.html
