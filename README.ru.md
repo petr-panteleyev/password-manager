@@ -1,9 +1,5 @@
 # Менеджер паролей
 
-[![GitHub](https://img.shields.io/github/license/petr-panteleyev/password-manager)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-18-orange?logo=java)](https://jdk.java.net/18/)
-[![JavaFX](https://img.shields.io/badge/JavaFX-18-orange?logo=java)](https://openjfx.io/)
-
 Приложение для хранения паролей, номеров банковских карт и прочей секретной информации.
 Используется алгоритм шифрования 256-bit AES.
 
@@ -17,7 +13,7 @@
 
 ## Как собрать
 
-Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 18.
+Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 20.
 
 Выполните следующую команду:
 

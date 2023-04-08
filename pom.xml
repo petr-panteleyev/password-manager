@@ -9,25 +9,26 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>23.1.1</version>
+    <version>23.4.1</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>19</maven.compiler.release>
+        <maven.compiler.release>20</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
-        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
+        <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
+        <mavenCompilerPluginVersion>3.11.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
-        <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.5.0</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>19</javaFxVersion>
+        <javaFxVersion>20</javaFxVersion>
         <javaFxHelpersVersion>1.12.1</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.2</controlsFxVersion>
@@ -101,8 +102,16 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${mavenResourcePluginVersion}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
+                <configuration>
+                    <compilerArgs>--enable-preview</compilerArgs>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -121,6 +130,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
+                <configuration>
+                    <argLine>
+                        --enable-preview
+                    </argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -156,6 +170,9 @@
                         <modulePath>target/jmods</modulePath>
                     </modulePaths>
                     <destination>target/dist</destination>
+                    <javaOptions>
+                        <option>--enable-preview</option>
+                    </javaOptions>
                 </configuration>
 
                 <executions>
@@ -196,6 +213,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <options>
+                                <option>--enable-preview</option>
                                 <option>-Dpassword.file=${password.file}</option>
                             </options>
                         </configuration>
@@ -204,6 +222,7 @@
                         <id>debug</id>
                         <configuration>
                             <options>
+                                <option>--enable-preview</option>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
                                 <option>-Dpassword.file=${password.file}</option>
                             </options>

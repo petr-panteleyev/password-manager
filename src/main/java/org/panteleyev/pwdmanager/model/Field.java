@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
@@ -27,14 +27,11 @@ public record Field(FieldType type, String name, Object value) {
     }
 
     public String serializeValue() {
-        // TODO: reimplement with switch pattern matching when available
-        if (value instanceof Enum enumValue) {
-            return enumValue.name();
-        } else if (value instanceof LocalDate dateValue) {
-            return Long.toString(dateValue.toEpochDay());
-        } else {
-            return value.toString();
-        }
+        return switch (value) {
+            case Enum<?> enumValue -> enumValue.name();
+            case LocalDate dateValue -> Long.toString(dateValue.toEpochDay());
+            default -> value.toString();
+        };
     }
 
     public static Object deserializeValue(FieldType type, String value) {

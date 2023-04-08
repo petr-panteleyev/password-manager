@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.cells;
@@ -60,21 +60,26 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, Object> {
     public void startEdit() {
         super.startEdit();
         var item = getItem();
-        // TODO: reimplement with switch pattern matching when available
-        if (item instanceof CardType cardType) {
-            cardTypeComboBox.getSelectionModel().select(cardType);
-            setGraphic(cardTypeComboBox);
-        } else if (item instanceof LocalDate localDate) {
-            datePicker.setValue(localDate);
-            setGraphic(datePicker);
-        } else {
-            setGraphic(textField);
-            textField.setText(item.toString());
-            Platform.runLater(() -> {
-                textField.requestFocus();
-                textField.selectAll();
-            });
+
+        switch (item) {
+            case CardType cardType -> {
+                cardTypeComboBox.getSelectionModel().select(cardType);
+                setGraphic(cardTypeComboBox);
+            }
+            case LocalDate localDate -> {
+                datePicker.setValue(localDate);
+                setGraphic(datePicker);
+            }
+            default -> {
+                setGraphic(textField);
+                textField.setText(item.toString());
+                Platform.runLater(() -> {
+                    textField.requestFocus();
+                    textField.selectAll();
+                });
+            }
         }
+
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     }
 
@@ -93,16 +98,19 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, Object> {
             setGraphic(null);
         } else {
             if (isEditing()) {
-                // TODO: reimplement with switch pattern matching when available
-                if (value instanceof CardType cardType) {
-                    cardTypeComboBox.getSelectionModel().select(cardType);
-                    setGraphic(cardTypeComboBox);
-                } else if (value instanceof LocalDate localDate) {
-                    datePicker.setValue(localDate);
-                    setGraphic(datePicker);
-                } else {
-                    textField.setText(value.toString());
-                    setGraphic(textField);
+                switch (value) {
+                    case CardType cardType -> {
+                        cardTypeComboBox.getSelectionModel().select(cardType);
+                        setGraphic(cardTypeComboBox);
+                    }
+                    case LocalDate localDate -> {
+                        datePicker.setValue(localDate);
+                        setGraphic(datePicker);
+                    }
+                    default -> {
+                        textField.setText(value.toString());
+                        setGraphic(textField);
+                    }
                 }
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             } else {
@@ -117,7 +125,6 @@ public class EditRecordFieldValueCell extends TableCell<EditableField, Object> {
             return;
         }
         var value = field.getValue();
-        // TODO: reimplement with switch pattern matching when available
         if (value instanceof CardType cardType) {
             setGraphic(imageView(cardType.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
             setText(cardType.getName());

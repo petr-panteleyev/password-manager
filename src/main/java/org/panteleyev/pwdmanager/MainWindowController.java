@@ -15,21 +15,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
@@ -42,7 +28,6 @@ import org.panteleyev.freedesktop.Utility;
 import org.panteleyev.freedesktop.entry.DesktopEntryBuilder;
 import org.panteleyev.freedesktop.entry.DesktopEntryType;
 import org.panteleyev.freedesktop.menu.Category;
-import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.pwdmanager.cells.RecordListCell;
@@ -71,57 +56,15 @@ import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.MenuFactory.checkMenuItem;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.*;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
-import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
+import static org.panteleyev.pwdmanager.Shortcuts.*;
 import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EDIT;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EDIT_BUTTON;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ERROR;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXIT;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXPORT;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FAVORITE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILTER;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_HELP;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_HELP_ABOUT;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_CARD;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_FILE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_NOTE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTHING_TO_IMPORT;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPEN;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPTIONS;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASTE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PURGE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_RESTORE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SAVE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SHOW_DELETED;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TOOLS;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UNABLE_TO_READ_FILE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VIEW;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.*;
+import static org.panteleyev.pwdmanager.model.Card.*;
 import static org.panteleyev.pwdmanager.model.Picture.BIG_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
@@ -455,17 +398,19 @@ final class MainWindowController extends Controller {
         cardContentTitleLabel.setText(record.name());
         cardContentTitleLabel.setGraphic(imageView(record.picture().getBigImage(), BIG_IMAGE_SIZE, BIG_IMAGE_SIZE));
 
-        // TODO: reimplement with switch pattern matching when available
-        if (record instanceof Note note) {
-            noteViewer.setText(note.note());
-            recordViewPane.setCenter(noteViewer);
-        } else if (record instanceof Card card) {
-            recordViewPane.setCenter(cardContentView);
-            var wrappers = card.fields().stream()
-                    .filter(f -> !f.isEmpty())
-                    .map(FieldWrapper::new)
-                    .toList();
-            cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
+        switch (record) {
+            case Card card -> {
+                recordViewPane.setCenter(cardContentView);
+                var wrappers = card.fields().stream()
+                        .filter(f -> !f.isEmpty())
+                        .map(FieldWrapper::new)
+                        .toList();
+                cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
+            }
+            case Note note -> {
+                noteViewer.setText(note.note());
+                recordViewPane.setCenter(noteViewer);
+            }
         }
     }
 
@@ -501,16 +446,11 @@ final class MainWindowController extends Controller {
 
     private void onEditCard() {
         getSelectedItem().ifPresent(item -> {
-            // TODO: reimplement with switch pattern matching when available
-            BaseDialog<? extends WalletRecord> dialog = null;
-            if (item instanceof Card card) {
-                dialog = new EditCardDialog(card);
-            } else if (item instanceof Note note) {
-                dialog = new EditNoteDialog(note);
-            }
-            if (dialog != null) {
-                dialog.showAndWait().ifPresent(this::processEditedRecord);
-            }
+            var dialog = switch (item) {
+                case Card card -> new EditCardDialog(card);
+                case Note note -> new EditNoteDialog(note);
+            };
+            dialog.showAndWait().ifPresent(this::processEditedRecord);
         });
     }
 
