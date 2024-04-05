@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -44,7 +44,7 @@ final class GeneralSettings {
 
     @SuppressWarnings("unchecked")
     <T> T get(Setting key) {
-        return (T) settings.computeIfAbsent(key, k -> key.getDefaultValue());
+        return (T) settings.computeIfAbsent(key, _ -> key.getDefaultValue());
     }
 
     void put(Setting key, Object value) {

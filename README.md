@@ -12,7 +12,7 @@ to user account, operating system or hardware including RAM.
 
 ## Build
 
-Make sure ```JAVA_HOME``` is set to JDK 20.
+Make sure ```JAVA_HOME``` is set to JDK 22.
 
 Execute the following:
 ```shell script

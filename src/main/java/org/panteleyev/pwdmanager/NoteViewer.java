@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -24,7 +24,7 @@ final class NoteViewer extends TextArea {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-                menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C, x -> copy())
+                menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C, _ -> copy())
         );
     }
 

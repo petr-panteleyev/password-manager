@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -63,7 +63,7 @@ class PasswordDialog extends BaseDialog<String> {
     }
 
     private void createValidationSupport() {
-        Validator<String> v1 = (Control c, String value) -> {
+        Validator<String> v1 = (Control c, String _) -> {
             // Main password invalidates repeated password
             var s = passwordEdit2.getText();
             passwordEdit2.setText(UUID.randomUUID().toString());
@@ -72,7 +72,7 @@ class PasswordDialog extends BaseDialog<String> {
             return ValidationResult.fromErrorIf(c, null, false);
         };
 
-        Validator<String> v2 = (Control c, String value) -> {
+        Validator<String> v2 = (Control c, String _) -> {
             var equal = Objects.equals(passwordEdit.getText(), passwordEdit2.getText());
             return ValidationResult.fromErrorIf(c, null, !equal);
         };

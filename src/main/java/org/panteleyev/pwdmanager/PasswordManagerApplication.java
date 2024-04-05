@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -26,12 +26,12 @@ public final class PasswordManagerApplication extends Application {
 
     private final static String LOG_PROPERTIES = """
             handlers                                = java.util.logging.FileHandler
-                        
+
             java.util.logging.FileHandler.level     = ALL
             java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
             java.util.logging.FileHandler.pattern   = %FILE_PATTERN%
             java.util.logging.FileHandler.append    = true
-                        
+
             java.util.logging.SimpleFormatter.format = %1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n
             """;
 
@@ -57,7 +57,7 @@ public final class PasswordManagerApplication extends Application {
             LogManager.getLogManager().readConfiguration(inputStream);
         }
 
-        setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
+        setDefaultUncaughtExceptionHandler((_, e) -> uncaughtException(e));
 
         stage.setTitle(APP_TITLE);
         stage.getIcons().add(Picture.WALLET.getImage());

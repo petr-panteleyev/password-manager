@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -105,10 +105,10 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
         lengthComboBox.getItems().addAll(4, 6, 8, 16, 24, 32);
         typeComboBox.setItems(observableArrayList(settings().getPasswordFieldTypes()));
         typeComboBox.getSelectionModel().selectedItemProperty().addListener(
-                (observableValue, oldValue, newValue) -> updatePasswordControls(newValue));
+                (_, _, newValue) -> updatePasswordControls(newValue));
         typeComboBox.getSelectionModel().selectFirst();
 
-        EventHandler<ActionEvent> updatePasswordOptionsCopy = event -> onUpdatePasswordOptions();
+        EventHandler<ActionEvent> updatePasswordOptionsCopy = _ -> onUpdatePasswordOptions();
         upperCaseCheckBox.setOnAction(updatePasswordOptionsCopy);
         lowerCaseCheckBox.setOnAction(updatePasswordOptionsCopy);
         digitsCheckBox.setOnAction(updatePasswordOptionsCopy);
@@ -132,18 +132,18 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
                                                         gridRow(label(fxString(UI_BUNDLE, I18N_TEXT, COLON)),
                                                                 controlsFontField,
                                                                 button(ELLIPSIS,
-                                                                        actionEvent -> onFontSelected(controlsFontField))),
+                                                                        _ -> onFontSelected(controlsFontField))),
                                                         gridRow(label(fxString(UI_BUNDLE, I18N_MENU, COLON)),
                                                                 menuFontField,
                                                                 button(ELLIPSIS,
-                                                                        actionEvent -> onFontSelected(menuFontField)))
+                                                                        _ -> onFontSelected(menuFontField)))
                                                 ), b -> b.withStyle(STYLE_GRID_PANE))
                                         ),
                                         titledPane(fxString(UI_BUNDLE, I18N_DIALOGS),
                                                 gridPane(List.of(
                                                                 gridRow(dialogFontField,
                                                                         button(ELLIPSIS,
-                                                                                actionEvent -> onFontSelected(dialogFontField)))
+                                                                                _ -> onFontSelected(dialogFontField)))
                                                         ), b -> b.withStyle(STYLE_GRID_PANE)
                                                 )
                                         )

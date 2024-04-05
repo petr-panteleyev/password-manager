@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -44,7 +44,7 @@ abstract class RecordDialog extends BaseDialog<Card> {
 
         nameEdit.setPrefColumnCount(25);
 
-        typeList.setOnAction(event -> onCardTypeSelected());
+        typeList.setOnAction(_ -> onCardTypeSelected());
 
         getDialogPane().setContent(gridPane(
                 List.of(
@@ -73,13 +73,13 @@ abstract class RecordDialog extends BaseDialog<Card> {
 
     void initLists() {
         typeList.setItems(FXCollections.observableArrayList(RecordType.values()));
-        typeList.setCellFactory(p -> new CardTypeListCell());
+        typeList.setCellFactory(_ -> new CardTypeListCell());
         typeList.setButtonCell(new CardTypeListCell());
         Picture.setupComboBox(pictureList);
     }
 
     void setupValidator() {
-        validation.registerValidator(nameEdit, (Control c, String value) ->
+        validation.registerValidator(nameEdit, (Control c, String _) ->
                 ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -97,7 +97,7 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
 
         var w = tableView.widthProperty().subtract(20);
 
-        tableView.setRowFactory(t -> new ImportRow());
+        tableView.setRowFactory(_ -> new ImportRow());
 
         tableView.getColumns().setAll(List.of(
                 tableColumn(fxString(UI_BUNDLE, I18N_TITLE), b ->
@@ -106,7 +106,7 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
                 ),
                 tableColumn(fxString(UI_BUNDLE, I18N_UPDATED), (TableColumnBuilder<ImportRecord, Long> b) ->
                         b.withPropertyCallback(r -> r.cardToImport().modified())
-                                .withCellFactory(x -> new TimestampCell())
+                                .withCellFactory(_ -> new TimestampCell())
                                 .withWidthBinding(w.multiply(0.35))
                 ),
                 tableColumn(fxString(UI_BUNDLE, I18N_ACTION),
@@ -140,21 +140,21 @@ final class ImportDialog extends BaseDialog<List<ImportRecord>> {
             importRecords.set(index, newItem);
             tableView.getSelectionModel().select(index);
         });
-        var column = tableView.getColumns().get(0);
+        var column = tableView.getColumns().getFirst();
         column.setVisible(false);
         column.setVisible(true);
     }
 
     private ContextMenu createContextMenu() {
         var toggleMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SKIP), false,
-                SHORTCUT_P, event -> onToggleApproval());
+                SHORTCUT_P, _ -> onToggleApproval());
         toggleMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
 
         var menu = new ContextMenu(
                 toggleMenuItem
         );
 
-        menu.setOnShowing(e -> toggleMenuItem.setSelected(
+        menu.setOnShowing(_ -> toggleMenuItem.setSelected(
                 getSelectedItem().map(r -> !r.approved()).orElse(false))
         );
 

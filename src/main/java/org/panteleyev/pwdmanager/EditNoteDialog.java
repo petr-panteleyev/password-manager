@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -68,7 +68,7 @@ final class EditNoteDialog extends BaseDialog<Note> {
     }
 
     private void setupValidator() {
-        validation.registerValidator(nameEdit, (Control c, String value) ->
+        validation.registerValidator(nameEdit, (Control c, String _) ->
                 ValidationResult.fromErrorIf(c, null, nameEdit.getText().isEmpty()));
         validation.initInitialDecoration();
     }

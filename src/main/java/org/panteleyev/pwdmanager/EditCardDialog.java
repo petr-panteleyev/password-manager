@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxFactory.newTab;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.fx.TabFactory.tab;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
@@ -70,7 +70,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
     private final MenuItem generateMenuItem = menuItem(fxString(UI_BUNDLE, I18N_GENERATE), SHORTCUT_G,
-            a -> onGeneratePassword());
+            _ -> onGeneratePassword());
 
     EditCardDialog(Card card) {
         super(settings().getDialogCssFileUrl());
@@ -89,7 +89,7 @@ final class EditCardDialog extends BaseDialog<Card> {
         );
 
         var contextMenu = createContextMenu();
-        contextMenu.setOnShowing(event ->
+        contextMenu.setOnShowing(_ ->
                 generateMenuItem.setDisable(getSelectedField()
                         .map(EditableField::getType)
                         .flatMap(settings()::getPasswordOptions)
@@ -113,9 +113,9 @@ final class EditCardDialog extends BaseDialog<Card> {
         var noteEditor = new TextArea();
 
         var tabPane = new TabPane(
-                newTab(UI_BUNDLE, I18M_FIELDS, false, pane),
-                newTab(UI_BUNDLE, I18N_NOTES, false, noteEditor),
-                newTab(UI_BUNDLE, I18N_PROPERTIES, false, optionsPane));
+                tab(fxString(UI_BUNDLE, I18M_FIELDS), false, pane),
+                tab(fxString(UI_BUNDLE, I18N_NOTES), false, noteEditor),
+                tab(fxString(UI_BUNDLE, I18N_PROPERTIES), false, optionsPane));
 
         getDialogPane().setContent(tabPane);
         createDefaultButtons(UI_BUNDLE);
@@ -150,14 +150,14 @@ final class EditCardDialog extends BaseDialog<Card> {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-                menuItem(fxString(UI_BUNDLE, I18N_ADD), SHORTCUT_N, a -> onNewField()),
+                menuItem(fxString(UI_BUNDLE, I18N_ADD), SHORTCUT_N, _ -> onNewField()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_DELETE), DELETE, a -> onDeleteField()),
+                menuItem(fxString(UI_BUNDLE, I18N_DELETE), DELETE, _ -> onDeleteField()),
                 new SeparatorMenuItem(),
                 generateMenuItem,
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_UP), SHORTCUT_U, a -> onFieldUp()),
-                menuItem(fxString(UI_BUNDLE, I18N_DOWN), SHORTCUT_D, a -> onFieldDown())
+                menuItem(fxString(UI_BUNDLE, I18N_UP), SHORTCUT_U, _ -> onFieldUp()),
+                menuItem(fxString(UI_BUNDLE, I18N_DOWN), SHORTCUT_D, _ -> onFieldDown())
         );
     }
 
@@ -175,7 +175,7 @@ final class EditCardDialog extends BaseDialog<Card> {
         fieldTypeColumn.setResizable(false);
         fieldTypeColumn.setReorderable(false);
         fieldTypeColumn.setStyle("-fx-alignment: CENTER;");
-        fieldTypeColumn.setCellFactory(column -> new EditRecordFieldTypeCell());
+        fieldTypeColumn.setCellFactory(_ -> new EditRecordFieldTypeCell());
         fieldTypeColumn.setCellValueFactory(p -> p.getValue().typeProperty());
 
         var fieldValueColumn = new TableColumn<EditableField, Object>();
@@ -183,7 +183,7 @@ final class EditCardDialog extends BaseDialog<Card> {
         fieldValueColumn.setResizable(false);
         fieldValueColumn.setReorderable(false);
         fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
-        fieldValueColumn.setCellFactory(column -> new EditRecordFieldValueCell());
+        fieldValueColumn.setCellFactory(_ -> new EditRecordFieldValueCell());
         fieldValueColumn.setCellValueFactory(p -> p.getValue().valueProperty());
 
         var w = cardContentView.widthProperty().subtract(5);
@@ -207,7 +207,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     private void onDeleteField() {
         getSelectedField().ifPresent(sel -> {
             var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(x -> editableFields.remove(sel));
+            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(_ -> editableFields.remove(sel));
         });
     }
 

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -27,7 +27,7 @@ final class ColorSettings {
     private final Map<ColorName, Color> colorMap = new ConcurrentHashMap<>();
 
     Color getColor(ColorName option) {
-        return colorMap.computeIfAbsent(option, key -> option.getDefaultColor());
+        return colorMap.computeIfAbsent(option, _ -> option.getDefaultColor());
     }
 
     String getWebString(ColorName option) {

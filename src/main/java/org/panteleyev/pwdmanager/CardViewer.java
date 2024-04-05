@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -100,7 +100,7 @@ final class CardViewer extends BorderPane {
             switch (field.getType()) {
                 case LINK -> {
                     valueLabel = new Hyperlink(field.getValueAsString());
-                    ((Hyperlink) valueLabel).setOnAction(e -> onHyperlinkClick(field.getValueAsString()));
+                    ((Hyperlink) valueLabel).setOnAction(_ -> onHyperlinkClick(field.getValueAsString()));
                 }
                 case CARD_TYPE -> {
                     var cardType = (CardType) field.getValue();
@@ -149,7 +149,7 @@ final class CardViewer extends BorderPane {
 
     private ContextMenu createContextMenu(FieldWrapper field) {
         var copyMenuItem = new MenuItem(UI_BUNDLE.getString(I18N_COPY) + " '" + field.getName() + "'");
-        copyMenuItem.setOnAction(x -> onCopy(field.getField()));
+        copyMenuItem.setOnAction(_ -> onCopy(field.getField()));
 
         return new ContextMenu(copyMenuItem);
     }
