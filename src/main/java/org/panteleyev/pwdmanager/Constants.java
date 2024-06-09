@@ -1,9 +1,10 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
+import javafx.stage.FileChooser;
 import org.panteleyev.pwdmanager.bundles.UiBundle;
 
 import java.util.ResourceBundle;
@@ -16,6 +17,9 @@ public final class Constants {
 
     public static final String APP_TITLE = "Password Manager";
     public static final String MASK = "*****";
+
+    public static final FileChooser.ExtensionFilter EXTENSION_FILTER =
+            new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd");
 
     private Constants() {
     }

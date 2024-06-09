@@ -9,8 +9,79 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>24.4.1</version>
+    <version>24.6.1</version>
     <packaging>jar</packaging>
+
+    <profiles>
+        <profile>
+            <id>win</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>${jpackageMavenPluginVersion}</version>
+
+                        <configuration>
+                            <icon>icons/icons.ico</icon>
+                            <winMenu>true</winMenu>
+                            <winDirChooser>true</winDirChooser>
+                            <winUpgradeUuid>4a8438d2-f56f-4a5a-bfbe-5cf74ea70685</winUpgradeUuid>
+                            <winMenuGroup>panteleyev.org</winMenuGroup>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>${jpackageMavenPluginVersion}</version>
+
+                        <configuration>
+                            <icon>icons/icons.icns</icon>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.panteleyev</groupId>
+                        <artifactId>jpackage-maven-plugin</artifactId>
+                        <version>${jpackageMavenPluginVersion}</version>
+
+                        <configuration>
+                            <type>APP_IMAGE</type>
+                            <icon>icons/icon.png</icon>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,14 +93,14 @@
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
+        <mavenJarPluginVersion>3.4.1</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.6.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.6.3</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.6.4</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>21.0.2</javaFxVersion>
-        <javaFxHelpersVersion>1.13.0</javaFxHelpersVersion>
+        <javaFxVersion>22.0.1</javaFxVersion>
+        <javaFxHelpersVersion>1.15.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
         <jUnitVersion>5.10.2</jUnitVersion>
@@ -104,6 +175,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${mavenResourcePluginVersion}</version>
+                <configuration>
+                    <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -163,32 +237,6 @@
                     </modulePaths>
                     <destination>target/dist</destination>
                 </configuration>
-
-                <executions>
-                    <execution>
-                        <id>mac</id>
-                        <configuration>
-                            <icon>icons/icons.icns</icon>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>linux</id>
-                        <configuration>
-                            <type>APP_IMAGE</type>
-                            <icon>icons/icon.png</icon>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>win</id>
-                        <configuration>
-                            <icon>icons/icons.ico</icon>
-                            <winMenu>true</winMenu>
-                            <winDirChooser>true</winDirChooser>
-                            <winUpgradeUuid>4a8438d2-f56f-4a5a-bfbe-5cf74ea70685</winUpgradeUuid>
-                            <winMenuGroup>panteleyev.org</winMenuGroup>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>

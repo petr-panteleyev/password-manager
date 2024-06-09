@@ -7,7 +7,6 @@ package org.panteleyev.pwdmanager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -43,6 +42,7 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
+import static org.panteleyev.pwdmanager.MainWindowController.newConfirmationAlert;
 import static org.panteleyev.pwdmanager.Shortcuts.DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_G;
@@ -59,6 +59,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ICON;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_FIELD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTES;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PROPERTIES;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_DELETE_FIELD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UP;
 
@@ -206,8 +207,10 @@ final class EditCardDialog extends BaseDialog<Card> {
 
     private void onDeleteField() {
         getSelectedField().ifPresent(sel -> {
-            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait().filter(x -> x == ButtonType.YES).ifPresent(_ -> editableFields.remove(sel));
+            var message = String.format(fxString(UI_BUNDLE, I18N_SURE_TO_DELETE_FIELD), sel.getName());
+            newConfirmationAlert(message).showAndWait()
+                    .filter(x -> x == ButtonType.YES)
+                    .ifPresent(_ -> editableFields.remove(sel));
         });
     }
 

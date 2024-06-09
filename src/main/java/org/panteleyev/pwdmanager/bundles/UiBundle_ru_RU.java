@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.bundles;
@@ -18,11 +18,13 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_T
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CAR_BODY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COLORS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONFIRMATION;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONTROLS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETED;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE_FINALLY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DIALOGS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DIGITS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DOWN;
@@ -76,6 +78,10 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_RESTOR
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SAVE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SHOW_DELETED;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SKIP;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_DELETE_FIELD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_FINALLY_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_PURGE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SYMBOLS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SYSTEM;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TEXT;
@@ -106,9 +112,11 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_CARD_TYPE, "Тип карты"},
                 {I18N_CHANGE_PASSWORD, "Изменить пароль"},
                 {I18N_COLORS, "Цвета"},
+                {I18N_CONFIRMATION, "Подтверждение"},
                 {I18N_CONTROLS, "Элементы управления"},
                 {I18N_COPY, "Копировать"},
                 {I18N_DELETE, "Удалить"},
+                {I18N_DELETE_FINALLY, "Удалить окончательно"},
                 {I18N_DELETED, "Удаленное"},
                 {I18N_DIALOGS, "Диалоги"},
                 {I18N_DIGITS, "Цифры"},
@@ -177,7 +185,11 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_UPPER_CASE, "Большие буквы"},
                 {I18N_VALID_UNTIL, "Годен до"},
                 {I18N_VIEW, "Вид"},
-                {I18N_CREATE_DESKTOP_ENTRY, "Создать ярлык приложения (Linux)"},
+                {I18N_CREATE_DESKTOP_ENTRY, "Создать ярлык приложения"},
+                {I18N_SURE_TO_DELETE, "Уверены, что хотите удалить \"%s\"?"},
+                {I18N_SURE_TO_FINALLY_DELETE, "Уверены, что хотите окончательно удалить \"%s\"?"},
+                {I18N_SURE_TO_PURGE, "Уверены, что хотите очистить все удалённые карточки?"},
+                {I18N_SURE_TO_DELETE_FIELD, "Уверены, что хотите удалить поле \"%s\"?"}
         };
     }
 }

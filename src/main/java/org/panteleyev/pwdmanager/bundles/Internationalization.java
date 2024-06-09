@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.bundles;
@@ -16,9 +16,11 @@ public final class Internationalization {
     public static final String I18N_CARD_TYPE = "I18N_CARD_TYPE";
     public static final String I18N_CHANGE_PASSWORD = "I18N_CHANGE_PASSWORD";
     public static final String I18N_COLORS = "I18N_COLORS";
+    public static final String I18N_CONFIRMATION = "I18N_CONFIRMATION";
     public static final String I18N_CONTROLS = "I18N_CONTROLS";
     public static final String I18N_COPY = "I18N_COPY";
     public static final String I18N_DELETE = "I18N_DELETE";
+    public static final String I18N_DELETE_FINALLY = "I18N_DELETE_FINALLY";
     public static final String I18N_DELETED = "I18N_DELETED";
     public static final String I18N_DIALOGS = "I18N_DIALOGS";
     public static final String I18N_DIGITS = "I18N_DIGITS";
@@ -88,6 +90,10 @@ public final class Internationalization {
     public static final String I18N_VALID_UNTIL = "I18N_VALID_UNTIL";
     public static final String I18N_VIEW = "I18N_VIEW";
     public static final String I18N_CREATE_DESKTOP_ENTRY = "I18N_CREATE_DESKTOP_ENTRY";
+    public static final String I18N_SURE_TO_DELETE = "I18N_SURE_TO_DELETE";
+    public static final String I18N_SURE_TO_FINALLY_DELETE = "I18N_SURE_TO_FINALLY_DELETE";
+    public static final String I18N_SURE_TO_PURGE = "I18N_SURE_TO_PURGE";
+    public static final String I18N_SURE_TO_DELETE_FIELD = "I18N_SURE_TO_DELETE_FIELD";
 
     private Internationalization() {
     }

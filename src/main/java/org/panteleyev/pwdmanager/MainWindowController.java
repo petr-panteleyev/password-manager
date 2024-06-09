@@ -15,7 +15,21 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
@@ -51,20 +65,69 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
+import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.FxFactory.searchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.MenuFactory.*;
+import static org.panteleyev.fx.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.MenuFactory.menu;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
+import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
-import static org.panteleyev.pwdmanager.Shortcuts.*;
+import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
 import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
-import static org.panteleyev.pwdmanager.bundles.Internationalization.*;
-import static org.panteleyev.pwdmanager.model.Card.*;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONFIRMATION;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_DELETE_FINALLY;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EDIT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EDIT_BUTTON;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ERROR;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXIT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_EXPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FAVORITE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILTER;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_HELP;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_HELP_ABOUT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_CARD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NEW_NOTE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTHING_TO_IMPORT;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPEN;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_OPTIONS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASTE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PURGE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_RESTORE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SAVE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SHOW_DELETED;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_FINALLY_DELETE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_PURGE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TOOLS;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UNABLE_TO_READ_FILE;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VIEW;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
+import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
 import static org.panteleyev.pwdmanager.model.Picture.BIG_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
@@ -85,7 +148,7 @@ final class MainWindowController extends Controller {
     private final BorderPane leftPane = new BorderPane(cardListView);
     private final TitledPane treeViewPane = new TitledPane("", leftPane);
 
-    private final TextField searchTextField = newSearchField(TextFields::createClearableTextField, this::doSearch);
+    private final TextField searchTextField = searchField(TextFields::createClearableTextField, this::doSearch);
 
     private final Label cardContentTitleLabel = new Label();
     private final Button cardEditButton = button(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS), _ -> onEditCard());
@@ -111,11 +174,15 @@ final class MainWindowController extends Controller {
     }
 
     private MenuBar createMainMenu() {
+        var deleteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_DELETE), SHIFT_DELETE,
+                _ -> onDeleteRecord());
+        var restoreMenuItem = menuItem(fxString(UI_BUNDLE, I18N_RESTORE),
+                _ -> onRestoreRecord());
         var pasteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_PASTE), SHORTCUT_V, _ -> onCardPaste());
         var favoriteMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_FAVORITE), false, SHORTCUT_I,
                 _ -> onFavorite());
 
-        var editMenu = newMenu(fxString(UI_BUNDLE, I18N_EDIT),
+        var editMenu = menu(fxString(UI_BUNDLE, I18N_EDIT),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), SHORTCUT_D, _ -> onNewCard(),
                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), SHORTCUT_T, _ -> onNewNote(),
@@ -129,18 +196,22 @@ final class MainWindowController extends Controller {
                         _ -> onCardCopy(), selectedItemProperty().isNull()),
                 pasteMenuItem,
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_DELETE), SHIFT_DELETE,
-                        _ -> onDeleteRecord(), selectedItemProperty().isNull()),
-                menuItem(fxString(UI_BUNDLE, I18N_RESTORE), _ -> onRestoreRecord(), selectedItemProperty().isNull())
+                deleteMenuItem,
+                restoreMenuItem
         );
-        editMenu.setOnShowing(_ -> setupEditMenuItems(favoriteMenuItem, pasteMenuItem));
+        editMenu.setOnShowing(_ -> setupEditMenuItems(
+                deleteMenuItem,
+                restoreMenuItem,
+                favoriteMenuItem,
+                pasteMenuItem
+        ));
 
         var showDeletedItemsMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SHOW_DELETED), false);
         showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
         showDeletedRecords.addListener((_, _, newValue) -> onShowDeletedItems(newValue));
 
         var menuBar = menuBar(
-                newMenu(fxString(UI_BUNDLE, I18N_FILE),
+                menu(fxString(UI_BUNDLE, I18N_FILE),
                         menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), SHORTCUT_N, _ -> onNewFile()),
                         menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, _ -> onOpenFile()),
                         new SeparatorMenuItem(),
@@ -148,11 +219,11 @@ final class MainWindowController extends Controller {
                 ),
                 // Edit
                 editMenu,
-                newMenu(fxString(UI_BUNDLE, I18N_VIEW),
+                menu(fxString(UI_BUNDLE, I18N_VIEW),
                         showDeletedItemsMenuItem
                 ),
                 // Tools
-                newMenu(fxString(UI_BUNDLE, I18N_TOOLS),
+                menu(fxString(UI_BUNDLE, I18N_TOOLS),
                         menuItem(fxString(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), _ -> onImportFile(), currentFile.isNull()),
                         menuItem(fxString(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), _ -> onExportFile(), currentFile.isNull()),
                         new SeparatorMenuItem(),
@@ -162,11 +233,15 @@ final class MainWindowController extends Controller {
                                 _ -> onChangePassword(), currentFile.isNull()),
                         new SeparatorMenuItem(),
                         menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), SHORTCUT_ALT_S, _ -> onOptions()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY), _ -> onCreateDesktopEntry())
+                        isLinux() ?
+                                new SeparatorMenuItem()
+                                : null,
+                        isLinux() ?
+                                menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY), _ -> onCreateDesktopEntry())
+                                : null
                 ),
                 // Help
-                newMenu(fxString(UI_BUNDLE, I18N_HELP),
+                menu(fxString(UI_BUNDLE, I18N_HELP),
                         menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), _ -> onAbout()))
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
@@ -202,6 +277,8 @@ final class MainWindowController extends Controller {
     }
 
     private ContextMenu createContextMenu() {
+        var ctxDeleteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_DELETE), _ -> onDeleteRecord());
+        var ctxRestoreMenuItem = menuItem(fxString(UI_BUNDLE, I18N_RESTORE), _ -> onRestoreRecord());
         var ctxCardPasteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_PASTE), _ -> onCardPaste());
         var ctxFavoriteMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_FAVORITE), false,
                 _ -> onFavorite());
@@ -214,24 +291,41 @@ final class MainWindowController extends Controller {
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), _ -> onNewNote(),
                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_DELETE), _ -> onDeleteRecord(),
-                        selectedItemProperty().isNull()),
-                menuItem(fxString(UI_BUNDLE, I18N_RESTORE), _ -> onRestoreRecord(),
-                        selectedItemProperty().isNull()),
+                ctxDeleteMenuItem,
+                ctxRestoreMenuItem,
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_COPY), _ -> onCardCopy()),
                 ctxCardPasteMenuItem
         );
 
-        menu.setOnShowing(_ -> setupEditMenuItems(ctxFavoriteMenuItem, ctxCardPasteMenuItem));
+        menu.setOnShowing(_ -> setupEditMenuItems(
+                ctxDeleteMenuItem,
+                ctxRestoreMenuItem,
+                ctxFavoriteMenuItem,
+                ctxCardPasteMenuItem
+        ));
         return menu;
     }
 
-    private void setupEditMenuItems(CheckMenuItem favoriteMenuItem, MenuItem pasteMenuItem) {
+    private void setupEditMenuItems(
+            MenuItem deleteMenuItem,
+            MenuItem restoreMenuItem,
+            CheckMenuItem favoriteMenuItem,
+            MenuItem pasteMenuItem
+    ) {
+        var targetItem = getSelectedItem();
+
+        targetItem.ifPresentOrElse(item -> {
+            restoreMenuItem.setDisable(item.active());
+            deleteMenuItem.setText(fxString(UI_BUNDLE, item.active() ? I18N_DELETE : I18N_DELETE_FINALLY));
+        }, () -> {
+            deleteMenuItem.setDisable(true);
+            restoreMenuItem.setDisable(true);
+        });
+
         var pasteEnable = false;
 
         var cb = Clipboard.getSystemClipboard();
-        var targetItem = getSelectedItem();
 
         favoriteMenuItem.setDisable(targetItem.isEmpty());
         favoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().favorite());
@@ -296,9 +390,7 @@ final class MainWindowController extends Controller {
     private void onImportFile() {
         var d = new FileChooser();
         d.setTitle(fxString(UI_BUNDLE, I18N_OPEN));
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
-        );
+        d.getExtensionFilters().addAll(EXTENSION_FILTER);
         var file = d.showOpenDialog(getStage());
         if (file == null || !file.exists()) {
             return;
@@ -341,9 +433,7 @@ final class MainWindowController extends Controller {
     private void onExportFile() {
         var d = new FileChooser();
         d.setTitle(fxString(UI_BUNDLE, I18N_SAVE));
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
-        );
+        d.getExtensionFilters().addAll(EXTENSION_FILTER);
         var file = d.showSaveDialog(null);
         if (file != null) {
             new PasswordDialog(this, file, false)
@@ -361,13 +451,20 @@ final class MainWindowController extends Controller {
 
     private void onDeleteRecord() {
         getSelectedItem().ifPresent((WalletRecord item) -> {
-            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait()
+            var messagePattern = fxString(UI_BUNDLE, item.active() ?
+                    I18N_SURE_TO_DELETE : I18N_SURE_TO_FINALLY_DELETE);
+
+            newConfirmationAlert(String.format(messagePattern, item.name())).showAndWait()
                     .filter(x -> x.equals(ButtonType.YES))
                     .ifPresent(_ -> {
-                        var newCard = item.setActive(false);
-                        updateListItem(newCard);
-                        writeDocument();
+                        if (item.active()) {
+                            var newCard = item.setActive(false);
+                            updateListItem(newCard);
+                            writeDocument();
+                        } else {
+                            recordList.remove(item);
+                            writeDocument();
+                        }
                     });
         });
     }
@@ -523,9 +620,7 @@ final class MainWindowController extends Controller {
     private void onNewFile() {
         var d = new FileChooser();
         d.setTitle(fxString(UI_BUNDLE, I18N_NEW_FILE));
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
-        );
+        d.getExtensionFilters().addAll(EXTENSION_FILTER);
         var file = d.showSaveDialog(null);
         if (file != null) {
             new PasswordDialog(this, file, true).showAndWait().ifPresent(password -> {
@@ -544,9 +639,7 @@ final class MainWindowController extends Controller {
     private void onOpenFile() {
         var d = new FileChooser();
         d.setTitle(fxString(UI_BUNDLE, I18N_OPEN));
-        d.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Password Manager Files", "*.pwd")
-        );
+        d.getExtensionFilters().addAll(EXTENSION_FILTER);
 
         var file = d.showOpenDialog(null);
         if (file != null) {
@@ -640,8 +733,7 @@ final class MainWindowController extends Controller {
     }
 
     private void onPurge() {
-        var alert = new Alert(Alert.AlertType.CONFIRMATION, "Sure?", ButtonType.YES, ButtonType.NO);
-        alert.showAndWait()
+        newConfirmationAlert(fxString(UI_BUNDLE, I18N_SURE_TO_PURGE)).showAndWait()
                 .filter(x -> x.equals(ButtonType.YES))
                 .ifPresent(_ -> {
                     recordList.removeIf(card -> !card.active());
@@ -650,7 +742,7 @@ final class MainWindowController extends Controller {
     }
 
     private void onCreateDesktopEntry() {
-        if (!Utility.isLinux()) {
+        if (!isLinux()) {
             return;
         }
         Utility.getExecutablePath().ifPresent(command -> {
@@ -669,5 +761,14 @@ final class MainWindowController extends Controller {
                     .build();
             desktopEntry.write("password-manager");
         });
+    }
+
+    public static Alert newConfirmationAlert(String message) {
+        var alert = new Alert(Alert.AlertType.CONFIRMATION,
+                message,
+                ButtonType.YES, ButtonType.NO);
+        alert.setTitle(fxString(UI_BUNDLE, I18N_CONFIRMATION));
+        alert.setHeaderText(fxString(UI_BUNDLE, I18N_CONFIRMATION));
+        return alert;
     }
 }
