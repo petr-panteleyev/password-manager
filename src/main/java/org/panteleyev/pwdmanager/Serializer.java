@@ -1,38 +1,31 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
+import org.panteleyev.commons.xml.StartElementWrapper;
+import org.panteleyev.commons.xml.XMLEventReaderWrapper;
+import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Note;
 import org.panteleyev.pwdmanager.model.Picture;
 import org.panteleyev.pwdmanager.model.WalletRecord;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
+import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
 final class Serializer {
-
     private enum CardClass {
         CARD,
         NOTE,
@@ -48,183 +41,157 @@ final class Serializer {
     }
 
     // Attributes
-    private static final String CLASS_ATTR = "recordClass";
-    private static final String UUID_ATTR = "uuid";
-    private static final String NAME_ATTR = "name";
-    private static final String TYPE_ATTR = "type";
-    private static final String MODIFIED_ATTR = "modified";
-    private static final String VALUE_ATTR = "value";
-    private static final String PICTURE_ATTR = "picture";
-    private static final String FAVORITE_ATTR = "favorite";
-    private static final String ACTIVE_ATTR = "active";
+    private static final QName ATTR_VERSION = new QName("version");
+    private static final QName ATTR_CLASS = new QName("recordClass");
+    private static final QName ATTR_UUID = new QName("uuid");
+    private static final QName ATTR_NAME = new QName("name");
+    private static final QName ATTR_TYPE = new QName("type");
+    private static final QName ATTR_MODIFIED = new QName("modified");
+    private static final QName ATTR_VALUE = new QName("value");
+    private static final QName ATTR_PICTURE = new QName("picture");
+    private static final QName ATTR_FAVORITE = new QName("favorite");
+    private static final QName ATTR_ACTIVE = new QName("active");
 
     // Tags
-    private static final String FIELD = "field";
-    private static final String FIELDS = FIELD + "s";
-    private static final String RECORDS = "records";
+    private static final QName WALLET = new QName("wallet");
+    private static final QName RECORD = new QName("record");
+    private static final QName NOTE = new QName("note");
+    private static final QName FIELD = new QName("field");
+    private static final QName FIELDS = new QName("fields");
+    private static final QName RECORDS = new QName("records");
 
-    private static final DocumentBuilderFactory DOC_FACTORY = DocumentBuilderFactory.newInstance();
+    static void serialize(OutputStream out, List<WalletRecord> records) {
+        try (var w = XMLStreamWriterWrapper.newInstance(out, Set.of(XMLStreamWriterWrapper.Option.LOCAL_DATE_AS_EPOCH_DAY))) {
+            w.document(WALLET, () -> {
+                w.attribute(ATTR_VERSION, BUILD_INFO_BUNDLE.getString("version"));
 
-    static void serialize(OutputStream out, List<WalletRecord> records) throws ParserConfigurationException,
-            TransformerException {
-        var docBuilder = DOC_FACTORY.newDocumentBuilder();
-
-        var doc = docBuilder.newDocument();
-        var rootElement = doc.createElement("wallet");
-        rootElement.setAttribute("version", BUILD_INFO_BUNDLE.getString("version"));
-
-        doc.appendChild(rootElement);
-
-        var recordsElement = doc.createElement(RECORDS);
-        rootElement.appendChild(recordsElement);
-
-        for (var r : records) {
-            recordsElement.appendChild(
-                    serializeRecord(doc, r)
-            );
-        }
-
-        var transformerFactory = TransformerFactory.newInstance();
-        var transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-        transformer.transform(new DOMSource(doc), new StreamResult(out));
-    }
-
-    static void deserialize(InputStream in, List<WalletRecord> list) throws ParserConfigurationException,
-            SAXException, IOException {
-        var docBuilder = DOC_FACTORY.newDocumentBuilder();
-
-        var doc = docBuilder.parse(in);
-
-        var rootElement = doc.getDocumentElement();
-        var records = rootElement.getElementsByTagName("record");
-        deserializeRecords(records, list);
-    }
-
-    static Element serializeRecord(Document doc, WalletRecord r) {
-        var xmlRecord = doc.createElement("record");
-
-        xmlRecord.setAttribute(UUID_ATTR, r.uuid().toString());
-        xmlRecord.setAttribute(NAME_ATTR, r.name());
-        xmlRecord.setAttribute(MODIFIED_ATTR, Long.toString(r.modified()));
-        xmlRecord.setAttribute(PICTURE_ATTR, r.picture().name());
-        xmlRecord.setAttribute(FAVORITE_ATTR, Boolean.toString(r.favorite()));
-        xmlRecord.setAttribute(ACTIVE_ATTR, Boolean.toString(r.active()));
-
-        switch (r) {
-            case Card card -> {
-                xmlRecord.setAttribute(CLASS_ATTR, CardClass.CARD.name());
-
-                var fields = card.fields();
-                if (!fields.isEmpty()) {
-                    var fieldsElement = doc.createElement(FIELDS);
-                    xmlRecord.appendChild(fieldsElement);
-
-                    for (var f : fields) {
-                        fieldsElement.appendChild(
-                                serializeField(doc, f)
-                        );
+                w.element(RECORDS, () -> {
+                    for (var r : records) {
+                        serializeRecord(w, r);
                     }
-                }
-
-                var note = card.note();
-                var noteElement = doc.createElement("note");
-                noteElement.setTextContent(note);
-                xmlRecord.appendChild(noteElement);
-            }
-            case Note note -> {
-                xmlRecord.setAttribute(CLASS_ATTR, CardClass.NOTE.name());
-                xmlRecord.appendChild(doc.createTextNode(note.note()));
-            }
+                });
+            });
         }
-
-        return xmlRecord;
     }
 
-    static Element serializeField(Document doc, Field f) {
-        var e = doc.createElement(FIELD);
-        e.setAttribute(NAME_ATTR, f.name());
-        e.setAttribute(TYPE_ATTR, f.type().name());
-        e.setAttribute(VALUE_ATTR, f.serializeValue());
-        return e;
-    }
+    static void deserialize(InputStream in, List<WalletRecord> list) {
+        try (var reader = XMLEventReaderWrapper.newInstance(in)) {
+            while (reader.hasNext()) {
+                var event = reader.nextEvent();
 
-    static Field deserializeField(Element e) {
-        var name = e.getAttribute(NAME_ATTR);
-        var type = FieldType.valueOf(e.getAttribute(TYPE_ATTR));
-        var value = Field.deserializeValue(type, e.getAttribute(VALUE_ATTR));
-
-        return new Field(type, name, value);
-    }
-
-    static WalletRecord deserializeNote(Element element) {
-        var uuid = readUuidAttribute(element);
-        var name = element.getAttribute(NAME_ATTR);
-        var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
-        var text = element.getTextContent();
-        var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
-        var active = readActiveAttribute(element);
-
-        return new Note(uuid, name, text, favorite, active, modified);
-    }
-
-    private static void deserializeRecords(NodeList records, List<WalletRecord> list) {
-        // children
-        for (int i = 0; i < records.getLength(); i++) {
-            var item = records.item(i);
-
-            if (item instanceof Element element) {
-                var recordClass = CardClass.of(element.getAttribute(CLASS_ATTR));
-                if (recordClass != null) {
-                    var record = switch (recordClass) {
-                        case CARD -> deserializeCard(element);
-                        case NOTE -> deserializeNote(element);
-                        default -> null;
-                    };
+                event.ifStartElement(RECORD, element -> {
+                    var record = deserializeRecord(reader, element);
                     if (record != null) {
                         list.add(record);
                     }
-                }
+                });
             }
         }
     }
 
-    static Card deserializeCard(Element element) {
-        var uuid = readUuidAttribute(element);
-        var name = element.getAttribute(NAME_ATTR);
-        var picture = Picture.of(element.getAttribute(PICTURE_ATTR));
-        var modified = Long.parseLong(element.getAttribute(MODIFIED_ATTR));
-        var favorite = Boolean.parseBoolean(element.getAttribute(FAVORITE_ATTR));
-        var active = readActiveAttribute(element);
+    private static void serializeRecord(XMLStreamWriterWrapper w, WalletRecord record) {
+        w.element(RECORD, () -> {
+            w.attributes(Map.of(
+                    ATTR_UUID, record.uuid(),
+                    ATTR_NAME, record.name(),
+                    ATTR_MODIFIED, record.modified(),
+                    ATTR_PICTURE, record.picture(),
+                    ATTR_FAVORITE, record.favorite(),
+                    ATTR_ACTIVE, record.active()
+            ));
 
-        // fields
-        var fList = element.getElementsByTagName(FIELD);
-        var fields = new ArrayList<Field>(fList.getLength());
-        for (int i = 0; i < fList.getLength(); i++) {
-            var f = deserializeField((Element) fList.item(i));
-            fields.add(f);
-        }
+            switch (record) {
+                case Card card -> {
+                    w.attribute(ATTR_CLASS, CardClass.CARD);
 
-        // note
-        var note = "";
-        var notes = element.getElementsByTagName("note");
-        if (notes.getLength() > 0) {
-            var noteElement = (Element) notes.item(0);
-            note = noteElement.getTextContent();
-        }
+                    var fields = card.fields();
+                    if (!fields.isEmpty()) {
+                        w.element(FIELDS, () -> {
+                            for (var f : fields) {
+                                serializeField(w, f);
+                            }
+                        });
+                    }
 
-        return new Card(uuid, modified, picture, name, fields, note, favorite, active);
+                    w.element(NOTE, card.note());
+                }
+                case Note note -> w.attribute(ATTR_CLASS, CardClass.NOTE)
+                        .text(note.note());
+            }
+        });
     }
 
-    private static boolean readActiveAttribute(Element element) {
-        // For backward compatibility missing 'active' attribute means true
-        var activeElement = element.getAttribute(ACTIVE_ATTR);
-        return activeElement.isBlank() || Boolean.parseBoolean(activeElement);
+    private static void serializeField(XMLStreamWriterWrapper w, Field field) {
+        w.element(FIELD, Map.of(
+                ATTR_NAME, field.name(),
+                ATTR_TYPE, field.type(),
+                ATTR_VALUE, field.value()
+        ));
     }
 
-    private static UUID readUuidAttribute(Element element) {
-        var uuidString = element.getAttribute(UUID_ATTR);
-        return uuidString.isEmpty() ? UUID.randomUUID() : UUID.fromString(uuidString);
+    private static WalletRecord deserializeRecord(XMLEventReaderWrapper reader, StartElementWrapper element) {
+        var recordClass = CardClass.of(element.getAttributeValue(ATTR_CLASS));
+        if (recordClass == null) {
+            return null;
+        }
+        return switch (recordClass) {
+            case CARD -> deserializeCard(reader, element);
+            case NOTE -> deserializeNote(reader, element);
+            default -> null;
+        };
+    }
+
+    private static WalletRecord deserializeCard(XMLEventReaderWrapper reader, StartElementWrapper element) {
+        var uuid = element.getAttributeValue(ATTR_UUID, UUID.randomUUID());
+        var name = element.getAttributeValue(ATTR_NAME);
+        var picture = Picture.of(element.getAttributeValue(ATTR_PICTURE));
+        var modified = Long.parseLong(element.getAttributeValue(ATTR_MODIFIED));
+        var favorite = element.getAttributeValue(ATTR_FAVORITE, false);
+        var active = element.getAttributeValue(ATTR_ACTIVE, true);
+
+        var fields = new ArrayList<Field>();
+        var note = new StringBuilder();
+
+        while (reader.hasNext()) {
+            var peek = reader.peek();
+            if (peek.isEmpty()) {
+                break;
+            }
+
+            var next = peek.get();
+
+            if (next.isEndElement(RECORD)) {
+                reader.nextEvent();
+                return new Card(uuid, modified, picture, name, fields, note.toString(), favorite, active);
+            }
+
+            next.asStartElement(FIELD).ifPresentOrElse(fieldElement -> {
+                reader.nextEvent();
+                fields.add(deserializeField(fieldElement));
+            }, () -> next.asStartElement(NOTE).ifPresentOrElse(_ -> {
+                reader.nextEvent();
+                note.append(reader.getElementText().orElse(""));
+            }, reader::nextEvent));
+        }
+
+        return null;
+    }
+
+    private static Field deserializeField(StartElementWrapper element) {
+        var name = element.getAttributeValue(ATTR_NAME);
+        var type = FieldType.valueOf(element.getAttributeValue(ATTR_TYPE));
+        var value = Field.deserializeValue(type, element.getAttributeValue(ATTR_VALUE));
+        return new Field(type, name, value);
+    }
+
+    private static WalletRecord deserializeNote(XMLEventReaderWrapper reader, StartElementWrapper element) {
+        var uuid = element.getAttributeValue(ATTR_UUID, UUID.randomUUID());
+        var name = element.getAttributeValue(ATTR_NAME);
+        var modified = Long.parseLong(element.getAttributeValue(ATTR_MODIFIED));
+        var favorite = element.getAttributeValue(ATTR_FAVORITE, false);
+        var active = element.getAttributeValue(ATTR_ACTIVE, true);
+        var text = reader.getElementText().orElse("");
+
+        return new Note(uuid, name, text, favorite, active, modified);
     }
 }

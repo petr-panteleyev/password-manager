@@ -1,5 +1,5 @@
 /*
- Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.settings;
@@ -13,8 +13,7 @@ import org.panteleyev.pwdmanager.ApplicationFiles;
 import org.panteleyev.pwdmanager.TemplateEngine;
 import org.panteleyev.pwdmanager.model.FieldType;
 
-import java.io.OutputStreamWriter;
-import java.net.URL;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import java.util.function.Consumer;
 
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
-import static org.panteleyev.pwdmanager.GlobalContext.files;
 import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
 
 public final class Settings {
@@ -33,6 +31,10 @@ public final class Settings {
     private final PasswordSettings passwordSettings = new PasswordSettings();
     private final WindowsSettings windowsSettings = new WindowsSettings();
     private final GeneralSettings generalSettings = new GeneralSettings();
+
+    private String mainCssEncoded = "";
+    private String dialogCssEncoded = "";
+    private String aboutDialogCssEncoded = "";
 
     public Settings(ApplicationFiles files) {
         this.files = files;
@@ -66,17 +68,13 @@ public final class Settings {
                 entry("actionRestoreColor", colorSettings.getWebString(ColorName.ACTION_RESTORE))
         );
 
-        files().write(ApplicationFiles.AppFile.MAIN_CSS, out -> templateEngine().process(
-                TemplateEngine.Template.MAIN_CSS, dataModel, new OutputStreamWriter(out))
-        );
+        mainCssEncoded = encode(templateEngine().process(TemplateEngine.Template.MAIN_CSS, dataModel));
+        dialogCssEncoded = encode(templateEngine().process(TemplateEngine.Template.DIALOG_CSS, dataModel));
+        aboutDialogCssEncoded = encode(templateEngine().process(TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel));
+    }
 
-        files().write(ApplicationFiles.AppFile.DIALOG_CSS, out -> templateEngine().process(
-                TemplateEngine.Template.DIALOG_CSS, dataModel, new OutputStreamWriter(out)
-        ));
-
-        files().write(ApplicationFiles.AppFile.ABOUT_DIALOG_CSS, out -> templateEngine().process(
-                TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel, new OutputStreamWriter(out)
-        ));
+    private static String encode(byte[] css) {
+        return "data:text/css;base64," + Base64.getEncoder().encodeToString(css);
     }
 
     public void reloadCssFile() {
@@ -102,15 +100,15 @@ public final class Settings {
     }
 
     public String getMainCssFilePath() {
-        return files.getUrl(ApplicationFiles.AppFile.MAIN_CSS).toExternalForm();
+        return mainCssEncoded;
     }
 
-    public URL getDialogCssFileUrl() {
-        return files.getUrl(ApplicationFiles.AppFile.DIALOG_CSS);
+    public String getDialogCssFileUrl() {
+        return dialogCssEncoded;
     }
 
-    public URL getAboutDialogCssFileUrl() {
-        return files.getUrl(ApplicationFiles.AppFile.ABOUT_DIALOG_CSS);
+    public String getAboutDialogCssFileUrl() {
+        return aboutDialogCssEncoded;
     }
 
     public Color getColor(ColorName option) {

@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class TestGenerator {
+public class GeneratorTest {
 
     private static List<Arguments> dataProvider() {
         return List.of(

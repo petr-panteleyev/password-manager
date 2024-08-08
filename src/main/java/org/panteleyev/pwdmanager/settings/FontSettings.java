@@ -7,31 +7,28 @@ package org.panteleyev.pwdmanager.settings;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import org.w3c.dom.Element;
+import org.panteleyev.commons.xml.XMLEventReaderWrapper;
+import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 
+import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
-import static org.panteleyev.pwdmanager.XMLUtils.appendElement;
-import static org.panteleyev.pwdmanager.XMLUtils.createDocument;
-import static org.panteleyev.pwdmanager.XMLUtils.getAttribute;
-import static org.panteleyev.pwdmanager.XMLUtils.readDocument;
-import static org.panteleyev.pwdmanager.XMLUtils.writeDocument;
 
 public final class FontSettings {
     private static final String DEFAULT_FONT_FAMILY = "System";
     private static final String DEFAULT_FONT_STYLE = "Normal Regular";
     private static final double DEFAULT_FONT_SIZE = 12;
 
-    private static final String ROOT_ELEMENT = "fonts";
-    private static final String FONT_ELEMENT = "font";
-    private static final String FONT_ATTR_NAME = "name";
-    private static final String FONT_ATTR_FAMILY = "family";
-    private static final String FONT_ATTR_STYLE = "style";
-    private static final String FONT_ATTR_SIZE = "size";
+    private static final QName ROOT_ELEMENT = new QName("fonts");
+    private static final QName FONT_ELEMENT = new QName("font");
+    private static final QName FONT_ATTR_NAME = new QName("name");
+    private static final QName FONT_ATTR_FAMILY = new QName("family");
+    private static final QName FONT_ATTR_STYLE = new QName("style");
+    private static final QName FONT_ATTR_SIZE = new QName("size");
 
     private final Map<FontName, Font> fontMap = new ConcurrentHashMap<>();
 
@@ -45,39 +42,42 @@ public final class FontSettings {
     }
 
     void save(OutputStream out) {
-        var root = createDocument(ROOT_ELEMENT);
-
-        for (var entry : fontMap.entrySet()) {
-            var e = appendElement(root, FONT_ELEMENT);
-            var font = entry.getValue();
-            e.setAttribute(FONT_ATTR_NAME, entry.getKey().name());
-            e.setAttribute(FONT_ATTR_FAMILY, font.getFamily());
-            e.setAttribute(FONT_ATTR_STYLE, font.getStyle());
-            e.setAttribute(FONT_ATTR_SIZE, Double.toString(font.getSize()));
+        try (var w = XMLStreamWriterWrapper.newInstance(out)) {
+            w.document(ROOT_ELEMENT, () -> {
+                for (var entry : fontMap.entrySet()) {
+                    var font = entry.getValue();
+                    w.element(FONT_ELEMENT, Map.of(
+                            FONT_ATTR_NAME, entry.getKey(),
+                            FONT_ATTR_FAMILY, font.getFamily(),
+                            FONT_ATTR_STYLE, font.getStyle(),
+                            FONT_ATTR_SIZE, font.getSize()
+                    ));
+                }
+            });
         }
-
-        writeDocument(root.getOwnerDocument(), out);
     }
 
     void load(InputStream in) {
         fontMap.clear();
-        var root = readDocument(in);
 
-        var fontNodes = root.getElementsByTagName(FONT_ELEMENT);
-        for (int i = 0; i < fontNodes.getLength(); i++) {
-            var fontElement = (Element) fontNodes.item(i);
-            FontName.of(fontElement.getAttribute(FONT_ATTR_NAME).toUpperCase()).ifPresent(option -> {
-                var family = getAttribute(fontElement, FONT_ATTR_FAMILY, DEFAULT_FONT_FAMILY);
-                var style = getAttribute(fontElement, FONT_ATTR_STYLE, DEFAULT_FONT_STYLE);
-                var size = getAttribute(fontElement, FONT_ATTR_SIZE, DEFAULT_FONT_SIZE);
+        try (var reader = XMLEventReaderWrapper.newInstance(in)) {
+            while (reader.hasNext()) {
+                var event = reader.nextEvent();
+                event.ifStartElement(FONT_ELEMENT, element ->
+                        FontName.of(element.getAttributeValue(FONT_ATTR_NAME, "").toUpperCase())
+                                .ifPresent(option -> {
+                                    var family = element.getAttributeValue(FONT_ATTR_FAMILY, DEFAULT_FONT_FAMILY);
+                                    var style = element.getAttributeValue(FONT_ATTR_STYLE, DEFAULT_FONT_STYLE);
+                                    var size = element.getAttributeValue(FONT_ATTR_SIZE, DEFAULT_FONT_SIZE);
 
-                var font = Font.font(family,
-                        style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
-                        style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
-                        size);
+                                    var font = Font.font(family,
+                                            style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
+                                            style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
+                                            size);
 
-                fontMap.put(option, font);
-            });
+                                    fontMap.put(option, font);
+                                }));
+            }
         }
     }
 }

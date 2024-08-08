@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
-import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,9 +22,6 @@ import static org.panteleyev.freedesktop.Utility.isLinux;
 
 public class ApplicationFiles {
     public enum AppFile {
-        MAIN_CSS("main.css"),
-        DIALOG_CSS("dialog.css"),
-        ABOUT_DIALOG_CSS("about-dialog.css"),
         COLORS("colors.xml"),
         FONTS("fonts.xml"),
         PASSWORDS("passwords.xml"),
@@ -34,10 +30,6 @@ public class ApplicationFiles {
 
         static final Set<AppFile> CONFIG_FILES = Set.of(
                 COLORS, FONTS, PASSWORDS, WINDOWS, SETTINGS
-        );
-
-        static final Set<AppFile> DATA_FILES = Set.of(
-                MAIN_CSS, DIALOG_CSS, ABOUT_DIALOG_CSS
         );
 
         private final String fileName;
@@ -78,9 +70,6 @@ public class ApplicationFiles {
         for (var appFile : AppFile.CONFIG_FILES) {
             fileMap.put(appFile, configDirectory.resolve(appFile.getFileName()));
         }
-        for (var appFile : AppFile.DATA_FILES) {
-            fileMap.put(appFile, dataDirectory.resolve(appFile.getFileName()));
-        }
     }
 
     public Path getLogDirectory() {
@@ -109,14 +98,6 @@ public class ApplicationFiles {
 
         try (var in = Files.newInputStream(file)) {
             fileConsumer.accept(in);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
-    }
-
-    public URL getUrl(AppFile appFile) {
-        try {
-            return fileMap.get(appFile).toUri().toURL();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

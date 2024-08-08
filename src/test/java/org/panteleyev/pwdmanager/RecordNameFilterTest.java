@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestRecordNameFilter {
+public class RecordNameFilterTest {
     private static final Card CARD =
             new Card("Card Name", null, List.of());
 

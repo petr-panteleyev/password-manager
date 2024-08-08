@@ -4,6 +4,10 @@
  */
 package org.panteleyev.pwdmanager.settings;
 
+import org.panteleyev.commons.xml.XMLEventReaderWrapper;
+import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
+
+import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
@@ -11,14 +15,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
-import static org.panteleyev.pwdmanager.XMLUtils.appendObjectTextNode;
-import static org.panteleyev.pwdmanager.XMLUtils.createDocument;
-import static org.panteleyev.pwdmanager.XMLUtils.getStringNodeValue;
-import static org.panteleyev.pwdmanager.XMLUtils.readDocument;
-import static org.panteleyev.pwdmanager.XMLUtils.writeDocument;
 
 final class GeneralSettings {
-    private static final String ROOT = "settings";
+    private static final QName ROOT = new QName("settings");
 
     enum Setting {
         CURRENT_FILE("currentFile", "");
@@ -31,8 +30,8 @@ final class GeneralSettings {
             this.defaultValue = defaultValue;
         }
 
-        public String getElementName() {
-            return elementName;
+        public QName getElementName() {
+            return new QName(elementName);
         }
 
         public Object getDefaultValue() {
@@ -52,22 +51,30 @@ final class GeneralSettings {
     }
 
     void save(OutputStream out) {
-        var root = createDocument(ROOT);
-        for (var key : Setting.values()) {
-            appendObjectTextNode(root, key.getElementName(), get(key));
+        try (var w = XMLStreamWriterWrapper.newInstance(out)) {
+            w.document(ROOT, () -> {
+                for (var key : Setting.values()) {
+                    w.element(key.getElementName(), get(key).toString());
+                }
+            });
         }
-        writeDocument(root.getOwnerDocument(), out);
     }
 
     void load(InputStream in) {
-        var rootElement = readDocument(in);
+        try (var reader = XMLEventReaderWrapper.newInstance(in)) {
+            while (reader.hasNext()) {
+                var event = reader.nextEvent();
 
-        for (var key : Setting.values()) {
-            Optional<?> value = Optional.empty();
-            if (key.getDefaultValue() instanceof String) {
-                value = getStringNodeValue(rootElement, key.getElementName());
+                for (var key : Setting.values()) {
+                    event.ifStartElement(key.getElementName(), _ -> {
+                        Optional<?> value = Optional.empty();
+                        if (key.getDefaultValue() instanceof String) {
+                            value = reader.getElementText();
+                        }
+                        value.ifPresent(x -> settings.put(key, x));
+                    });
+                }
             }
-            value.ifPresent(x -> settings.put(key, x));
         }
     }
 }

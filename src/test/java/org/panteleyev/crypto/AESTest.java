@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.crypto;
@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.panteleyev.TestUtil.randomString;
 
-public class TestAES {
-    private static final String PASSWORD = UUID.randomUUID().toString();
+public class AESTest {
+    private static final String PASSWORD = randomString();
     private static final String TEXT = "This is 1st line of text\nSecond line\nThird line";
 
     @Test
@@ -74,10 +74,10 @@ public class TestAES {
 
     @Test
     public void testKeyGen() {
-        var key128 = AES.generate128key(UUID.randomUUID().toString());
+        var key128 = AES.generate128key(randomString());
         assertEquals(128 / 8, key128.length);
 
-        var key256 = AES.generate256key(UUID.randomUUID().toString());
+        var key256 = AES.generate256key(randomString());
         assertEquals(256 / 8, key256.length);
     }
 

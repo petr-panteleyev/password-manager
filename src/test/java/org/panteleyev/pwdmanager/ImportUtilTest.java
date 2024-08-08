@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -18,8 +18,9 @@ import java.util.stream.IntStream;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.panteleyev.TestUtil.randomString;
 
-public class TestImportUtil {
+public class ImportUtilTest {
     private static final int SIZE = 10;
     private static final int NEW_SIZE = 3;
     private static final int DELETE_SIZE = 5;
@@ -28,7 +29,7 @@ public class TestImportUtil {
                     UUID.randomUUID(),
                     x,
                     Picture.AIRPLANE,
-                    UUID.randomUUID().toString(),
+                    randomString(),
                     emptyList(),
                     "",
                     false,
@@ -68,7 +69,7 @@ public class TestImportUtil {
                     UUID.randomUUID(),
                     x,
                     Picture.AIRPLANE,
-                    UUID.randomUUID().toString(),
+                    randomString(),
                     emptyList(),
                     "",
                     false,
