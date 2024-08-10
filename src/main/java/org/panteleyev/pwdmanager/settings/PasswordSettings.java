@@ -6,7 +6,6 @@ package org.panteleyev.pwdmanager.settings;
 
 import org.panteleyev.commons.xml.XMLEventReaderWrapper;
 import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
-import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
 
 import javax.xml.namespace.QName;

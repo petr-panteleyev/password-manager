@@ -8,7 +8,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
-import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.ApplicationFiles;
 import org.panteleyev.pwdmanager.TemplateEngine;
 import org.panteleyev.pwdmanager.model.FieldType;

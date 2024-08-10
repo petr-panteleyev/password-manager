@@ -6,7 +6,6 @@ package org.panteleyev.pwdmanager.settings;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.panteleyev.generator.GeneratorOptions;
 import org.panteleyev.pwdmanager.model.FieldType;
 
 import java.io.ByteArrayInputStream;

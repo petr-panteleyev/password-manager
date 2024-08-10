@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>24.8.1</version>
+    <version>24.8.2</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -93,14 +93,14 @@
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.4.1</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
-        <mavenDependencyPluginVersion>3.6.1</mavenDependencyPluginVersion>
+        <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.7.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.6.4</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>22.0.1</javaFxVersion>
-        <javaCommonsVersion>1.1.0</javaCommonsVersion>
+        <javaFxVersion>22.0.2</javaFxVersion>
+        <javaCommonsVersion>1.2.0</javaCommonsVersion>
         <javaFxHelpersVersion>1.17.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>

@@ -21,8 +21,8 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import org.panteleyev.commons.password.PasswordGenerator;
 import org.panteleyev.fx.BaseDialog;
-import org.panteleyev.generator.Generator;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldTypeCell;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldValueCell;
 import org.panteleyev.pwdmanager.model.Card;
@@ -216,7 +216,7 @@ final class EditCardDialog extends BaseDialog<Card> {
 
     private void onGeneratePassword() {
         getSelectedField().ifPresent(sel -> settings().getPasswordOptions(sel.getType()).ifPresent(options -> {
-            var password = new Generator().generate(options);
+            var password = new PasswordGenerator().generate(options.getPasswordCharacterSets(), options.length());
             sel.valueProperty().set(password);
         }));
     }
