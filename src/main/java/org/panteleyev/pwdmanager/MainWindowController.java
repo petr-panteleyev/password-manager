@@ -33,7 +33,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.control.textfield.TextFields;
@@ -53,10 +52,13 @@ import org.panteleyev.pwdmanager.model.RecordType;
 import org.panteleyev.pwdmanager.model.WalletRecord;
 import org.panteleyev.pwdmanager.settings.SettingsDialog;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +77,7 @@ import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.fx.dialogs.FileChooserBuilder.fileChooser;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
@@ -132,7 +135,7 @@ import static org.panteleyev.pwdmanager.model.Picture.BIG_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 final class MainWindowController extends Controller {
-    private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
 
     private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
     private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
@@ -388,24 +391,21 @@ final class MainWindowController extends Controller {
     }
 
     private void onImportFile() {
-        var d = new FileChooser();
-        d.setTitle(fxString(UI_BUNDLE, I18N_OPEN));
-        d.getExtensionFilters().addAll(EXTENSION_FILTER);
-        var file = d.showOpenDialog(getStage());
+        var file = fileChooser(fxString(UI_BUNDLE, I18N_OPEN), List.of(EXTENSION_FILTER))
+                .showOpenDialog(getStage());
         if (file == null || !file.exists()) {
             return;
         }
 
         new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
-            try (var in = new FileInputStream(file)) {
+            try (var fileInputStream = new FileInputStream(file);
+                 var decypheredInputStream = decypheredInputStream(fileInputStream, password))
+            {
                 var list = new ArrayList<WalletRecord>();
-                if (!password.isEmpty()) {
-                    try (var cin = AES.aes256().getInputStream(in, password)) {
-                        Serializer.deserialize(cin, list);
-                    }
-                } else {
-                    Serializer.deserialize(in, list);
-                }
+
+                XmlValidator.validate(decypheredInputStream);
+                decypheredInputStream.reset();
+                Serializer.deserialize(decypheredInputStream, list);
 
                 var importRecords = calculateImport(recordList, list);
                 if (importRecords.isEmpty()) {
@@ -431,10 +431,8 @@ final class MainWindowController extends Controller {
     }
 
     private void onExportFile() {
-        var d = new FileChooser();
-        d.setTitle(fxString(UI_BUNDLE, I18N_SAVE));
-        d.getExtensionFilters().addAll(EXTENSION_FILTER);
-        var file = d.showSaveDialog(null);
+        var file = fileChooser(fxString(UI_BUNDLE, I18N_SAVE), List.of(EXTENSION_FILTER))
+                .showSaveDialog(getStage());
         if (file != null) {
             new PasswordDialog(this, file, false)
                     .showAndWait()
@@ -618,10 +616,8 @@ final class MainWindowController extends Controller {
     }
 
     private void onNewFile() {
-        var d = new FileChooser();
-        d.setTitle(fxString(UI_BUNDLE, I18N_NEW_FILE));
-        d.getExtensionFilters().addAll(EXTENSION_FILTER);
-        var file = d.showSaveDialog(null);
+        var file = fileChooser(fxString(UI_BUNDLE, I18N_NEW_FILE), List.of(EXTENSION_FILTER))
+                .showSaveDialog(getStage());
         if (file != null) {
             new PasswordDialog(this, file, true).showAndWait().ifPresent(password -> {
                 currentPassword = password;
@@ -637,11 +633,8 @@ final class MainWindowController extends Controller {
     }
 
     private void onOpenFile() {
-        var d = new FileChooser();
-        d.setTitle(fxString(UI_BUNDLE, I18N_OPEN));
-        d.getExtensionFilters().addAll(EXTENSION_FILTER);
-
-        var file = d.showOpenDialog(null);
+        var file = fileChooser(fxString(UI_BUNDLE, I18N_OPEN), List.of(EXTENSION_FILTER))
+                .showOpenDialog(getStage());
         if (file != null) {
             loadDocument(file, true);
         }
@@ -658,16 +651,14 @@ final class MainWindowController extends Controller {
             new PasswordDialog(null, file, false).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
-                try (var in = new FileInputStream(file)) {
+                try (var fileInputStream = new FileInputStream(file);
+                     var decypheredInputStream = decypheredInputStream(fileInputStream, password))
+                {
                     var list = new ArrayList<WalletRecord>();
-                    if (!currentPassword.isEmpty()) {
-                        try (var cin = AES.aes256().getInputStream(in, password)) {
-                            Serializer.deserialize(cin, list);
-                        }
-                    } else {
-                        Serializer.deserialize(in, list);
-                    }
 
+                    XmlValidator.validate(decypheredInputStream);
+                    decypheredInputStream.reset();
+                    Serializer.deserialize(decypheredInputStream, list);
                     recordList.setAll(list);
 
                     currentFile.set(file);
@@ -761,6 +752,19 @@ final class MainWindowController extends Controller {
                     .build();
             desktopEntry.write("password-manager");
         });
+    }
+
+    private InputStream decypheredInputStream(InputStream inputStream, String password) throws IOException {
+        try (var outputStream = new ByteArrayOutputStream()) {
+            if (!password.isEmpty()) {
+                try (var cin = AES.aes256().getInputStream(inputStream, password)) {
+                    cin.transferTo(outputStream);
+                }
+            } else {
+                inputStream.transferTo(outputStream);
+            }
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
     }
 
     public static Alert newConfirmationAlert(String message) {

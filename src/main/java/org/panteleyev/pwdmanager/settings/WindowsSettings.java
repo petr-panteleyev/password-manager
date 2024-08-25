@@ -69,7 +69,7 @@ final class WindowsSettings {
             while (reader.hasNext()) {
                 var event = reader.nextEvent();
                 event.ifStartElement(WINDOW_ELEMENT, element -> {
-                    var className = element.getAttributeValue(CLASS_ATTR);
+                    var className = element.getAttributeValue(CLASS_ATTR).orElseThrow();
                     windowMap.put(className, new StagePositionAndSize(
                             element.getAttributeValue(X_ATTR, 0.0),
                             element.getAttributeValue(Y_ATTR, 0.0),

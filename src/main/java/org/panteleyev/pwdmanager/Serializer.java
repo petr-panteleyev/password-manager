@@ -23,21 +23,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.panteleyev.commons.xml.SerializationOption.LOCAL_DATE_AS_EPOCH_DAY;
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
 final class Serializer {
     private enum CardClass {
         CARD,
         NOTE,
-        UNKNOWN;
-
-        public static CardClass of(String value) {
-            try {
-                return valueOf(value);
-            } catch (Exception ex) {
-                return UNKNOWN;
-            }
-        }
+        UNKNOWN
     }
 
     // Attributes
@@ -61,7 +54,7 @@ final class Serializer {
     private static final QName RECORDS = new QName("records");
 
     static void serialize(OutputStream out, List<WalletRecord> records) {
-        try (var w = XMLStreamWriterWrapper.newInstance(out, Set.of(XMLStreamWriterWrapper.Option.LOCAL_DATE_AS_EPOCH_DAY))) {
+        try (var w = XMLStreamWriterWrapper.newInstance(out, Set.of(LOCAL_DATE_AS_EPOCH_DAY))) {
             w.document(WALLET, () -> {
                 w.attribute(ATTR_VERSION, BUILD_INFO_BUNDLE.getString("version"));
 
@@ -113,7 +106,7 @@ final class Serializer {
                         });
                     }
 
-                    w.element(NOTE, card.note());
+                    w.textElement(NOTE, card.note());
                 }
                 case Note note -> w.attribute(ATTR_CLASS, CardClass.NOTE)
                         .text(note.note());
@@ -130,10 +123,7 @@ final class Serializer {
     }
 
     private static WalletRecord deserializeRecord(XMLEventReaderWrapper reader, StartElementWrapper element) {
-        var recordClass = CardClass.of(element.getAttributeValue(ATTR_CLASS));
-        if (recordClass == null) {
-            return null;
-        }
+        var recordClass = element.getAttributeValue(ATTR_CLASS, CardClass.class).orElse(CardClass.UNKNOWN);
         return switch (recordClass) {
             case CARD -> deserializeCard(reader, element);
             case NOTE -> deserializeNote(reader, element);
@@ -143,9 +133,9 @@ final class Serializer {
 
     private static WalletRecord deserializeCard(XMLEventReaderWrapper reader, StartElementWrapper element) {
         var uuid = element.getAttributeValue(ATTR_UUID, UUID.randomUUID());
-        var name = element.getAttributeValue(ATTR_NAME);
-        var picture = Picture.of(element.getAttributeValue(ATTR_PICTURE));
-        var modified = Long.parseLong(element.getAttributeValue(ATTR_MODIFIED));
+        var name = element.getAttributeValue(ATTR_NAME).orElseThrow();
+        var picture = element.getAttributeValue(ATTR_PICTURE, Picture.class).orElse(Picture.GENERIC);
+        var modified = element.getAttributeValue(ATTR_MODIFIED, 0L);
         var favorite = element.getAttributeValue(ATTR_FAVORITE, false);
         var active = element.getAttributeValue(ATTR_ACTIVE, true);
 
@@ -178,16 +168,16 @@ final class Serializer {
     }
 
     private static Field deserializeField(StartElementWrapper element) {
-        var name = element.getAttributeValue(ATTR_NAME);
-        var type = FieldType.valueOf(element.getAttributeValue(ATTR_TYPE));
-        var value = Field.deserializeValue(type, element.getAttributeValue(ATTR_VALUE));
+        var name = element.getAttributeValue(ATTR_NAME).orElseThrow();
+        var type = element.getAttributeValue(ATTR_TYPE, FieldType.class).orElseThrow();
+        var value = Field.deserializeValue(type, element.getAttributeValue(ATTR_VALUE).orElseThrow());
         return new Field(type, name, value);
     }
 
     private static WalletRecord deserializeNote(XMLEventReaderWrapper reader, StartElementWrapper element) {
         var uuid = element.getAttributeValue(ATTR_UUID, UUID.randomUUID());
-        var name = element.getAttributeValue(ATTR_NAME);
-        var modified = Long.parseLong(element.getAttributeValue(ATTR_MODIFIED));
+        var name = element.getAttributeValue(ATTR_NAME).orElseThrow();
+        var modified = element.getAttributeValue(ATTR_MODIFIED, 0L);
         var favorite = element.getAttributeValue(ATTR_FAVORITE, false);
         var active = element.getAttributeValue(ATTR_ACTIVE, true);
         var text = reader.getElementText().orElse("");

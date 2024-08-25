@@ -1,7 +1,7 @@
 # Password Manager
 
-![JDK](https://www.panteleyev.org/badges/java-22.svg)
-[![License](https://www.panteleyev.org/badges/license.svg)](LICENSE)
+![JDK](docs/java.svg)
+[![License](docs/license.svg)](LICENSE)
 
 Desktop application to store passwords, credit card numbers and other sensitive information. 
 Application uses 256-bit AES encryption.

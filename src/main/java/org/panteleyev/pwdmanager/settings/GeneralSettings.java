@@ -54,7 +54,7 @@ final class GeneralSettings {
         try (var w = XMLStreamWriterWrapper.newInstance(out)) {
             w.document(ROOT, () -> {
                 for (var key : Setting.values()) {
-                    w.element(key.getElementName(), get(key).toString());
+                    w.textElement(key.getElementName(), get(key).toString());
                 }
             });
         }

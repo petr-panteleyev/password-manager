@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Integer.parseInt;
 import static java.util.Map.entry;
 
 public class PasswordSettings {
@@ -66,13 +64,13 @@ public class PasswordSettings {
             while (reader.hasNext()) {
                 var event = reader.nextEvent();
                 event.ifStartElement(PASSWORD_ELEMENT, element -> passwordOptions.put(
-                        FieldType.valueOf(element.getAttributeValue(TYPE_ATTR)),
+                        element.getAttributeValue(TYPE_ATTR, FieldType.class).orElseThrow(),
                         new GeneratorOptions(
-                                parseBoolean(element.getAttributeValue(UPPER_CASE_ATTR)),
-                                parseBoolean(element.getAttributeValue(LOWER_CASE_ATTR)),
-                                parseBoolean(element.getAttributeValue(DIGITS_ATTR)),
-                                parseBoolean(element.getAttributeValue(SYMBOLS_ATTR)),
-                                parseInt(element.getAttributeValue(LENGTH_ATTR))
+                                element.getAttributeValue(UPPER_CASE_ATTR, true),
+                                element.getAttributeValue(LOWER_CASE_ATTR, true),
+                                element.getAttributeValue(DIGITS_ATTR, true),
+                                element.getAttributeValue(SYMBOLS_ATTR, true),
+                                element.getAttributeValue(LENGTH_ATTR, 16)
                         )
                 ));
             }
