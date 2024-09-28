@@ -173,7 +173,14 @@ final class MainWindowController extends Controller {
 
         settings().loadStageDimensions(this);
 
-        initialize();
+        cardListView.getSelectionModel().selectedItemProperty().addListener(_ -> onListViewSelected());
+
+        cardEditButton.setDisable(true);
+        leftPane.setTop(searchTextField);
+        BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
+
+        Platform.runLater(cardListView::requestFocus);
+        Platform.runLater(this::openInitialFile);
     }
 
     private MenuBar createMainMenu() {
@@ -342,14 +349,7 @@ final class MainWindowController extends Controller {
         pasteMenuItem.setDisable(!pasteEnable);
     }
 
-    private void initialize() {
-        cardListView.getSelectionModel().selectedItemProperty().addListener(_ -> onListViewSelected());
-
-        cardEditButton.setDisable(true);
-        leftPane.setTop(searchTextField);
-        BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
-
-        // Cmd parameter overrides stored file but does not overwrite the setting.
+    private void openInitialFile() {
         var fileName = System.getProperty("password.file");
         if (fileName != null && !fileName.isEmpty()) {
             loadDocument(new File(fileName), false);
@@ -359,7 +359,6 @@ final class MainWindowController extends Controller {
                 loadDocument(new File(currentFilePath), true);
             }
         }
-        Platform.runLater(cardListView::requestFocus);
     }
 
     private void doSearch(String newValue) {
@@ -648,7 +647,7 @@ final class MainWindowController extends Controller {
             }
             setTitle();
         } else {
-            new PasswordDialog(null, file, false).showAndWait().ifPresent(password -> {
+            new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
                 currentPassword = password;
 
                 try (var fileInputStream = new FileInputStream(file);

@@ -1,6 +1,6 @@
 # Password Manager
 
-![JDK](docs/java.svg)
+[![JDK](docs/java.svg)](https://jdk.java.net/23/)
 [![License](docs/license.svg)](LICENSE)
 
 Desktop application to store passwords, credit card numbers and other sensitive information. 
@@ -15,7 +15,7 @@ to user account, operating system or hardware including RAM.
 
 ## Build
 
-* Set ```JAVA_HOME``` to JDK 22+.
+* Set ```JAVA_HOME``` to JDK 23+.
 * Execute:
 
 ```shell script

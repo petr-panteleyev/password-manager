@@ -6,10 +6,11 @@ package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
 import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.panteleyev.pwdmanager.model.Picture;
 
 import java.io.ByteArrayInputStream;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -26,14 +27,16 @@ public final class PasswordManagerApplication extends Application {
 
     private final static String LOG_PROPERTIES = """
             handlers                                = java.util.logging.FileHandler
-
+            
             java.util.logging.FileHandler.level     = ALL
             java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
             java.util.logging.FileHandler.pattern   = %FILE_PATTERN%
             java.util.logging.FileHandler.append    = true
-
+            
             java.util.logging.SimpleFormatter.format = %1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n
             """;
+
+    private final static String APP_ICON_PATH = "/images/wallet-256.png";
 
 
     private static PasswordManagerApplication application;
@@ -52,7 +55,7 @@ public final class PasswordManagerApplication extends Application {
         settings().load();
 
         var logProperties = LOG_PROPERTIES.replace("%FILE_PATTERN%",
-                files().getLogDirectory().resolve("PasswordManager.log").toString());
+                files().getLogDirectory().resolve("PasswordManager.log").toString().replace("\\", "/"));
         try (var inputStream = new ByteArrayInputStream(logProperties.getBytes(UTF_8))) {
             LogManager.getLogManager().readConfiguration(inputStream);
         }
@@ -60,7 +63,9 @@ public final class PasswordManagerApplication extends Application {
         setDefaultUncaughtExceptionHandler((_, e) -> uncaughtException(e));
 
         stage.setTitle(APP_TITLE);
-        stage.getIcons().add(Picture.WALLET.getImage());
+
+        var appImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(APP_ICON_PATH)));
+        stage.getIcons().add(appImage);
 
         new MainWindowController(stage);
         stage.show();
