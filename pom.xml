@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>24.9.1</version>
+    <version>24.9.1.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -85,7 +85,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>23</maven.compiler.release>
+        <maven.compiler.release>22</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
