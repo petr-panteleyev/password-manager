@@ -99,7 +99,7 @@
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>23</javaFxVersion>
+        <javaFxVersion>23.0.1</javaFxVersion>
         <javaCommonsVersion>1.4.1</javaCommonsVersion>
         <javaFxHelpersVersion>1.18.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
@@ -111,11 +111,6 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>${javaFxVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
             <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
