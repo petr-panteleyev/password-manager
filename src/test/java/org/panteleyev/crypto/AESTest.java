@@ -11,21 +11,11 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.panteleyev.TestUtil.randomString;
 
 public class AESTest {
     private static final String PASSWORD = randomString();
     private static final String TEXT = "This is 1st line of text\nSecond line\nThird line";
-
-    @Test
-    public void testAES128EncryptDecrypt() {
-        var aes = AES.aes128();
-        var enc = aes.encrypt(TEXT, PASSWORD);
-        var dec = aes.decrypt(enc, PASSWORD);
-        assertEquals(TEXT, new String(dec, StandardCharsets.UTF_8), "Decoded text is the same as original");
-        assertEquals(TEXT, aes.decryptString(enc, PASSWORD), "Decoded text is the same as original");
-    }
 
     @Test
     public void testAES256EncryptDecrypt() {
@@ -61,22 +51,13 @@ public class AESTest {
 
     @Test
     public void testNewInstance() {
-        var aes128_1 = AES.aes128();
-        var aes128_2 = AES.aes128();
-        assertEquals(aes128_1, aes128_2);
-
         var aes256_1 = AES.aes256();
         var aes256_2 = AES.aes256();
         assertEquals(aes256_1, aes256_2);
-
-        assertNotEquals(aes128_1, aes256_1);
     }
 
     @Test
     public void testKeyGen() {
-        var key128 = AES.generate128key(randomString());
-        assertEquals(128 / 8, key128.length);
-
         var key256 = AES.generate256key(randomString());
         assertEquals(256 / 8, key256.length);
     }

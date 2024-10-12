@@ -1,5 +1,5 @@
 /*
- Copyright © 2020 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.crypto;
@@ -100,17 +100,6 @@ public interface AES {
     }
 
     /**
-     * Default 128-bit key generator. This implementation uses MD5 message digest
-     * algorithm.
-     *
-     * @param password password string
-     * @return key bytes
-     */
-    static byte[] generate128key(String password) {
-        return AESImpl.generateKey(password, "MD5");
-    }
-
-    /**
      * Return AES instance with specified key generation function.
      *
      * @param keyGen key generation function
@@ -129,14 +118,5 @@ public interface AES {
      */
     static AES aes256() {
         return aes(AES::generate256key);
-    }
-
-    /**
-     * Return AES instance with default 128-bit key generation function.
-     *
-     * @return in case of error
-     */
-    static AES aes128() {
-        return aes(AES::generate128key);
     }
 }
