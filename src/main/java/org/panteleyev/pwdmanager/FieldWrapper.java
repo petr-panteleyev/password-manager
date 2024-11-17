@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -7,31 +7,31 @@ package org.panteleyev.pwdmanager;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 
-final class FieldWrapper {
+public final class FieldWrapper {
     private final Field field;
     private boolean show;
 
-    FieldWrapper(Field field) {
+    public FieldWrapper(Field field) {
         this.field = field;
     }
 
-    Field getField() {
+    public Field getField() {
         return field;
     }
 
-    void toggleShow() {
+    public void toggleShow() {
         show = !show;
     }
 
-    boolean getShow() {
+    public boolean getShow() {
         return show;
     }
 
-    String getName() {
+    public String getName() {
         return field.name();
     }
 
-    FieldType getType() {
+    public FieldType getType() {
         return field.type();
     }
 

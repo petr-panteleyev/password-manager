@@ -36,7 +36,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.control.textfield.TextFields;
-import org.panteleyev.crypto.AES;
+import org.panteleyev.commons.crypto.AES;
 import org.panteleyev.freedesktop.Utility;
 import org.panteleyev.freedesktop.entry.DesktopEntryBuilder;
 import org.panteleyev.freedesktop.entry.DesktopEntryType;
@@ -44,6 +44,13 @@ import org.panteleyev.freedesktop.menu.Category;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.pwdmanager.cells.RecordListCell;
+import org.panteleyev.pwdmanager.dialogs.AboutDialog;
+import org.panteleyev.pwdmanager.dialogs.CardDialog;
+import org.panteleyev.pwdmanager.dialogs.EditCardDialog;
+import org.panteleyev.pwdmanager.dialogs.EditNoteDialog;
+import org.panteleyev.pwdmanager.imprt.ImportDialog;
+import org.panteleyev.pwdmanager.dialogs.NoteDialog;
+import org.panteleyev.pwdmanager.dialogs.PasswordDialog;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.filters.RecordNameFilter;
 import org.panteleyev.pwdmanager.model.Card;
@@ -82,7 +89,7 @@ import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
-import static org.panteleyev.pwdmanager.ImportUtil.calculateImport;
+import static org.panteleyev.pwdmanager.imprt.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
@@ -134,7 +141,7 @@ import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
 import static org.panteleyev.pwdmanager.model.Picture.BIG_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
-final class MainWindowController extends Controller {
+public final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
 
     private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
@@ -160,7 +167,7 @@ final class MainWindowController extends Controller {
     private final NoteViewer noteViewer = new NoteViewer();
     private final CardViewer cardContentView = new CardViewer();
 
-    MainWindowController(Stage stage) {
+    public MainWindowController(Stage stage) {
         super(stage, settings().getMainCssFilePath());
 
         sortedList.setComparator(COMPARE_BY_ACTIVE

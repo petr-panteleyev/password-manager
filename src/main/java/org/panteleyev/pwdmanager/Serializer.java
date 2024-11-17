@@ -26,7 +26,7 @@ import java.util.UUID;
 import static org.panteleyev.commons.xml.SerializationOption.LOCAL_DATE_AS_EPOCH_DAY;
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
-final class Serializer {
+public class Serializer {
     private enum CardClass {
         CARD,
         NOTE,
@@ -53,7 +53,7 @@ final class Serializer {
     private static final QName FIELDS = new QName("fields");
     private static final QName RECORDS = new QName("records");
 
-    static void serialize(OutputStream out, List<WalletRecord> records) {
+    public static void serialize(OutputStream out, List<WalletRecord> records) {
         try (var w = XMLStreamWriterWrapper.newInstance(out, Set.of(LOCAL_DATE_AS_EPOCH_DAY))) {
             w.document(WALLET, () -> {
                 w.attribute(ATTR_VERSION, BUILD_INFO_BUNDLE.getString("version"));
@@ -67,7 +67,7 @@ final class Serializer {
         }
     }
 
-    static void deserialize(InputStream in, List<WalletRecord> list) {
+    public static void deserialize(InputStream in, List<WalletRecord> list) {
         try (var reader = XMLEventReaderWrapper.newInstance(in)) {
             while (reader.hasNext()) {
                 var event = reader.nextEvent();

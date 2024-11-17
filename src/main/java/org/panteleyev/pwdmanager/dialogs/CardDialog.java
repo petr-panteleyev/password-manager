@@ -1,8 +1,8 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
 import org.panteleyev.pwdmanager.model.Card;
@@ -16,10 +16,10 @@ import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TYPE;
 
-final class CardDialog extends RecordDialog {
+public final class CardDialog extends RecordDialog {
     private final RecordType defaultType;
 
-    CardDialog(RecordType defaultType) {
+    public CardDialog(RecordType defaultType) {
         this.defaultType = requireNonNull(defaultType);
         initialize();
     }

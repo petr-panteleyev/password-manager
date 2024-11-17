@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -16,13 +16,13 @@ public final class EditableField {
     private final SimpleStringProperty name = new SimpleStringProperty();
     private final SimpleObjectProperty<Object> value = new SimpleObjectProperty<>();
 
-    EditableField(FieldType type, String name, Object value) {
+    public EditableField(FieldType type, String name, Object value) {
         this.type.set(type);
         this.name.set(name);
         this.value.set(value);
     }
 
-    EditableField(Field field) {
+    public EditableField(Field field) {
         type.set(field.type());
         name.set(field.name());
         value.set(field.value());

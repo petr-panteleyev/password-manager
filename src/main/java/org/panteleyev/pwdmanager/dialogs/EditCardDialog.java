@@ -2,7 +2,7 @@
  Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +28,7 @@ import org.panteleyev.pwdmanager.cells.EditRecordFieldValueCell;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Picture;
+import org.panteleyev.pwdmanager.EditableField;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_T
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UP;
 
-final class EditCardDialog extends BaseDialog<Card> {
+public final class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;
 
     private final TableView<EditableField> cardContentView = new TableView<>();
@@ -73,7 +74,7 @@ final class EditCardDialog extends BaseDialog<Card> {
     private final MenuItem generateMenuItem = menuItem(fxString(UI_BUNDLE, I18N_GENERATE), SHORTCUT_G,
             _ -> onGeneratePassword());
 
-    EditCardDialog(Card card) {
+    public EditCardDialog(Card card) {
         super(settings().getDialogCssFileUrl());
         setResizable(true);
 

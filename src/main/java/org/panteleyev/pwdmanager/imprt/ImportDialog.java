@@ -2,7 +2,7 @@
  Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.imprt;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -44,7 +44,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SKIP;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPDATED;
 
-final class ImportDialog extends BaseDialog<List<ImportRecord>> {
+public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private static final Map<ImportAction, String> STYLE_MAP = Map.of(

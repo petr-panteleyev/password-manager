@@ -2,7 +2,7 @@
  Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.imprt;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

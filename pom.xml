@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>24.9.1.1</version>
+    <version>24.11.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -85,26 +85,28 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>22</maven.compiler.release>
+        <maven.compiler.release>23</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
+        <mavenCleanPluginVersion>3.4.0</mavenCleanPluginVersion>
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
-        <mavenDependencyPluginVersion>3.7.1</mavenDependencyPluginVersion>
+        <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.8.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
+        <jlinkMavenPluginVersion>1.0.0</jlinkMavenPluginVersion>
         <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>23.0.1</javaFxVersion>
-        <javaCommonsVersion>1.4.1</javaCommonsVersion>
+        <javaCommonsVersion>1.5.0</javaCommonsVersion>
         <javaFxHelpersVersion>1.18.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
-        <jUnitVersion>5.10.2</jUnitVersion>
+        <jUnitVersion>5.11.3</jUnitVersion>
     </properties>
 
     <dependencies>
@@ -222,7 +224,53 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <!--
+                Remove empty JavaFX jars to enable jlink
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${mavenCleanPluginVersion}</version>
+                <executions>
+                    <execution>
+                        <id>clean-jfx</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}/jmods</directory>
+                                    <includes>
+                                        <include>javafx-base-${javaFxVersion}.jar</include>
+                                        <include>javafx-controls-${javaFxVersion}.jar</include>
+                                        <include>javafx-graphics-${javaFxVersion}.jar</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jlink-maven-plugin</artifactId>
+                <version>${jlinkMavenPluginVersion}</version>
+                <configuration>
+                    <output>${project.build.directory}/jlink</output>
+                    <modulePaths>
+                        <modulePath>${project.build.directory}/jmods</modulePath>
+                    </modulePaths>
+                    <addModules>
+                        <addModule>ALL-MODULE-PATH</addModule>
+                    </addModules>
+                    <noHeaderFiles>true</noHeaderFiles>
+                    <noManPages>true</noManPages>
+                    <stripDebug>true</stripDebug>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>

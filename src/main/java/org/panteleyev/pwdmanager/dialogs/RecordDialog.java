@@ -2,7 +2,7 @@
  Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;

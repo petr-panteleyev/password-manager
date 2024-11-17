@@ -1,6 +1,6 @@
 # Password Manager
 
-[![JDK](docs/java-22.svg)](https://jdk.java.net/archive/)
+[![JDK](docs/java-23.svg)](https://jdk.java.net/archive/)
 [![License](docs/license.svg)](LICENSE)
 
 Desktop application to store passwords, credit card numbers and other sensitive information. 
@@ -15,7 +15,7 @@ to user account, operating system or hardware including RAM.
 
 ## Build
 
-* Set ```JAVA_HOME``` to JDK 22+.
+* Set ```JAVA_HOME``` to JDK 23+.
 * Execute:
 
 ```shell script
@@ -31,6 +31,14 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ```
 
 To open specific file add ```-Dpassword.file=<file>``` to the command line.
+
+## Custom Run-Time Image
+
+```shell script
+./mvnw clean verify jlink:jlink
+```
+
+Run-time image will be found in ```target/jlink``` directory.
 
 ## Binary Packages
 

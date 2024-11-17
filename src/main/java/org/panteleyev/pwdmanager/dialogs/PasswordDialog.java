@@ -2,7 +2,7 @@
  Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
 import javafx.scene.control.Control;
@@ -31,13 +31,13 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASSWORD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_REPEAT;
 
-class PasswordDialog extends BaseDialog<String> {
+public final class PasswordDialog extends BaseDialog<String> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final PasswordField passwordEdit = new PasswordField();
     private final PasswordField passwordEdit2 = new PasswordField();
 
-    PasswordDialog(Controller owner, File file, boolean change) {
+    public PasswordDialog(Controller owner, File file, boolean change) {
         super(owner, settings().getDialogCssFileUrl());
 
         setTitle(fxString(UI_BUNDLE, I18N_PASSWORD));

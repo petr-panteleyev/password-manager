@@ -2,7 +2,7 @@
  Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
@@ -25,7 +25,7 @@ import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ABOUT_LABEL;
 
-final class AboutDialog extends BaseDialog<Object> {
+public final class AboutDialog extends BaseDialog<Object> {
     private record BuildInformation(String version, String timestamp) {
         static BuildInformation load() {
             var bundle = ResourceBundle.getBundle("buildInfo");
@@ -46,7 +46,7 @@ final class AboutDialog extends BaseDialog<Object> {
     private static final DateTimeFormatter TIMESTAMP_PARSER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssVV");
     private static final DateTimeFormatter LOCAL_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-    AboutDialog(Controller owner) {
+    public AboutDialog(Controller owner) {
         super(owner, settings().getAboutDialogCssFileUrl());
 
         setHeaderText(APP_TITLE);

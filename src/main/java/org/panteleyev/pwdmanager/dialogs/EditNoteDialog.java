@@ -2,7 +2,7 @@
  Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -28,7 +28,7 @@ import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 
-final class EditNoteDialog extends BaseDialog<Note> {
+public final class EditNoteDialog extends BaseDialog<Note> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField nameEdit = textField(25);
@@ -36,7 +36,7 @@ final class EditNoteDialog extends BaseDialog<Note> {
 
     private final Note note;
 
-    EditNoteDialog(Note note) {
+    public EditNoteDialog(Note note) {
         super(settings().getDialogCssFileUrl());
         this.note = requireNonNull(note);
         initialize();

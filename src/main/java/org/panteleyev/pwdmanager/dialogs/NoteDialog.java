@@ -2,7 +2,7 @@
  Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
 import javafx.scene.control.Control;
@@ -27,12 +27,12 @@ import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 
-final class NoteDialog extends BaseDialog<Note> {
+public final class NoteDialog extends BaseDialog<Note> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField nameEdit = textField(20);
 
-    NoteDialog() {
+    public NoteDialog() {
         super(settings().getDialogCssFileUrl());
 
         setTitle(UI_BUNDLE.getString(I18N_NOTE));

@@ -1,8 +1,8 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.pwdmanager;
+package org.panteleyev.pwdmanager.imprt;
 
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-final class ImportUtil {
+public final class ImportUtil {
     private ImportUtil() {
     }
 
-    static List<ImportRecord> calculateImport(Collection<? extends WalletRecord> existing, Collection<?
+    public static List<ImportRecord> calculateImport(Collection<? extends WalletRecord> existing, Collection<?
             extends WalletRecord> toImport) {
         var result = new ArrayList<ImportRecord>(toImport.size());
         for (var card : toImport) {
