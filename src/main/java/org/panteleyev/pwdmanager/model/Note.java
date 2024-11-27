@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.model;
@@ -14,6 +14,11 @@ public record Note(
         boolean active,
         long modified
 ) implements WalletRecord {
+    public Note {
+        if (note == null) {
+            note = "";
+        }
+    }
 
     public Note(String name) {
         this(UUID.randomUUID(), name, "", false, true, System.currentTimeMillis());

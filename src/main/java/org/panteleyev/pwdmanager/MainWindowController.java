@@ -48,11 +48,11 @@ import org.panteleyev.pwdmanager.dialogs.AboutDialog;
 import org.panteleyev.pwdmanager.dialogs.CardDialog;
 import org.panteleyev.pwdmanager.dialogs.EditCardDialog;
 import org.panteleyev.pwdmanager.dialogs.EditNoteDialog;
-import org.panteleyev.pwdmanager.imprt.ImportDialog;
 import org.panteleyev.pwdmanager.dialogs.NoteDialog;
 import org.panteleyev.pwdmanager.dialogs.PasswordDialog;
 import org.panteleyev.pwdmanager.filters.FieldContentFilter;
 import org.panteleyev.pwdmanager.filters.RecordNameFilter;
+import org.panteleyev.pwdmanager.imprt.ImportDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Note;
 import org.panteleyev.pwdmanager.model.RecordType;
@@ -66,7 +66,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -89,7 +88,6 @@ import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
-import static org.panteleyev.pwdmanager.imprt.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
@@ -135,6 +133,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_T
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TOOLS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UNABLE_TO_READ_FILE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VIEW;
+import static org.panteleyev.pwdmanager.imprt.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
@@ -407,11 +406,7 @@ public final class MainWindowController extends Controller {
             try (var fileInputStream = new FileInputStream(file);
                  var decypheredInputStream = decypheredInputStream(fileInputStream, password))
             {
-                var list = new ArrayList<WalletRecord>();
-
-                XmlValidator.validate(decypheredInputStream);
-                decypheredInputStream.reset();
-                Serializer.deserialize(decypheredInputStream, list);
+                var list = Serializer.deserialize(decypheredInputStream);
 
                 var importRecords = calculateImport(recordList, list);
                 if (importRecords.isEmpty()) {
@@ -660,11 +655,7 @@ public final class MainWindowController extends Controller {
                 try (var fileInputStream = new FileInputStream(file);
                      var decypheredInputStream = decypheredInputStream(fileInputStream, password))
                 {
-                    var list = new ArrayList<WalletRecord>();
-
-                    XmlValidator.validate(decypheredInputStream);
-                    decypheredInputStream.reset();
-                    Serializer.deserialize(decypheredInputStream, list);
+                    var list = Serializer.deserialize(decypheredInputStream);
                     recordList.setAll(list);
 
                     currentFile.set(file);

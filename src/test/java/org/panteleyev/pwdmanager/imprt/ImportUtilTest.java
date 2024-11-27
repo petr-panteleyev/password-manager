@@ -101,7 +101,7 @@ public class ImportUtilTest {
 
     @ParameterizedTest
     @MethodSource("dataProvider")
-    public void test(List<Card> cards, List<Card> toImport, List<ImportRecord> expected) {
+    public void testCalculateImport(List<Card> cards, List<Card> toImport, List<ImportRecord> expected) {
         var actual = ImportUtil.calculateImport(cards, toImport);
         assertEquals(expected, actual);
     }

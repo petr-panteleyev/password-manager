@@ -16,7 +16,6 @@ import org.panteleyev.pwdmanager.model.WalletRecord;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,16 +70,13 @@ public class SerializerTest {
     );
 
     @Test
-    public void testSerializeAndDeserialize() {
+    public void testSerializeAndDeserialize() throws Exception {
         var out = new ByteArrayOutputStream();
         Serializer.serialize(out, RECORDS);
 
         var bytes = out.toByteArray();
-        XmlValidator.validate(new ByteArrayInputStream(bytes));
 
-        var deserialized = new ArrayList<WalletRecord>();
-        Serializer.deserialize(new ByteArrayInputStream(bytes), deserialized);
-
-        assertEquals(RECORDS, deserialized);
+        var list = Serializer.deserialize(new ByteArrayInputStream(bytes));
+        assertEquals(RECORDS, list);
     }
 }
