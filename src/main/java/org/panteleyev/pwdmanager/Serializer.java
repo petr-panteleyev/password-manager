@@ -91,7 +91,7 @@ public class Serializer {
     }
 
     public static void serialize(OutputStream out, List<WalletRecord> records) {
-        try (var w = XMLStreamWriterWrapper.newInstance(out, Set.of(LOCAL_DATE_AS_EPOCH_DAY))) {
+        try (var w = XMLStreamWriterWrapper.newInstance(out)) {
             w.document(WALLET, () -> {
                 w.attribute(ATTR_VERSION, BUILD_INFO_BUNDLE.getString(ATTR_VERSION.getLocalPart()));
 

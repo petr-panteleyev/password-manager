@@ -1,12 +1,16 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public final class StringUtil {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     private StringUtil() {
     }
 
@@ -23,8 +27,12 @@ public final class StringUtil {
         try {
             var longValue = Long.parseLong(value);
             return LocalDate.ofEpochDay(longValue);
-        } catch (NumberFormatException ex) {
-            return LocalDate.now();
+        } catch (NumberFormatException _) {
+            try {
+                return LocalDate.parse(value, DATE_FORMATTER);
+            } catch (DateTimeParseException _) {
+                return LocalDate.now();
+            }
         }
     }
 }

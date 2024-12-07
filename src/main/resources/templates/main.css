@@ -79,5 +79,5 @@
 
 .cardContentTitle {
     -fx-font-family: "${controlsFontFamily}";
-    -fx-font-size: 36;
+    -fx-font-size: 14;
 }

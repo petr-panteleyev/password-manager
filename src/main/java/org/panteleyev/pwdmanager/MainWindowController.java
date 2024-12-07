@@ -22,7 +22,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -98,7 +97,6 @@ import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_V;
-import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONFIRMATION;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
@@ -137,8 +135,6 @@ import static org.panteleyev.pwdmanager.imprt.ImportUtil.calculateImport;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
 import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
-import static org.panteleyev.pwdmanager.model.Picture.BIG_IMAGE_SIZE;
-import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 public final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
@@ -159,11 +155,9 @@ public final class MainWindowController extends Controller {
 
     private final TextField searchTextField = searchField(TextFields::createClearableTextField, this::doSearch);
 
-    private final Label cardContentTitleLabel = new Label();
     private final Button cardEditButton = button(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS), _ -> onEditCard());
     private final BorderPane recordViewPane = new BorderPane();
 
-    private final NoteViewer noteViewer = new NoteViewer();
     private final CardViewer cardContentView = new CardViewer();
 
     public MainWindowController(Stage stage) {
@@ -184,6 +178,8 @@ public final class MainWindowController extends Controller {
         cardEditButton.setDisable(true);
         leftPane.setTop(searchTextField);
         BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
+
+        recordViewPane.setCenter(cardContentView);
 
         Platform.runLater(cardListView::requestFocus);
         Platform.runLater(this::openInitialFile);
@@ -274,13 +270,10 @@ public final class MainWindowController extends Controller {
         var buttonBar = new ButtonBar();
         buttonBar.getButtons().setAll(cardEditButton);
 
-        recordViewPane.setTop(cardContentTitleLabel);
         recordViewPane.setBottom(buttonBar);
 
         BorderPane.setMargin(buttonBar, new Insets(5, 5, 5, 5));
 
-        cardContentTitleLabel.getStyleClass().add(STYLE_CARD_CONTENT_TITLE);
-        BorderPane.setAlignment(cardContentTitleLabel, Pos.CENTER);
         BorderPane.setAlignment(buttonBar, Pos.CENTER);
 
         treeViewPane.setMaxHeight(Double.MAX_VALUE);
@@ -491,36 +484,23 @@ public final class MainWindowController extends Controller {
     }
 
     private void setupRecordViewer(WalletRecord record) {
-        cardContentTitleLabel.setText(record.name());
-        cardContentTitleLabel.setGraphic(imageView(record.picture().getBigImage(), BIG_IMAGE_SIZE, BIG_IMAGE_SIZE));
-
         switch (record) {
             case Card card -> {
-                recordViewPane.setCenter(cardContentView);
                 var wrappers = card.fields().stream()
                         .filter(f -> !f.isEmpty())
                         .map(FieldWrapper::new)
                         .toList();
-                cardContentView.setData(FXCollections.observableArrayList(wrappers), record.note());
+                cardContentView.setData(card, FXCollections.observableArrayList(wrappers));
             }
-            case Note note -> {
-                noteViewer.setText(note.note());
-                recordViewPane.setCenter(noteViewer);
-            }
+            case Note note -> cardContentView.setData(note);
+            case null -> cardContentView.clearData();
         }
     }
 
     private void onListViewSelected() {
         var item = cardListView.getSelectionModel().getSelectedItem();
         cardEditButton.setDisable(item == null || !item.active());
-
-        if (item == null) {
-            recordViewPane.setCenter(null);
-            cardContentTitleLabel.setText(null);
-            cardContentTitleLabel.setGraphic(null);
-        } else {
-            setupRecordViewer(item);
-        }
+        setupRecordViewer(item);
     }
 
     private Optional<WalletRecord> findByUuid(UUID uuid) {

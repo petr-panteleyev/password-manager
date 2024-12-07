@@ -13,7 +13,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
@@ -21,18 +23,21 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.CardType;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.pwdmanager.model.Note;
 import org.panteleyev.pwdmanager.model.Picture;
 
 import java.util.List;
 
 import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.TabFactory.tab;
 import static org.panteleyev.pwdmanager.Constants.MASK;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.showDocument;
+import static org.panteleyev.pwdmanager.Styles.STYLE_CARD_CONTENT_TITLE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_NAME;
 import static org.panteleyev.pwdmanager.Styles.STYLE_FIELD_VALUE;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -45,16 +50,16 @@ final class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
     private static final double RIGHT_WIDTH = 100.0 - LEFT_WIDTH;
 
+
     private final GridPane grid = new GridPane();
-    private final Label noteLabel = label(fxString(UI_BUNDLE, I18N_NOTES),
-            new ImageView(Picture.NOTE.getImage()));
-    private final Label noteViewer = new Label();
+    private final TextArea noteArea = new TextArea();
+
+    private final TabPane tabPane = new TabPane();
+    private final Tab fieldTab;
+    private final Tab noteTab = tab("Note", noteArea);
+
 
     CardViewer() {
-        initialize();
-    }
-
-    private void initialize() {
         grid.getStyleClass().add(STYLE_GRID_PANE);
 
         var col1 = new ColumnConstraints();
@@ -68,26 +73,36 @@ final class CardViewer extends BorderPane {
         grid.getColumnConstraints().setAll(col1, col2);
         grid.setFocusTraversable(false);
 
-        var vBox = new VBox(
-                grid,
-                noteLabel,
-                noteViewer
-        );
-
+        var vBox = new VBox(grid);
         VBox.setMargin(grid, new Insets(10, 5, 10, 5));
-
-        noteLabel.getStyleClass().add("noteLabel");
-        noteViewer.getStyleClass().add("noteViewer");
 
         var pane = new ScrollPane(vBox);
         pane.getStyleClass().add("whiteBackground");
         pane.setFitToWidth(true);
         pane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         pane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        setCenter(pane);
+
+        noteTab.setGraphic(Picture.imageView(Picture.NOTE.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
+        noteTab.getStyleClass().add(STYLE_CARD_CONTENT_TITLE);
+
+        fieldTab = tab("", pane);
+        fieldTab.getStyleClass().add(STYLE_CARD_CONTENT_TITLE);
+
+        noteArea.setEditable(false);
+        setCenter(tabPane);
     }
 
-    void setData(List<FieldWrapper> items, String note) {
+    void clearData() {
+        grid.getChildren().clear();
+        tabPane.getTabs().remove(fieldTab);
+        tabPane.getTabs().remove(noteTab);
+    }
+
+    void setData(Card card, List<FieldWrapper> items) {
+        if (!tabPane.getTabs().contains(fieldTab)) {
+            tabPane.getTabs().addFirst(fieldTab);
+        }
+
         grid.getChildren().clear();
 
         int y = 0;
@@ -129,9 +144,35 @@ final class CardViewer extends BorderPane {
             GridPane.setValignment(valueLabel, VPos.TOP);
         }
 
-        noteViewer.setVisible(!note.isEmpty());
-        noteLabel.setVisible(!note.isEmpty());
-        noteViewer.setText(note);
+        var note = card.note();
+
+        var fieldTab = tabPane.getTabs().getFirst();
+        fieldTab.setText(card.name());
+        fieldTab.setGraphic(Picture.imageView(card.picture().getImage(), 24, 24));
+
+        if (note.isEmpty()) {
+            tabPane.getTabs().remove(noteTab);
+        } else {
+            if (!tabPane.getTabs().contains(noteTab)) {
+                tabPane.getTabs().add(noteTab);
+            }
+            noteArea.setText(note);
+        }
+
+        noteTab.setText(fxString(UI_BUNDLE, I18N_NOTES));
+        tabPane.getSelectionModel().selectFirst();
+    }
+
+    void setData(Note note) {
+        grid.getChildren().clear();
+
+        tabPane.getTabs().remove(fieldTab);
+        if (!tabPane.getTabs().contains(noteTab)) {
+            tabPane.getTabs().add(noteTab);
+        }
+
+        noteTab.setText(note.name());
+        noteArea.setText(note.note());
     }
 
     private void onHyperlinkClick(String url) {
