@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.dialogs;
@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.cells.CardTypeListCell;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Picture;
@@ -39,8 +40,8 @@ abstract class RecordDialog extends BaseDialog<Card> {
     private final ComboBox<Picture> pictureList = new ComboBox<>();
     private final Label typeLabel = label(fxString(UI_BUNDLE, I18N_TYPE, COLON));
 
-    RecordDialog() {
-        super(settings().getDialogCssFileUrl());
+    RecordDialog(Controller owner) {
+        super(owner, settings().getDialogCssFileUrl());
 
         nameEdit.setPrefColumnCount(25);
 

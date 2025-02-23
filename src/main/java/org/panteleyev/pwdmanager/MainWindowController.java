@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -16,15 +16,11 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
@@ -34,6 +30,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.commons.crypto.AES;
 import org.panteleyev.freedesktop.Utility;
@@ -67,6 +65,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,7 +74,6 @@ import java.util.logging.Logger;
 import static java.util.Objects.requireNonNull;
 import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
-import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.searchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -83,6 +82,7 @@ import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.dialogs.FileChooserBuilder.fileChooser;
+import static org.panteleyev.pwdmanager.ActionFactory.action;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
@@ -91,6 +91,7 @@ import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
+import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_N;
@@ -138,13 +139,10 @@ import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
 
 public final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
-
+    private static final long OPEN_DIALOG_DELAY = 300;
     private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
     private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
-
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
-    private String currentPassword;
-
     private final ObservableList<WalletRecord> recordList = FXCollections.observableArrayList();
     private final SortedList<WalletRecord> sortedList = new SortedList<>(recordList);
     private final FilteredList<WalletRecord> filteredList = sortedList.filtered(defaultFilter);
@@ -155,68 +153,83 @@ public final class MainWindowController extends Controller {
 
     private final TextField searchTextField = searchField(TextFields::createClearableTextField, this::doSearch);
 
-    private final Button cardEditButton = button(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS), _ -> onEditCard());
     private final BorderPane recordViewPane = new BorderPane();
 
     private final CardViewer cardContentView = new CardViewer();
+    private String currentPassword;
+
+    // Actions
+    private final Action editCardAction = action(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS), SHORTCUT_E,
+                                                 _ -> onEditCard(), true);
+    private final Action deleteCardAction = action(fxString(UI_BUNDLE, I18N_DELETE), SHIFT_DELETE,
+                                                   _ -> onDeleteRecord(), true);
+    private final Action restoreCardAction = action(fxString(UI_BUNDLE, I18N_RESTORE), _ -> onRestoreRecord(), true);
+    private final Action favoriteAction = action(fxString(UI_BUNDLE, I18N_FAVORITE), SHORTCUT_I, _ -> onFavorite(),
+                                                 true, action -> action.setSelected(false));
+    private final Action pasteAction = action(fxString(UI_BUNDLE, I18N_PASTE), SHORTCUT_V, _ -> onCardPaste(), true);
 
     public MainWindowController(Stage stage) {
         super(stage, settings().getMainCssFilePath());
 
         sortedList.setComparator(COMPARE_BY_ACTIVE
-                .thenComparing(COMPARE_BY_FAVORITE)
-                .thenComparing(COMPARE_BY_NAME));
+                                         .thenComparing(COMPARE_BY_FAVORITE)
+                                         .thenComparing(COMPARE_BY_NAME));
 
         filteredList.predicateProperty().bind(defaultFilter);
 
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
 
-        settings().loadStageDimensions(this);
-
         cardListView.getSelectionModel().selectedItemProperty().addListener(_ -> onListViewSelected());
 
-        cardEditButton.setDisable(true);
         leftPane.setTop(searchTextField);
         BorderPane.setMargin(searchTextField, new Insets(0, 0, 10, 0));
 
         recordViewPane.setCenter(cardContentView);
 
-        Platform.runLater(cardListView::requestFocus);
-        Platform.runLater(this::openInitialFile);
+        Platform.runLater(() -> {
+            settings().loadStageDimensions(MainWindowController.this);
+            cardListView.requestFocus();
+        });
+
+        var timer = new Timer(true);
+        timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        Platform.runLater(() -> openInitialFile());
+                    }
+                }, OPEN_DIALOG_DELAY
+        );
+    }
+
+    public static Alert newConfirmationAlert(String message) {
+        var alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        alert.setTitle(fxString(UI_BUNDLE, I18N_CONFIRMATION));
+        alert.setHeaderText(fxString(UI_BUNDLE, I18N_CONFIRMATION));
+        return alert;
     }
 
     private MenuBar createMainMenu() {
-        var deleteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_DELETE), SHIFT_DELETE,
-                _ -> onDeleteRecord());
-        var restoreMenuItem = menuItem(fxString(UI_BUNDLE, I18N_RESTORE),
-                _ -> onRestoreRecord());
-        var pasteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_PASTE), SHORTCUT_V, _ -> onCardPaste());
-        var favoriteMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_FAVORITE), false, SHORTCUT_I,
-                _ -> onFavorite());
-
-        var editMenu = menu(fxString(UI_BUNDLE, I18N_EDIT),
-                menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), SHORTCUT_D, _ -> onNewCard(),
-                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+        var editMenu = menu(
+                fxString(UI_BUNDLE, I18N_EDIT),
+                ActionUtils.createMenuItem(editCardAction),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), SHORTCUT_N, _ -> onNewCard(),
+                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), SHORTCUT_T, _ -> onNewNote(),
-                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_FILTER), SHORTCUT_F, _ -> onFilter()),
                 new SeparatorMenuItem(),
-                favoriteMenuItem,
+                ActionUtils.createCheckMenuItem(favoriteAction),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C,
-                        _ -> onCardCopy(), selectedItemProperty().isNull()),
-                pasteMenuItem,
+                menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C, _ -> onCardCopy(),
+                         selectedItemProperty().isNull()),
+                ActionUtils.createMenuItem(pasteAction),
                 new SeparatorMenuItem(),
-                deleteMenuItem,
-                restoreMenuItem
+                ActionUtils.createMenuItem(deleteCardAction),
+                ActionUtils.createMenuItem(restoreCardAction)
         );
-        editMenu.setOnShowing(_ -> setupEditMenuItems(
-                deleteMenuItem,
-                restoreMenuItem,
-                favoriteMenuItem,
-                pasteMenuItem
-        ));
 
         var showDeletedItemsMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SHOW_DELETED), false);
         showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
@@ -224,37 +237,32 @@ public final class MainWindowController extends Controller {
 
         var menuBar = menuBar(
                 menu(fxString(UI_BUNDLE, I18N_FILE),
-                        menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), SHORTCUT_N, _ -> onNewFile()),
-                        menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, _ -> onOpenFile()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI_BUNDLE, I18N_EXIT), _ -> onExit())
-                ),
+                     menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), _ -> onNewFile()),
+                     menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, _ -> onOpenFile()),
+                     new SeparatorMenuItem(),
+                     menuItem(fxString(UI_BUNDLE, I18N_EXIT), _ -> onExit())),
                 // Edit
                 editMenu,
                 menu(fxString(UI_BUNDLE, I18N_VIEW),
-                        showDeletedItemsMenuItem
-                ),
+                     showDeletedItemsMenuItem),
                 // Tools
                 menu(fxString(UI_BUNDLE, I18N_TOOLS),
-                        menuItem(fxString(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), _ -> onImportFile(), currentFile.isNull()),
-                        menuItem(fxString(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), _ -> onExportFile(), currentFile.isNull()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI_BUNDLE, I18N_PURGE, ELLIPSIS), _ -> onPurge(), currentFile.isNull()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS),
-                                _ -> onChangePassword(), currentFile.isNull()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), SHORTCUT_ALT_S, _ -> onOptions()),
-                        isLinux() ?
-                                new SeparatorMenuItem()
-                                : null,
-                        isLinux() ?
-                                menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY), _ -> onCreateDesktopEntry())
-                                : null
+                     menuItem(fxString(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), _ -> onImportFile(), currentFile.isNull()),
+                     menuItem(fxString(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), _ -> onExportFile(), currentFile.isNull()),
+                     new SeparatorMenuItem(),
+                     menuItem(fxString(UI_BUNDLE, I18N_PURGE, ELLIPSIS), _ -> onPurge(), currentFile.isNull()),
+                     new SeparatorMenuItem(),
+                     menuItem(fxString(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS), _ -> onChangePassword(),
+                              currentFile.isNull()),
+                     new SeparatorMenuItem(),
+                     menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), SHORTCUT_ALT_S, _ -> onOptions()),
+                     isLinux() ? new SeparatorMenuItem() : null,
+                     isLinux() ? menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY),
+                                          _ -> onCreateDesktopEntry()) : null
                 ),
                 // Help
                 menu(fxString(UI_BUNDLE, I18N_HELP),
-                        menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), _ -> onAbout()))
+                     menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), _ -> onAbout()))
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
@@ -267,15 +275,6 @@ public final class MainWindowController extends Controller {
         cardListView.setCellFactory(_ -> new RecordListCell());
         cardListView.setContextMenu(createContextMenu());
 
-        var buttonBar = new ButtonBar();
-        buttonBar.getButtons().setAll(cardEditButton);
-
-        recordViewPane.setBottom(buttonBar);
-
-        BorderPane.setMargin(buttonBar, new Insets(5, 5, 5, 5));
-
-        BorderPane.setAlignment(buttonBar, Pos.CENTER);
-
         treeViewPane.setMaxHeight(Double.MAX_VALUE);
         treeViewPane.setMaxWidth(Double.MAX_VALUE);
 
@@ -286,66 +285,22 @@ public final class MainWindowController extends Controller {
     }
 
     private ContextMenu createContextMenu() {
-        var ctxDeleteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_DELETE), _ -> onDeleteRecord());
-        var ctxRestoreMenuItem = menuItem(fxString(UI_BUNDLE, I18N_RESTORE), _ -> onRestoreRecord());
-        var ctxCardPasteMenuItem = menuItem(fxString(UI_BUNDLE, I18N_PASTE), _ -> onCardPaste());
-        var ctxFavoriteMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_FAVORITE), false,
-                _ -> onFavorite());
-
-        var menu = new ContextMenu(
-                ctxFavoriteMenuItem,
+        return new ContextMenu(
+                ActionUtils.createMenuItem(editCardAction),
+                new SeparatorMenuItem(),
+                ActionUtils.createCheckMenuItem(favoriteAction),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), _ -> onNewCard(),
-                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), _ -> onNewNote(),
-                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 new SeparatorMenuItem(),
-                ctxDeleteMenuItem,
-                ctxRestoreMenuItem,
+                ActionUtils.createMenuItem(deleteCardAction),
+                ActionUtils.createMenuItem(restoreCardAction),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_COPY), _ -> onCardCopy()),
-                ctxCardPasteMenuItem
+                ActionUtils.createMenuItem(pasteAction)
         );
-
-        menu.setOnShowing(_ -> setupEditMenuItems(
-                ctxDeleteMenuItem,
-                ctxRestoreMenuItem,
-                ctxFavoriteMenuItem,
-                ctxCardPasteMenuItem
-        ));
-        return menu;
-    }
-
-    private void setupEditMenuItems(
-            MenuItem deleteMenuItem,
-            MenuItem restoreMenuItem,
-            CheckMenuItem favoriteMenuItem,
-            MenuItem pasteMenuItem
-    ) {
-        var targetItem = getSelectedItem();
-
-        targetItem.ifPresentOrElse(item -> {
-            restoreMenuItem.setDisable(item.active());
-            deleteMenuItem.setText(fxString(UI_BUNDLE, item.active() ? I18N_DELETE : I18N_DELETE_FINALLY));
-        }, () -> {
-            deleteMenuItem.setDisable(true);
-            restoreMenuItem.setDisable(true);
-        });
-
-        var pasteEnable = false;
-
-        var cb = Clipboard.getSystemClipboard();
-
-        favoriteMenuItem.setDisable(targetItem.isEmpty());
-        favoriteMenuItem.setSelected(targetItem.isPresent() && targetItem.get().favorite());
-
-        if (cb.hasContent(Card.DATA_FORMAT) && targetItem.isPresent()) {
-            var sourceId = (UUID) cb.getContent(Card.DATA_FORMAT);
-            var sourceItem = findRecordById(sourceId);
-            pasteEnable = sourceItem.isPresent();
-        }
-
-        pasteMenuItem.setDisable(!pasteEnable);
     }
 
     private void openInitialFile() {
@@ -397,8 +352,7 @@ public final class MainWindowController extends Controller {
 
         new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
             try (var fileInputStream = new FileInputStream(file);
-                 var decypheredInputStream = decypheredInputStream(fileInputStream, password))
-            {
+                 var decypheredInputStream = decypheredInputStream(fileInputStream, password)) {
                 var list = Serializer.deserialize(decypheredInputStream);
 
                 var importRecords = calculateImport(recordList, list);
@@ -443,8 +397,10 @@ public final class MainWindowController extends Controller {
 
     private void onDeleteRecord() {
         getSelectedItem().ifPresent((WalletRecord item) -> {
-            var messagePattern = fxString(UI_BUNDLE, item.active() ?
-                    I18N_SURE_TO_DELETE : I18N_SURE_TO_FINALLY_DELETE);
+            var messagePattern = fxString(
+                    UI_BUNDLE, item.active() ?
+                            I18N_SURE_TO_DELETE : I18N_SURE_TO_FINALLY_DELETE
+            );
 
             newConfirmationAlert(String.format(messagePattern, item.name())).showAndWait()
                     .filter(x -> x.equals(ButtonType.YES))
@@ -470,13 +426,13 @@ public final class MainWindowController extends Controller {
     }
 
     private void onNewCard() {
-        new CardDialog(RecordType.PASSWORD)
+        new CardDialog(this, RecordType.PASSWORD)
                 .showAndWait()
                 .ifPresent(this::processNewRecord);
     }
 
     private void onNewNote() {
-        new NoteDialog().showAndWait().ifPresent(this::processNewRecord);
+        new NoteDialog(this).showAndWait().ifPresent(this::processNewRecord);
     }
 
     private void onFilter() {
@@ -499,14 +455,37 @@ public final class MainWindowController extends Controller {
 
     private void onListViewSelected() {
         var item = cardListView.getSelectionModel().getSelectedItem();
-        cardEditButton.setDisable(item == null || !item.active());
+
+        if (item != null) {
+            editCardAction.setDisabled(!item.active());
+            deleteCardAction.setText(fxString(UI_BUNDLE, item.active() ? I18N_DELETE : I18N_DELETE_FINALLY));
+            deleteCardAction.setDisabled(false);
+            restoreCardAction.setDisabled(item.active());
+            favoriteAction.setDisabled(false);
+            favoriteAction.setSelected(item.favorite());
+        } else {
+            editCardAction.setDisabled(true);
+            deleteCardAction.setDisabled(true);
+            restoreCardAction.setDisabled(true);
+            favoriteAction.setDisabled(true);
+            favoriteAction.setSelected(false);
+        }
+
+        var pasteEnable = false;
+        var cb = Clipboard.getSystemClipboard();
+        if (item != null && cb.hasContent(Card.DATA_FORMAT)) {
+            var sourceId = (UUID) cb.getContent(Card.DATA_FORMAT);
+            var sourceItem = findRecordById(sourceId);
+            pasteEnable = sourceItem.isPresent();
+        }
+        pasteAction.setDisabled(!pasteEnable);
+
         setupRecordViewer(item);
     }
 
     private Optional<WalletRecord> findByUuid(UUID uuid) {
         return recordList.stream().filter(x -> x.uuid().equals(uuid)).findFirst();
     }
-
 
     private void processEditedRecord(WalletRecord r) {
         var index = getIndexByUUID(r.uuid());
@@ -523,8 +502,8 @@ public final class MainWindowController extends Controller {
     private void onEditCard() {
         getSelectedItem().ifPresent(item -> {
             var dialog = switch (item) {
-                case Card card -> new EditCardDialog(card);
-                case Note note -> new EditNoteDialog(note);
+                case Card card -> new EditCardDialog(this, card);
+                case Note note -> new EditNoteDialog(this, note);
             };
             dialog.showAndWait().ifPresent(this::processEditedRecord);
         });
@@ -633,8 +612,7 @@ public final class MainWindowController extends Controller {
                 currentPassword = password;
 
                 try (var fileInputStream = new FileInputStream(file);
-                     var decypheredInputStream = decypheredInputStream(fileInputStream, password))
-                {
+                     var decypheredInputStream = decypheredInputStream(fileInputStream, password)) {
                     var list = Serializer.deserialize(decypheredInputStream);
                     recordList.setAll(list);
 
@@ -742,14 +720,5 @@ public final class MainWindowController extends Controller {
             }
             return new ByteArrayInputStream(outputStream.toByteArray());
         }
-    }
-
-    public static Alert newConfirmationAlert(String message) {
-        var alert = new Alert(Alert.AlertType.CONFIRMATION,
-                message,
-                ButtonType.YES, ButtonType.NO);
-        alert.setTitle(fxString(UI_BUNDLE, I18N_CONFIRMATION));
-        alert.setHeaderText(fxString(UI_BUNDLE, I18N_CONFIRMATION));
-        return alert;
     }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.dialogs;
@@ -15,6 +15,7 @@ import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.model.Note;
 
 import static java.util.Objects.requireNonNull;
@@ -36,8 +37,8 @@ public final class EditNoteDialog extends BaseDialog<Note> {
 
     private final Note note;
 
-    public EditNoteDialog(Note note) {
-        super(settings().getDialogCssFileUrl());
+    public EditNoteDialog(Controller owner, Note note) {
+        super(owner, settings().getDialogCssFileUrl());
         this.note = requireNonNull(note);
         initialize();
     }

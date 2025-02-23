@@ -1,10 +1,11 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.RecordType;
 
@@ -13,13 +14,15 @@ import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
+import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TYPE;
 
 public final class CardDialog extends RecordDialog {
     private final RecordType defaultType;
 
-    public CardDialog(RecordType defaultType) {
+    public CardDialog(Controller owner, RecordType defaultType) {
+        super(owner);
         this.defaultType = requireNonNull(defaultType);
         initialize();
     }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.dialogs;
@@ -23,6 +23,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import org.panteleyev.commons.password.PasswordGenerator;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldTypeCell;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldValueCell;
 import org.panteleyev.pwdmanager.model.Card;
@@ -74,8 +75,8 @@ public final class EditCardDialog extends BaseDialog<Card> {
     private final MenuItem generateMenuItem = menuItem(fxString(UI_BUNDLE, I18N_GENERATE), SHORTCUT_G,
             _ -> onGeneratePassword());
 
-    public EditCardDialog(Card card) {
-        super(settings().getDialogCssFileUrl());
+    public EditCardDialog(Controller owner, Card card) {
+        super(owner, settings().getDialogCssFileUrl());
         setResizable(true);
 
         editableFields = FXCollections.observableArrayList(

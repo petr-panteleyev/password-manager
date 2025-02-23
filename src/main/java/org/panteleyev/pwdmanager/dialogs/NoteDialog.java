@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.dialogs;
@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.pwdmanager.model.Note;
 
 import java.util.List;
@@ -32,8 +33,8 @@ public final class NoteDialog extends BaseDialog<Note> {
 
     private final TextField nameEdit = textField(20);
 
-    public NoteDialog() {
-        super(settings().getDialogCssFileUrl());
+    public NoteDialog(Controller owner) {
+        super(owner, settings().getDialogCssFileUrl());
 
         setTitle(UI_BUNDLE.getString(I18N_NOTE));
 

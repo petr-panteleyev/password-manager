@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -14,6 +14,7 @@ import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(KeyCode.C, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_D = new KeyCodeCombination(KeyCode.D, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(KeyCode.E, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_F = new KeyCodeCombination(KeyCode.F, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_G = new KeyCodeCombination(KeyCode.G, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_I = new KeyCodeCombination(KeyCode.I, SHORTCUT_DOWN);
