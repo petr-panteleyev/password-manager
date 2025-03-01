@@ -30,8 +30,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionUtils;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.commons.crypto.AES;
 import org.panteleyev.freedesktop.Utility;
@@ -39,6 +37,7 @@ import org.panteleyev.freedesktop.entry.DesktopEntryBuilder;
 import org.panteleyev.freedesktop.entry.DesktopEntryType;
 import org.panteleyev.freedesktop.menu.Category;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.FxAction;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.pwdmanager.cells.RecordListCell;
 import org.panteleyev.pwdmanager.dialogs.AboutDialog;
@@ -82,7 +81,6 @@ import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.dialogs.FileChooserBuilder.fileChooser;
-import static org.panteleyev.pwdmanager.ActionFactory.action;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
@@ -90,7 +88,6 @@ import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
-import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_I;
@@ -159,21 +156,26 @@ public final class MainWindowController extends Controller {
     private String currentPassword;
 
     // Actions
-    private final Action editCardAction = action(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS), SHORTCUT_E,
-                                                 _ -> onEditCard(), true);
-    private final Action deleteCardAction = action(fxString(UI_BUNDLE, I18N_DELETE), SHIFT_DELETE,
-                                                   _ -> onDeleteRecord(), true);
-    private final Action restoreCardAction = action(fxString(UI_BUNDLE, I18N_RESTORE), _ -> onRestoreRecord(), true);
-    private final Action favoriteAction = action(fxString(UI_BUNDLE, I18N_FAVORITE), SHORTCUT_I, _ -> onFavorite(),
-                                                 true, action -> action.setSelected(false));
-    private final Action pasteAction = action(fxString(UI_BUNDLE, I18N_PASTE), SHORTCUT_V, _ -> onCardPaste(), true);
+    private final FxAction editCardAction = FxAction.create(fxString(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS),
+            _ -> onEditCard(), SHORTCUT_E, true);
+    private final FxAction deleteCardAction = FxAction.create(fxString(UI_BUNDLE, I18N_DELETE),
+            _ -> onDeleteRecord(), SHIFT_DELETE, true);
+    private final FxAction restoreCardAction = FxAction.create(fxString(UI_BUNDLE, I18N_RESTORE),
+            _ -> onRestoreRecord());
+    private final FxAction favoriteAction = FxAction.create(fxString(UI_BUNDLE, I18N_FAVORITE),
+            _ -> onFavorite(), SHORTCUT_I, true);
+    private final FxAction pasteAction = FxAction.create(fxString(UI_BUNDLE, I18N_PASTE),
+            _ -> onCardPaste(), SHORTCUT_V, true);
 
     public MainWindowController(Stage stage) {
         super(stage, settings().getMainCssFilePath());
 
+        restoreCardAction.setVisible(false);
+        favoriteAction.setSelected(false);
+
         sortedList.setComparator(COMPARE_BY_ACTIVE
-                                         .thenComparing(COMPARE_BY_FAVORITE)
-                                         .thenComparing(COMPARE_BY_NAME));
+                .thenComparing(COMPARE_BY_FAVORITE)
+                .thenComparing(COMPARE_BY_NAME));
 
         filteredList.predicateProperty().bind(defaultFilter);
 
@@ -212,23 +214,23 @@ public final class MainWindowController extends Controller {
     private MenuBar createMainMenu() {
         var editMenu = menu(
                 fxString(UI_BUNDLE, I18N_EDIT),
-                ActionUtils.createMenuItem(editCardAction),
+                editCardAction.createMenuItem(),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), SHORTCUT_N, _ -> onNewCard(),
-                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), SHORTCUT_T, _ -> onNewNote(),
-                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_FILTER), SHORTCUT_F, _ -> onFilter()),
                 new SeparatorMenuItem(),
-                ActionUtils.createCheckMenuItem(favoriteAction),
+                favoriteAction.createCheckMenuItem(),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_COPY), SHORTCUT_C, _ -> onCardCopy(),
-                         selectedItemProperty().isNull()),
-                ActionUtils.createMenuItem(pasteAction),
+                        selectedItemProperty().isNull()),
+                pasteAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                ActionUtils.createMenuItem(deleteCardAction),
-                ActionUtils.createMenuItem(restoreCardAction)
+                deleteCardAction.createMenuItem(),
+                restoreCardAction.createMenuItem()
         );
 
         var showDeletedItemsMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SHOW_DELETED), false);
@@ -237,32 +239,32 @@ public final class MainWindowController extends Controller {
 
         var menuBar = menuBar(
                 menu(fxString(UI_BUNDLE, I18N_FILE),
-                     menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), _ -> onNewFile()),
-                     menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, _ -> onOpenFile()),
-                     new SeparatorMenuItem(),
-                     menuItem(fxString(UI_BUNDLE, I18N_EXIT), _ -> onExit())),
+                        menuItem(fxString(UI_BUNDLE, I18N_NEW_FILE), _ -> onNewFile()),
+                        menuItem(fxString(UI_BUNDLE, I18N_OPEN), SHORTCUT_O, _ -> onOpenFile()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI_BUNDLE, I18N_EXIT), _ -> onExit())),
                 // Edit
                 editMenu,
                 menu(fxString(UI_BUNDLE, I18N_VIEW),
-                     showDeletedItemsMenuItem),
+                        showDeletedItemsMenuItem),
                 // Tools
                 menu(fxString(UI_BUNDLE, I18N_TOOLS),
-                     menuItem(fxString(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), _ -> onImportFile(), currentFile.isNull()),
-                     menuItem(fxString(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), _ -> onExportFile(), currentFile.isNull()),
-                     new SeparatorMenuItem(),
-                     menuItem(fxString(UI_BUNDLE, I18N_PURGE, ELLIPSIS), _ -> onPurge(), currentFile.isNull()),
-                     new SeparatorMenuItem(),
-                     menuItem(fxString(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS), _ -> onChangePassword(),
-                              currentFile.isNull()),
-                     new SeparatorMenuItem(),
-                     menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), SHORTCUT_ALT_S, _ -> onOptions()),
-                     isLinux() ? new SeparatorMenuItem() : null,
-                     isLinux() ? menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY),
-                                          _ -> onCreateDesktopEntry()) : null
+                        menuItem(fxString(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), _ -> onImportFile(), currentFile.isNull()),
+                        menuItem(fxString(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), _ -> onExportFile(), currentFile.isNull()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI_BUNDLE, I18N_PURGE, ELLIPSIS), _ -> onPurge(), currentFile.isNull()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS), _ -> onChangePassword(),
+                                currentFile.isNull()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), SHORTCUT_ALT_S, _ -> onOptions()),
+                        isLinux() ? new SeparatorMenuItem() : null,
+                        isLinux() ? menuItem(fxString(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY),
+                                _ -> onCreateDesktopEntry()) : null
                 ),
                 // Help
                 menu(fxString(UI_BUNDLE, I18N_HELP),
-                     menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), _ -> onAbout()))
+                        menuItem(fxString(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), _ -> onAbout()))
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
@@ -286,20 +288,20 @@ public final class MainWindowController extends Controller {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-                ActionUtils.createMenuItem(editCardAction),
+                editCardAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                ActionUtils.createCheckMenuItem(favoriteAction),
+                favoriteAction.createCheckMenuItem(),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS), _ -> onNewCard(),
-                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 menuItem(fxString(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS), _ -> onNewNote(),
-                         currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
+                        currentFile.isNull().or(searchTextField.textProperty().isEmpty().not())),
                 new SeparatorMenuItem(),
-                ActionUtils.createMenuItem(deleteCardAction),
-                ActionUtils.createMenuItem(restoreCardAction),
+                deleteCardAction.createMenuItem(),
+                restoreCardAction.createMenuItem(),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI_BUNDLE, I18N_COPY), _ -> onCardCopy()),
-                ActionUtils.createMenuItem(pasteAction)
+                pasteAction.createMenuItem()
         );
     }
 
@@ -352,7 +354,8 @@ public final class MainWindowController extends Controller {
 
         new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
             try (var fileInputStream = new FileInputStream(file);
-                 var decypheredInputStream = decypheredInputStream(fileInputStream, password)) {
+                 var decypheredInputStream = decypheredInputStream(fileInputStream, password)
+            ) {
                 var list = Serializer.deserialize(decypheredInputStream);
 
                 var importRecords = calculateImport(recordList, list);
@@ -457,18 +460,18 @@ public final class MainWindowController extends Controller {
         var item = cardListView.getSelectionModel().getSelectedItem();
 
         if (item != null) {
-            editCardAction.setDisabled(!item.active());
-            deleteCardAction.setText(fxString(UI_BUNDLE, item.active() ? I18N_DELETE : I18N_DELETE_FINALLY));
-            deleteCardAction.setDisabled(false);
-            restoreCardAction.setDisabled(item.active());
-            favoriteAction.setDisabled(false);
-            favoriteAction.setSelected(item.favorite());
+            editCardAction.setDisable(!item.active());
+            deleteCardAction.setText(fxString(UI_BUNDLE, item.active() ? I18N_DELETE : I18N_DELETE_FINALLY))
+                    .setDisable(false);
+            restoreCardAction.setVisible(!item.active());
+            favoriteAction.setDisable(false)
+                    .setSelected(item.favorite());
         } else {
-            editCardAction.setDisabled(true);
-            deleteCardAction.setDisabled(true);
-            restoreCardAction.setDisabled(true);
-            favoriteAction.setDisabled(true);
-            favoriteAction.setSelected(false);
+            editCardAction.setDisable(true);
+            deleteCardAction.setDisable(true);
+            restoreCardAction.setVisible(false);
+            favoriteAction.setDisable(true)
+                    .setSelected(false);
         }
 
         var pasteEnable = false;
@@ -478,7 +481,7 @@ public final class MainWindowController extends Controller {
             var sourceItem = findRecordById(sourceId);
             pasteEnable = sourceItem.isPresent();
         }
-        pasteAction.setDisabled(!pasteEnable);
+        pasteAction.setDisable(!pasteEnable);
 
         setupRecordViewer(item);
     }
@@ -612,7 +615,8 @@ public final class MainWindowController extends Controller {
                 currentPassword = password;
 
                 try (var fileInputStream = new FileInputStream(file);
-                     var decypheredInputStream = decypheredInputStream(fileInputStream, password)) {
+                     var decypheredInputStream = decypheredInputStream(fileInputStream, password)
+                ) {
                     var list = Serializer.deserialize(decypheredInputStream);
                     recordList.setAll(list);
 
