@@ -71,6 +71,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
+import static org.panteleyev.commons.functional.Extensions.apply;
 import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.FxFactory.searchField;
@@ -141,8 +142,15 @@ public final class MainWindowController extends Controller {
     private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private final ObservableList<WalletRecord> recordList = FXCollections.observableArrayList();
-    private final SortedList<WalletRecord> sortedList = new SortedList<>(recordList);
-    private final FilteredList<WalletRecord> filteredList = sortedList.filtered(defaultFilter);
+
+    private final SortedList<WalletRecord> sortedList = apply(new SortedList<>(recordList),
+            list -> list.setComparator(COMPARE_BY_ACTIVE
+                    .thenComparing(COMPARE_BY_FAVORITE)
+                    .thenComparing(COMPARE_BY_NAME)));
+
+    private final FilteredList<WalletRecord> filteredList = apply(sortedList.filtered(defaultFilter),
+            list -> list.predicateProperty().bind(defaultFilter));
+
     private final ListView<WalletRecord> cardListView = new ListView<>(filteredList);
 
     private final BorderPane leftPane = new BorderPane(cardListView);
@@ -160,24 +168,15 @@ public final class MainWindowController extends Controller {
             _ -> onEditCard(), SHORTCUT_E, true);
     private final FxAction deleteCardAction = FxAction.create(fxString(UI_BUNDLE, I18N_DELETE),
             _ -> onDeleteRecord(), SHIFT_DELETE, true);
-    private final FxAction restoreCardAction = FxAction.create(fxString(UI_BUNDLE, I18N_RESTORE),
-            _ -> onRestoreRecord());
-    private final FxAction favoriteAction = FxAction.create(fxString(UI_BUNDLE, I18N_FAVORITE),
-            _ -> onFavorite(), SHORTCUT_I, true);
+    private final FxAction restoreCardAction = apply(FxAction.create(fxString(UI_BUNDLE, I18N_RESTORE),
+            _ -> onRestoreRecord()), action -> action.setVisible(false));
+    private final FxAction favoriteAction = apply(FxAction.create(fxString(UI_BUNDLE, I18N_FAVORITE),
+            _ -> onFavorite(), SHORTCUT_I, true), action -> action.setSelected(false));
     private final FxAction pasteAction = FxAction.create(fxString(UI_BUNDLE, I18N_PASTE),
             _ -> onCardPaste(), SHORTCUT_V, true);
 
     public MainWindowController(Stage stage) {
         super(stage, settings().getMainCssFilePath());
-
-        restoreCardAction.setVisible(false);
-        favoriteAction.setSelected(false);
-
-        sortedList.setComparator(COMPARE_BY_ACTIVE
-                .thenComparing(COMPARE_BY_FAVORITE)
-                .thenComparing(COMPARE_BY_NAME));
-
-        filteredList.predicateProperty().bind(defaultFilter);
 
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
 
@@ -205,10 +204,10 @@ public final class MainWindowController extends Controller {
     }
 
     public static Alert newConfirmationAlert(String message) {
-        var alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
-        alert.setTitle(fxString(UI_BUNDLE, I18N_CONFIRMATION));
-        alert.setHeaderText(fxString(UI_BUNDLE, I18N_CONFIRMATION));
-        return alert;
+        return apply(new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO), alert -> {
+            alert.setTitle(fxString(UI_BUNDLE, I18N_CONFIRMATION));
+            alert.setHeaderText(fxString(UI_BUNDLE, I18N_CONFIRMATION));
+        });
     }
 
     private MenuBar createMainMenu() {
