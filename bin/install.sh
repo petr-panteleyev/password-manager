@@ -18,6 +18,15 @@ cp -r $LAUNCH_DIR/../target/jlink/* $INSTALL_DIR
 echo "
 #!/bin/sh
 $INSTALL_DIR/bin/java \\
+  -XX:NewRatio=1 \\
+  -Xms250m \\
+  -Xmx250m \\
+  -XX:+UnlockExperimentalVMOptions \\
+  -XX:+UseCompactObjectHeaders \\
+  -XX:+AutoCreateSharedArchive \\
+  -XX:SharedArchiveFile=\$TMP/password-manager.jsa \\
+  --enable-native-access=javafx.graphics \\
+  --sun-misc-unsafe-memory-access=allow \\
   --module password.manager/org.panteleyev.pwdmanager.PasswordManagerApplication
 " > $INSTALL_DIR/password-manager.sh
 

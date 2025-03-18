@@ -1,6 +1,6 @@
 # Password Manager
 
-[![JDK](docs/java-23.svg)](https://jdk.java.net/archive/)
+![JDK](docs/java-24.svg)
 [![License](docs/license.svg)](LICENSE)
 
 Desktop application to store passwords, credit card numbers and other sensitive information. 
@@ -15,7 +15,7 @@ to user account, operating system or hardware including RAM.
 
 ## Build
 
-* Set ```JAVA_HOME``` to JDK 23+.
+* Set ```JAVA_HOME``` to JDK 24+.
 * Execute:
 
 ```shell script
@@ -27,7 +27,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ## Run
 
 ```shell script
-./mvnw javafx:run
+./mvnw exec:exec@run
 ```
 
 To open specific file add ```-Dpassword.file=<file>``` to the command line.
@@ -35,20 +35,16 @@ To open specific file add ```-Dpassword.file=<file>``` to the command line.
 ## Custom Run-Time Image
 
 ```shell script
-./mvnw clean verify jlink:jlink
+./mvnw jlink:jlink
 ```
 
 Run-time image will be found in ```target/jlink``` directory.
 
 ## Binary Packages
 
-To build binary installers perform the following steps:
-* On Microsoft Windows: install [WiX Toolset 3.x](https://github.com/wixtoolset/wix3/releases), add its binary 
-directory to ```PATH``` environment variable
-* Execute:
 
 ```shell script
-./mvnw clean verify jpackage:jpackage
+./mvnw jpackage:jpackage
 ```
 
 Installation packages will be found in ```target/dist``` directory.

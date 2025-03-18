@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>25.3.2</version>
+    <version>25.3.3</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -85,7 +85,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>23</maven.compiler.release>
+        <maven.compiler.release>24</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
@@ -97,16 +97,16 @@
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.8.1</mavenDependencyPluginVersion>
-        <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
-        <jlinkMavenPluginVersion>1.0.0</jlinkMavenPluginVersion>
+        <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
+        <jlinkMavenPluginVersion>1.1.0</jlinkMavenPluginVersion>
         <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>23.0.2</javaFxVersion>
+        <javaFxVersion>24</javaFxVersion>
         <javaCommonsVersion>1.6.1</javaCommonsVersion>
-        <javaFxHelpersVersion>1.19.1</javaFxHelpersVersion>
-        <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
+        <javaFxHelpersVersion>1.20.0</javaFxHelpersVersion>
+        <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
-        <jUnitVersion>5.11.3</jUnitVersion>
+        <jUnitVersion>5.12.1</jUnitVersion>
     </properties>
 
     <dependencies>
@@ -204,6 +204,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
+                <configuration>
+                    <argLine>
+                        --enable-native-access=ALL-UNNAMED
+                    </argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -269,6 +274,7 @@
                     <noHeaderFiles>true</noHeaderFiles>
                     <noManPages>true</noManPages>
                     <stripDebug>true</stripDebug>
+                    <generateCdsArchive>true</generateCdsArchive>
                 </configuration>
             </plugin>
             <plugin>
@@ -285,31 +291,66 @@
                         <modulePath>target/jmods</modulePath>
                     </modulePaths>
                     <destination>target/dist</destination>
+                    <removeDestination>true</removeDestination>
+                    <javaOptions>
+                        <javaOption>-XX:NewRatio=1</javaOption>
+                        <javaOption>-Xms250m</javaOption>
+                        <javaOption>-Xmx250m</javaOption>
+                        <javaOption>--enable-native-access=javafx.graphics</javaOption>
+                        <javaOption>--sun-misc-unsafe-memory-access=allow</javaOption>
+                    </javaOptions>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>${javaFxPluginVersion}</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${mavenExecPluginVersion}</version>
                 <configuration>
-                    <mainClass>${appModule}/${appMainClass}</mainClass>
+                    <executable>java</executable>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>default-cli</id>
+                        <id>run</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
                         <configuration>
-                            <options>
-                                <option>-Dpassword.file=${password.file}</option>
-                            </options>
+                            <arguments>
+                                <argument>-XX:NewRatio=1</argument>
+                                <argument>-Xms250m</argument>
+                                <argument>-Xmx250m</argument>
+                                <argument>--enable-native-access=javafx.graphics</argument>
+                                <argument>--sun-misc-unsafe-memory-access=allow</argument>
+                                <argument>--module-path</argument>
+                                <modulepath/>
+                                <argument>--module</argument>
+                                <argument>${appModule}/${appMainClass}</argument>
+                                <!--suppress UnresolvedMavenProperty -->
+                                <argument>-Dpassword.file=${password.file}</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                     <execution>
                         <id>debug</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
                         <configuration>
-                            <options>
-                                <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
-                                <option>-Dpassword.file=${password.file}</option>
-                            </options>
+                            <arguments>
+                                <argument>-XX:NewRatio=1</argument>
+                                <argument>-Xms250m</argument>
+                                <argument>-Xmx250m</argument>
+                                <argument>--enable-native-access=javafx.graphics</argument>
+                                <argument>--sun-misc-unsafe-memory-access=allow</argument>
+                                <!--suppress UnresolvedMavenProperty -->
+                                <argument>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</argument>
+                                <argument>--module-path</argument>
+                                <modulepath/>
+                                <argument>--module</argument>
+                                <argument>${appModule}/${appMainClass}</argument>
+                                <!--suppress UnresolvedMavenProperty -->
+                                <argument>-Dpassword.file=${password.file}</argument>
+                            </arguments>
                         </configuration>
                     </execution>
                 </executions>
