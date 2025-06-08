@@ -91,22 +91,22 @@
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
-        <mavenCleanPluginVersion>3.4.1</mavenCleanPluginVersion>
+        <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
+        <mavenSurefirePluginVersion>3.5.3</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.8.1</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
-        <jlinkMavenPluginVersion>1.1.0</jlinkMavenPluginVersion>
+        <jlinkMavenPluginVersion>1.1.1</jlinkMavenPluginVersion>
         <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>24</javaFxVersion>
+        <javaFxVersion>24.0.1</javaFxVersion>
         <javaCommonsVersion>1.6.1</javaCommonsVersion>
         <javaFxHelpersVersion>1.20.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
-        <jUnitVersion>5.12.1</jUnitVersion>
+        <jUnitVersion>5.13.1</jUnitVersion>
     </properties>
 
     <dependencies>
@@ -230,7 +230,7 @@
                 </executions>
             </plugin>
             <!--
-                Remove empty JavaFX jars to enable jlink
+                Remove JavaFX jars to enable jlink with SDK
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -238,8 +238,7 @@
                 <version>${mavenCleanPluginVersion}</version>
                 <executions>
                     <execution>
-                        <id>clean-jfx</id>
-                        <phase>package</phase>
+                        <id>jfx</id>
                         <goals>
                             <goal>clean</goal>
                         </goals>
@@ -249,9 +248,7 @@
                                 <fileset>
                                     <directory>${project.build.directory}/jmods</directory>
                                     <includes>
-                                        <include>javafx-base-${javaFxVersion}.jar</include>
-                                        <include>javafx-controls-${javaFxVersion}.jar</include>
-                                        <include>javafx-graphics-${javaFxVersion}.jar</include>
+                                        <include>javafx-*</include>
                                     </includes>
                                 </fileset>
                             </filesets>
@@ -267,9 +264,11 @@
                     <output>${project.build.directory}/jlink</output>
                     <modulePaths>
                         <modulePath>${project.build.directory}/jmods</modulePath>
+                        <!--suppress UnresolvedMavenProperty -->
+                        <modulePath>${JAVAFX_JMODS}</modulePath>
                     </modulePaths>
                     <addModules>
-                        <addModule>ALL-MODULE-PATH</addModule>
+                        <addModule>${appModule}</addModule>
                     </addModules>
                     <noHeaderFiles>true</noHeaderFiles>
                     <noManPages>true</noManPages>
@@ -287,9 +286,7 @@
                     <appVersion>${project.version}</appVersion>
                     <vendor>panteleyev.org</vendor>
                     <module>${appModule}/${appMainClass}</module>
-                    <modulePaths>
-                        <modulePath>target/jmods</modulePath>
-                    </modulePaths>
+                    <runtimeImage>target/jlink</runtimeImage>
                     <destination>target/dist</destination>
                     <removeDestination>true</removeDestination>
                     <javaOptions>
