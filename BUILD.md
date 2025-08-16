@@ -1,9 +1,9 @@
 # Build
 
-Build requires JDK 24+.
+Build requires JDK 24+ and JavaFX 25.
 
 ```shell script
-export JAVA_HOME=/path/to/jdk24
+export JAVA_HOME=/path/to/jdk
 
 ./mvnw clean verify
 ```
@@ -22,7 +22,7 @@ To open specific file add ```-Dpassword.file=<file>``` to the command line.
 
 ## Step 1: Custom Image
 
-Download and unpack [JavaFX JMODs distribution](https://jdk.java.net/javafx24/).
+Download and unpack [JavaFX JMODs distribution](https://jdk.java.net/javafx25/).
 
 ```shell
 export JAVAFX_JMODS=/path/to/javafx-jmods-{javafx-version}

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -29,10 +29,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-import static org.panteleyev.commons.xml.SerializationOption.LOCAL_DATE_AS_EPOCH_DAY;
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
 public class Serializer {
@@ -174,7 +172,7 @@ public class Serializer {
                     var record = switch (recordClass) {
                         case CARD -> deserializeCard(element);
                         case NOTE -> deserializeNote(element);
-                        default -> null;
+                        case UNKNOWN -> null;
                     };
                     if (record != null) {
                         list.add(record);

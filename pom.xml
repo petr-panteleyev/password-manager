@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>25.3.3</version>
+    <version>25.9.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -95,18 +95,18 @@
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.5.3</mavenSurefirePluginVersion>
+        <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.8.1</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
         <jlinkMavenPluginVersion>1.1.1</jlinkMavenPluginVersion>
         <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>24.0.1</javaFxVersion>
+        <javaFxVersion>25</javaFxVersion>
         <javaCommonsVersion>1.6.1</javaCommonsVersion>
         <javaFxHelpersVersion>1.20.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
-        <controlsFxVersion>11.2.1</controlsFxVersion>
-        <jUnitVersion>5.13.1</jUnitVersion>
+        <controlsFxVersion>11.2.2</controlsFxVersion>
+        <jUnitVersion>5.13.4</jUnitVersion>
     </properties>
 
     <dependencies>
@@ -206,7 +206,7 @@
                 <version>${mavenSurefirePluginVersion}</version>
                 <configuration>
                     <argLine>
-                        --enable-native-access=ALL-UNNAMED
+                        --enable-native-access=javafx.graphics
                     </argLine>
                 </configuration>
             </plugin>
@@ -273,7 +273,6 @@
                     <noHeaderFiles>true</noHeaderFiles>
                     <noManPages>true</noManPages>
                     <stripDebug>true</stripDebug>
-                    <generateCdsArchive>true</generateCdsArchive>
                 </configuration>
             </plugin>
             <plugin>

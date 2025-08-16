@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -49,7 +49,6 @@ import static org.panteleyev.pwdmanager.model.Picture.imageView;
 final class CardViewer extends BorderPane {
     private static final double LEFT_WIDTH = 40.0;
     private static final double RIGHT_WIDTH = 100.0 - LEFT_WIDTH;
-
 
     private final GridPane grid = new GridPane();
     private final TextArea noteArea = new TextArea();
@@ -110,29 +109,29 @@ final class CardViewer extends BorderPane {
             var nameLabel = new Label(field.getName());
             nameLabel.getStyleClass().add(STYLE_FIELD_NAME);
 
-            Labeled valueLabel;
-
-            switch (field.getType()) {
+            var valueLabel = switch (field.getType()) {
                 case LINK -> {
-                    valueLabel = new Hyperlink(field.getValueAsString());
-                    ((Hyperlink) valueLabel).setOnAction(_ -> onHyperlinkClick(field.getValueAsString()));
+                    var label = new Hyperlink(field.getValueAsString());
+                    label.setOnAction(_ -> onHyperlinkClick(field.getValueAsString()));
+                    yield label;
                 }
                 case CARD_TYPE -> {
                     var cardType = (CardType) field.getValue();
-                    valueLabel = new Label(cardType.getName(),
+                    yield new Label(cardType.getName(),
                             imageView(cardType.getImage(), SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE));
                 }
                 default -> {
-                    valueLabel = new Label(field.getType().isMasked() ? MASK : field.getValueAsString());
-                    valueLabel.getStyleClass().add(STYLE_FIELD_VALUE);
+                    var label = new Label(field.getType().isMasked() ? MASK : field.getValueAsString());
+                    label.getStyleClass().add(STYLE_FIELD_VALUE);
 
-                    valueLabel.setOnMouseClicked(event -> {
+                    label.setOnMouseClicked(event -> {
                         if (event.getClickCount() > 1) {
-                            onContentViewDoubleClick(field, valueLabel);
+                            onContentViewDoubleClick(field, label);
                         }
                     });
+                    yield label;
                 }
-            }
+            };
 
             valueLabel.setContextMenu(createContextMenu(field));
             valueLabel.setWrapText(true);
