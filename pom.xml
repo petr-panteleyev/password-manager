@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>25.9.1</version>
+    <version>25.10.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -85,7 +85,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>24</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <appModule>password.manager</appModule>
         <appMainClass>org.panteleyev.pwdmanager.PasswordManagerApplication</appMainClass>
@@ -93,17 +93,17 @@
         <!-- Plugins -->
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.14.1</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.8.1</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
-        <jlinkMavenPluginVersion>1.1.1</jlinkMavenPluginVersion>
-        <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
+        <jlinkMavenPluginVersion>1.2.0</jlinkMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.7.1</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>25</javaFxVersion>
         <javaCommonsVersion>1.6.1</javaCommonsVersion>
-        <javaFxHelpersVersion>1.20.0</javaFxHelpersVersion>
+        <javaFxHelpersVersion>1.22.1</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
         <jUnitVersion>5.13.4</jUnitVersion>
@@ -238,7 +238,8 @@
                 <version>${mavenCleanPluginVersion}</version>
                 <executions>
                     <execution>
-                        <id>jfx</id>
+                        <id>clean-javafx</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>clean</goal>
                         </goals>
@@ -289,11 +290,12 @@
                     <destination>target/dist</destination>
                     <removeDestination>true</removeDestination>
                     <javaOptions>
-                        <javaOption>-XX:NewRatio=1</javaOption>
-                        <javaOption>-Xms250m</javaOption>
-                        <javaOption>-Xmx250m</javaOption>
-                        <javaOption>--enable-native-access=javafx.graphics</javaOption>
-                        <javaOption>--sun-misc-unsafe-memory-access=allow</javaOption>
+                        <option>-XX:NewRatio=1</option>
+                        <option>-Xms250m</option>
+                        <option>-Xmx250m</option>
+                        <option>-XX:+UseCompactObjectHeaders</option>
+                        <option>--enable-native-access=javafx.graphics</option>
+                        <option>--sun-misc-unsafe-memory-access=allow</option>
                     </javaOptions>
                 </configuration>
             </plugin>
@@ -315,6 +317,7 @@
                                 <argument>-XX:NewRatio=1</argument>
                                 <argument>-Xms250m</argument>
                                 <argument>-Xmx250m</argument>
+                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <argument>--module-path</argument>
@@ -336,6 +339,7 @@
                                 <argument>-XX:NewRatio=1</argument>
                                 <argument>-Xms250m</argument>
                                 <argument>-Xmx250m</argument>
+                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <!--suppress UnresolvedMavenProperty -->

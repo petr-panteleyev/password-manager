@@ -1,10 +1,9 @@
 # Build
 
-Build requires JDK 24+ and JavaFX 25.
+Build requires JDK 25 and JavaFX 25.
 
 ```shell script
-export JAVA_HOME=/path/to/jdk
-
+export JAVA_HOME=/path/to/jdk-25
 ./mvnw clean verify
 ```
 
@@ -25,9 +24,8 @@ To open specific file add ```-Dpassword.file=<file>``` to the command line.
 Download and unpack [JavaFX JMODs distribution](https://jdk.java.net/javafx25/).
 
 ```shell
-export JAVAFX_JMODS=/path/to/javafx-jmods-{javafx-version}
-
-./mvnw -DskipTests=true clean verify clean:clean@jfx jlink:jlink
+export JAVAFX_JMODS=/path/to/javafx-jmods-25
+./mvnw -DskipTests=true clean verify jlink:jlink
 ```
 
 Custom image will be found in ```target/jlink``` directory.
@@ -37,7 +35,7 @@ Custom image will be found in ```target/jlink``` directory.
 ### OS X and MS Windows
 
 ```shell
-./mvnw jpackage:jpackage
+./mvnw -DskipTests=true clean verify jlink:jlink jpackage:jpackage
 ```
 
 Installer packages will be found in ```target/dist``` directory.

@@ -1,15 +1,18 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.panteleyev.pwdmanager.dialogs.PasswordDialog;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -38,10 +41,9 @@ public final class PasswordManagerApplication extends Application {
 
     private final static String APP_ICON_PATH = "/images/wallet-256.png";
 
-
     private static PasswordManagerApplication application;
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         launch(args);
     }
 
@@ -67,7 +69,7 @@ public final class PasswordManagerApplication extends Application {
         var appImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream(APP_ICON_PATH)));
         stage.getIcons().add(appImage);
 
-        new MainWindowController(stage);
+        new MainWindowController(stage, getStartupParameters());
         stage.show();
     }
 
@@ -80,5 +82,31 @@ public final class PasswordManagerApplication extends Application {
     private static void uncaughtException(Throwable e) {
         LOGGER.log(Level.SEVERE, "Uncaught exception", e);
         runLater(() -> new Alert(Alert.AlertType.ERROR, e.toString()).showAndWait());
+    }
+
+    private StartupParameters getStartupParameters() {
+        var fileName = System.getProperty("password.file");
+        var saveFileName = false;
+
+        if (fileName == null || fileName.isBlank()) {
+            fileName = settings().getCurrentFile();
+            saveFileName = true;
+        }
+
+        if (fileName == null || fileName.isBlank()) {
+            return null;
+        }
+
+        var file = new File(fileName);
+        if (!file.exists() || !file.isFile()) {
+            return null;
+        }
+
+        var password = new PasswordDialog(null, file, false).showAndWait().orElse(null);
+        if (password == null) {
+            return null;
+        }
+
+        return new StartupParameters(file, password, saveFileName);
     }
 }

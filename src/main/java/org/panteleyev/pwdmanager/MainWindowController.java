@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -64,8 +64,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -137,7 +135,6 @@ import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
 
 public final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
-    private static final long OPEN_DIALOG_DELAY = 300;
     private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
     private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
@@ -175,7 +172,7 @@ public final class MainWindowController extends Controller {
     private final FxAction pasteAction = FxAction.create(fxString(UI_BUNDLE, I18N_PASTE),
             _ -> onCardPaste(), SHORTCUT_V, true);
 
-    public MainWindowController(Stage stage) {
+    public MainWindowController(Stage stage, StartupParameters params) {
         super(stage, settings().getMainCssFilePath());
 
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
@@ -192,15 +189,14 @@ public final class MainWindowController extends Controller {
             cardListView.requestFocus();
         });
 
-        var timer = new Timer(true);
-        timer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        Platform.runLater(() -> openInitialFile());
-                    }
-                }, OPEN_DIALOG_DELAY
-        );
+        if (params != null) {
+            loadDocument(params.initialFile(), params.password(), params.saveFileName());
+        }
+    }
+
+    @Override
+    public String getTitle() {
+        return APP_TITLE;
     }
 
     public static Alert newConfirmationAlert(String message) {
@@ -602,6 +598,31 @@ public final class MainWindowController extends Controller {
         }
     }
 
+    private void loadDocument(File file, String password, boolean changeSettings) {
+        currentPassword = password;
+
+        try (var fileInputStream = new FileInputStream(file);
+             var decypheredInputStream = decypheredInputStream(fileInputStream, password)
+        ) {
+            var list = Serializer.deserialize(decypheredInputStream);
+            recordList.setAll(list);
+
+            currentFile.set(file);
+            if (changeSettings) {
+                settings().setCurrentFile(currentFile.get().getAbsolutePath());
+            }
+
+            setTitle();
+        } catch (Exception ex) {
+            var path = file.getAbsolutePath();
+            var alert = new Alert(Alert.AlertType.ERROR, ex.toString());
+            alert.setTitle(fxString(UI_BUNDLE, I18N_ERROR));
+            alert.setHeaderText(fxString(UI_BUNDLE, I18N_UNABLE_TO_READ_FILE, ": ") + path);
+            alert.showAndWait();
+            LOGGER.log(Level.SEVERE, "Exception while reading file " + path, ex);
+        }
+    }
+
     private void loadDocument(File file, boolean changeSettings) {
         if (!file.exists()) {
             currentFile.set(null);
@@ -611,28 +632,7 @@ public final class MainWindowController extends Controller {
             setTitle();
         } else {
             new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
-                currentPassword = password;
-
-                try (var fileInputStream = new FileInputStream(file);
-                     var decypheredInputStream = decypheredInputStream(fileInputStream, password)
-                ) {
-                    var list = Serializer.deserialize(decypheredInputStream);
-                    recordList.setAll(list);
-
-                    currentFile.set(file);
-                    if (changeSettings) {
-                        settings().setCurrentFile(currentFile.get().getAbsolutePath());
-                    }
-
-                    setTitle();
-                } catch (Exception ex) {
-                    var path = file.getAbsolutePath();
-                    var alert = new Alert(Alert.AlertType.ERROR, ex.toString());
-                    alert.setTitle(fxString(UI_BUNDLE, I18N_ERROR));
-                    alert.setHeaderText(fxString(UI_BUNDLE, I18N_UNABLE_TO_READ_FILE, ": ") + path);
-                    alert.showAndWait();
-                    LOGGER.log(Level.SEVERE, "Exception while reading file " + path, ex);
-                }
+                loadDocument(file, password, changeSettings);
             });
         }
     }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager.dialogs;
@@ -59,7 +59,10 @@ public final class PasswordDialog extends BaseDialog<String> {
         if (change) {
             Platform.runLater(this::createValidationSupport);
         }
-        Platform.runLater(passwordEdit::requestFocus);
+        Platform.runLater(() -> {
+            passwordEdit.requestFocus();
+            centerOnScreen();
+        });
     }
 
     private void createValidationSupport() {
