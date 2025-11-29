@@ -300,18 +300,6 @@ public final class MainWindowController extends Controller {
         );
     }
 
-    private void openInitialFile() {
-        var fileName = System.getProperty("password.file");
-        if (fileName != null && !fileName.isEmpty()) {
-            loadDocument(new File(fileName), false);
-        } else {
-            var currentFilePath = settings().getCurrentFile();
-            if (!currentFilePath.isEmpty()) {
-                loadDocument(new File(currentFilePath), true);
-            }
-        }
-    }
-
     private void doSearch(String newValue) {
         if (newValue.isEmpty()) {
             filteredList.predicateProperty().bind(defaultFilter);
@@ -631,9 +619,8 @@ public final class MainWindowController extends Controller {
             }
             setTitle();
         } else {
-            new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
-                loadDocument(file, password, changeSettings);
-            });
+            new PasswordDialog(this, file, false).showAndWait()
+                    .ifPresent(password -> loadDocument(file, password, changeSettings));
         }
     }
 

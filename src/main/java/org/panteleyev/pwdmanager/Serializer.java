@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.pwdmanager;
@@ -19,9 +19,9 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
@@ -70,7 +70,7 @@ public class Serializer {
 
     private static final String SCHEMA_URL = "/xsd/password-manager.xsd";
 
-    private static final Schema SCHEMA;
+    private static final DocumentBuilder DOCUMENT_BUILDER;
     private static final DefaultHandler HANDLER = new DefaultHandler() {
         @Override
         public void error(SAXParseException e) throws SAXException {
@@ -81,10 +81,15 @@ public class Serializer {
     static {
         var schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
-            SCHEMA = schemaFactory.newSchema(Serializer.class.getResource(SCHEMA_URL));
-        } catch (SAXException e) {
+            var schema = schemaFactory.newSchema(Serializer.class.getResource(SCHEMA_URL));
+            var factory = DocumentBuilderFactory.newInstance();
+            factory.setSchema(schema);
+            factory.setValidating(false);
+            DOCUMENT_BUILDER = factory.newDocumentBuilder();
+            DOCUMENT_BUILDER.setErrorHandler(HANDLER);
+        } catch (SAXException | ParserConfigurationException ex) {
             // There should not be any exceptions so just fail.
-            throw new RuntimeException(e);
+            throw new RuntimeException(ex);
         }
     }
 
@@ -102,21 +107,15 @@ public class Serializer {
         }
     }
 
-    public static List<WalletRecord> deserialize(InputStream in) throws ParserConfigurationException,
-            SAXException, IOException {
+    public static List<WalletRecord> deserialize(InputStream in) throws IOException, SAXException {
+        // Paranoid lock
+        synchronized (DOCUMENT_BUILDER) {
+            var doc = DOCUMENT_BUILDER.parse(in);
 
-        var factory = DocumentBuilderFactory.newInstance();
-        factory.setSchema(SCHEMA);
-        factory.setValidating(false);
-
-        var docBuilder = factory.newDocumentBuilder();
-        docBuilder.setErrorHandler(HANDLER);
-
-        var doc = docBuilder.parse(in);
-
-        var rootElement = doc.getDocumentElement();
-        var records = rootElement.getElementsByTagName(RECORD.getLocalPart());
-        return deserializeRecords(records);
+            var rootElement = doc.getDocumentElement();
+            var records = rootElement.getElementsByTagName(RECORD.getLocalPart());
+            return deserializeRecords(records);
+        }
     }
 
     private static void serializeRecord(XMLStreamWriterWrapper w, WalletRecord record) {
