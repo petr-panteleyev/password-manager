@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.imprt;
 
 import javafx.collections.FXCollections;
@@ -13,7 +11,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.fx.TableColumnBuilder;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.pwdmanager.model.ImportAction;
 import org.panteleyev.pwdmanager.model.ImportRecord;
 
@@ -28,9 +26,10 @@ import java.util.Optional;
 
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.MenuFactory.checkMenuItem;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_P;
@@ -100,19 +99,20 @@ public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         tableView.setRowFactory(_ -> new ImportRow());
 
         tableView.getColumns().setAll(List.of(
-                tableColumn(fxString(UI_BUNDLE, I18N_TITLE), b ->
-                        b.withPropertyCallback(r -> r.cardToImport().name())
-                                .withWidthBinding(w.multiply(0.35))
-                ),
-                tableColumn(fxString(UI_BUNDLE, I18N_UPDATED), (TableColumnBuilder<ImportRecord, Long> b) ->
-                        b.withPropertyCallback(r -> r.cardToImport().modified())
-                                .withCellFactory(_ -> new TimestampCell())
-                                .withWidthBinding(w.multiply(0.35))
-                ),
-                tableColumn(fxString(UI_BUNDLE, I18N_ACTION),
-                        b -> b.withPropertyCallback(ImportRecord::getEffectiveAction)
-                                .withWidthBinding(w.multiply(0.27))
-                )
+                apply(tableStringColumn(string(UI_BUNDLE, I18N_TITLE)), c -> {
+                    c.valueConverter(r -> r.cardToImport().name());
+                    c.widthBinding(w.multiply(0.35));
+                }),
+                apply(TableFactory.<ImportRecord, Long>tableValueColumn(string(UI_BUNDLE, I18N_UPDATED)), c -> {
+                    c.setCellFactory(_ -> new TimestampCell());
+                    c.valueConverter(r -> r.cardToImport().modified());
+                    c.widthBinding(w.multiply(0.35));
+                }),
+                apply(TableFactory.<ImportRecord, ImportAction>tableValueColumn(string(UI_BUNDLE, I18N_ACTION)),
+                        c -> {
+                            c.valueConverter(ImportRecord::getEffectiveAction);
+                            c.widthBinding(w.multiply(0.35));
+                        })
         ));
 
         setResultConverter(buttonType -> {
@@ -146,9 +146,11 @@ public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     }
 
     private ContextMenu createContextMenu() {
-        var toggleMenuItem = checkMenuItem(fxString(UI_BUNDLE, I18N_SKIP), false,
-                SHORTCUT_P, _ -> onToggleApproval());
-        toggleMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
+        var toggleMenuItem = apply(checkMenuItem(string(UI_BUNDLE, I18N_SKIP)), item -> {
+            item.setAccelerator(SHORTCUT_P);
+            item.setOnAction(_ -> onToggleApproval());
+            item.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
+        });
 
         var menu = new ContextMenu(
                 toggleMenuItem

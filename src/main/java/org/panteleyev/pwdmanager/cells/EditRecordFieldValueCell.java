@@ -1,7 +1,5 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.cells;
 
 import javafx.application.Platform;
@@ -17,18 +15,19 @@ import org.panteleyev.pwdmanager.model.CardType;
 
 import java.time.LocalDate;
 
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static java.util.Arrays.asList;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
 import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;
 
 public class EditRecordFieldValueCell extends TableCell<EditableField, Object> {
     private final TextField textField = new TextField();
-    private final ComboBox<CardType> cardTypeComboBox = comboBox(CardType.values(),
-            b -> b.withDefaultString("-")
-                    .withStringConverter(CardType::getName)
-                    .withImageConverter(CardType::getImage)
-                    .withImageDimension(new Dimension2D(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE))
+    private final ComboBox<CardType> cardTypeComboBox = comboBox(asList(CardType.values()),
+            _ -> comboBoxListCell(
+                    "-", CardType::getName, CardType::getImage, new Dimension2D(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE))
     );
+
     private final DatePicker datePicker = new DatePicker();
 
     public EditRecordFieldValueCell() {

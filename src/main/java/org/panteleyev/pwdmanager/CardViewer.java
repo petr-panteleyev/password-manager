@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager;
 
 import javafx.geometry.HPos;
@@ -19,7 +17,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -32,8 +29,10 @@ import org.panteleyev.pwdmanager.model.Picture;
 
 import java.util.List;
 
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.TabFactory.tab;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.TabFactory.tab;
+import static org.panteleyev.fx.factories.grid.ColumnConstraintsFactory.columnConstraints;
 import static org.panteleyev.pwdmanager.Constants.MASK;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.PasswordManagerApplication.showDocument;
@@ -60,16 +59,15 @@ final class CardViewer extends BorderPane {
 
     CardViewer() {
         grid.getStyleClass().add(STYLE_GRID_PANE);
-
-        var col1 = new ColumnConstraints();
-        col1.setPercentWidth(LEFT_WIDTH);
-        col1.setHgrow(Priority.NEVER);
-        col1.setHalignment(HPos.RIGHT);
-        var col2 = new ColumnConstraints();
-        col2.setPercentWidth(RIGHT_WIDTH);
-        col2.setHgrow(Priority.NEVER);
-        col2.setHalignment(HPos.LEFT);
-        grid.getColumnConstraints().setAll(col1, col2);
+        grid.getColumnConstraints().setAll(apply(columnConstraints(), c -> {
+            c.setPercentWidth(LEFT_WIDTH);
+            c.setHgrow(Priority.NEVER);
+            c.setHalignment(HPos.RIGHT);
+        }), apply(columnConstraints(), c -> {
+            c.setPercentWidth(RIGHT_WIDTH);
+            c.setHgrow(Priority.NEVER);
+            c.setHalignment(HPos.LEFT);
+        }));
         grid.setFocusTraversable(false);
 
         var vBox = new VBox(grid);
@@ -158,7 +156,7 @@ final class CardViewer extends BorderPane {
             noteArea.setText(note);
         }
 
-        noteTab.setText(fxString(UI_BUNDLE, I18N_NOTES));
+        noteTab.setText(string(UI_BUNDLE, I18N_NOTES));
         tabPane.getSelectionModel().selectFirst();
     }
 

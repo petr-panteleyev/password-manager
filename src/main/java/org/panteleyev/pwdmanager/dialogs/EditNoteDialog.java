@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
@@ -20,10 +18,10 @@ import org.panteleyev.pwdmanager.model.Note;
 
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxFactory.textField;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.TextFieldFactory.textField;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_NOTE;
@@ -46,7 +44,7 @@ public final class EditNoteDialog extends BaseDialog<Note> {
     private void initialize() {
         setTitle(UI_BUNDLE.getString(I18N_NOTE));
 
-        var box = new HBox(5, label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit);
+        var box = new HBox(5, label(string(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit);
         box.setAlignment(Pos.CENTER_LEFT);
         box.setPadding(new Insets(0, 0, 5, 0));
 

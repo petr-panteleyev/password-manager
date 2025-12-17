@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.model;
 
 import javafx.scene.image.Image;
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static java.util.ResourceBundle.getBundle;
-import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_NUMBER;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_PROVIDER;
@@ -37,25 +35,25 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VALID_
 public enum RecordType {
     EMPTY(Picture.GENERIC, List.of()),
     CREDIT_CARD(Picture.CREDIT_CARD, List.of(
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_CARD_PROVIDER), ""),
-            new Field(FieldType.CARD_TYPE, fxString(UI_BUNDLE, I18N_CARD_TYPE), CardType.OTHER),
-            new Field(FieldType.CREDIT_CARD_NUMBER, fxString(UI_BUNDLE, I18N_CARD_NUMBER), ""),
-            new Field(FieldType.EXPIRATION_MONTH, fxString(UI_BUNDLE, I18N_EXPIRATION_DATE), LocalDate.now()),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_CARD_PROVIDER), ""),
+            new Field(FieldType.CARD_TYPE, string(UI_BUNDLE, I18N_CARD_TYPE), CardType.OTHER),
+            new Field(FieldType.CREDIT_CARD_NUMBER, string(UI_BUNDLE, I18N_CARD_NUMBER), ""),
+            new Field(FieldType.EXPIRATION_MONTH, string(UI_BUNDLE, I18N_EXPIRATION_DATE), LocalDate.now()),
             new Field(FieldType.PIN, "PIN", ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_NAME_ON_CARD), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_PHONE_NUMBER), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_NAME_ON_CARD), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_PHONE_NUMBER), ""),
             new Field(FieldType.HIDDEN, "CVC#", ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_LOGIN), ""),
-            new Field(FieldType.LONG_PASSWORD, fxString(UI_BUNDLE, I18N_PASSWORD), "")
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_LOGIN), ""),
+            new Field(FieldType.LONG_PASSWORD, string(UI_BUNDLE, I18N_PASSWORD), "")
     )),
     CAR(Picture.AUTO, List.of(
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_TITLE_1), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_TITLE_1), ""),
             new Field(FieldType.STRING, "VIN", ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_PASSPORT), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_REGISTRATION), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_ENGINE), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_CAR_BODY), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_PLATE), "")
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_PASSPORT), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_REGISTRATION), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_ENGINE), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_CAR_BODY), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_PLATE), "")
     )),
     GLASSES(Picture.GLASSES, List.of(
             new Field(FieldType.STRING, "Right (O.D.) SPH", ""),
@@ -70,26 +68,26 @@ public enum RecordType {
             new Field(FieldType.STRING, "Other Information", "")
     )),
     PASSPORT(Picture.PASSPORT, List.of(
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_TITLE_1), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_NUMBER), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_ISSUED), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_VALID_UNTIL), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_ISSUER), "")
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_TITLE_1), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_NUMBER), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_ISSUED), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_VALID_UNTIL), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_ISSUER), "")
     )),
     EMAIL(Picture.EMAIL, List.of(
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_SYSTEM), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_SYSTEM), ""),
             new Field(FieldType.EMAIL, "E-Mail", ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_LOGIN), ""),
-            new Field(FieldType.LONG_PASSWORD, fxString(UI_BUNDLE, I18N_PASSWORD), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_LOGIN), ""),
+            new Field(FieldType.LONG_PASSWORD, string(UI_BUNDLE, I18N_PASSWORD), ""),
             new Field(FieldType.STRING, "IMAP", ""),
             new Field(FieldType.STRING, "IMAP Port", ""),
             new Field(FieldType.STRING, "SMTP", ""),
             new Field(FieldType.STRING, "SMTP Port", "")
     )),
     PASSWORD(Picture.GENERIC, List.of(
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_SYSTEM), ""),
-            new Field(FieldType.STRING, fxString(UI_BUNDLE, I18N_LOGIN), ""),
-            new Field(FieldType.LONG_PASSWORD, fxString(UI_BUNDLE, I18N_PASSWORD), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_SYSTEM), ""),
+            new Field(FieldType.STRING, string(UI_BUNDLE, I18N_LOGIN), ""),
+            new Field(FieldType.LONG_PASSWORD, string(UI_BUNDLE, I18N_PASSWORD), ""),
             new Field(FieldType.LINK, "URL", "")
     ));
 

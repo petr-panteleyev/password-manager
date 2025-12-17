@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>25.11.1</version>
+    <version>25.12.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -94,7 +94,7 @@
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.14.1</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
+        <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
@@ -103,7 +103,8 @@
         <!-- Dependencies -->
         <javaFxVersion>25.0.1</javaFxVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
-        <javaFxHelpersVersion>1.22.1</javaFxHelpersVersion>
+        <orgPanteleyevFunctionalVersion>1.1.0</orgPanteleyevFunctionalVersion>
+        <javaFxHelpersVersion>2.0.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
         <jUnitVersion>6.0.0</jUnitVersion>
@@ -145,6 +146,11 @@
             <groupId>org.panteleyev</groupId>
             <artifactId>commons</artifactId>
             <version>${javaCommonsVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>org-panteleyev-functional</artifactId>
+            <version>${orgPanteleyevFunctionalVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>

@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
 import javafx.event.ActionEvent;
@@ -27,19 +25,20 @@ import java.util.Map;
 
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxFactory.textField;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.SKIP;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.TabFactory.tab;
-import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.Controller.SKIP;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.ELLIPSIS;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.TabFactory.tab;
+import static org.panteleyev.fx.factories.TextFieldFactory.textField;
+import static org.panteleyev.fx.factories.TitledPaneFactory.titledPane;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
@@ -65,10 +64,10 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPPER_
 public final class SettingsDialog extends BaseDialog<ButtonType> {
     private final ComboBox<FieldType> typeComboBox = new ComboBox<>();
 
-    private final CheckBox digitsCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_DIGITS));
-    private final CheckBox upperCaseCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_UPPER_CASE));
-    private final CheckBox lowerCaseCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_LOWER_CASE));
-    private final CheckBox symbolsCheckBox = new CheckBox(fxString(UI_BUNDLE, I18N_SYMBOLS));
+    private final CheckBox digitsCheckBox = new CheckBox(string(UI_BUNDLE, I18N_DIGITS));
+    private final CheckBox upperCaseCheckBox = new CheckBox(string(UI_BUNDLE, I18N_UPPER_CASE));
+    private final CheckBox lowerCaseCheckBox = new CheckBox(string(UI_BUNDLE, I18N_LOWER_CASE));
+    private final CheckBox symbolsCheckBox = new CheckBox(string(UI_BUNDLE, I18N_SYMBOLS));
     private final ComboBox<Integer> lengthComboBox = new ComboBox<>();
 
     // Font text fields
@@ -87,7 +86,7 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
 
     public SettingsDialog(Controller owner) {
         super(owner, settings().getDialogCssFileUrl());
-        setTitle(fxString(UI_BUNDLE, I18N_OPTIONS));
+        setTitle(string(UI_BUNDLE, I18N_OPTIONS));
 
         controlsFontField.setEditable(false);
         menuFontField.setEditable(false);
@@ -117,53 +116,52 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
         var vBox = vBox(BIG_SPACING,
                 hBox(SMALL_SPACING, typeComboBox),
                 hBox(SMALL_SPACING, upperCaseCheckBox, lowerCaseCheckBox, digitsCheckBox, symbolsCheckBox),
-                hBox(SMALL_SPACING, label(fxString(UI_BUNDLE, I18N_LENGTH, COLON)), lengthComboBox)
+                hBox(SMALL_SPACING, label(string(UI_BUNDLE, I18N_LENGTH, COLON)), lengthComboBox)
         );
         vBox.setPadding(new Insets(BIG_SPACING, 0, BIG_SPACING, 0));
 
         getDialogPane().setContent(
                 new TabPane(
-                        tab(fxString(UI_BUNDLE, I18N_PASSWORDS), false, vBox),
-                        tab(fxString(UI_BUNDLE, I18N_FONTS), false,
+                        tab(string(UI_BUNDLE, I18N_PASSWORDS), vBox),
+                        tab(string(UI_BUNDLE, I18N_FONTS),
                                 vBox(10,
-                                        titledPane(fxString(UI_BUNDLE, I18N_CONTROLS),
-                                                gridPane(List.of(
-                                                        gridRow(label(fxString(UI_BUNDLE, I18N_TEXT, COLON)),
+                                        titledPane(string(UI_BUNDLE, I18N_CONTROLS),
+                                                apply(gridPane(List.of(
+                                                        gridRow(label(string(UI_BUNDLE, I18N_TEXT, COLON)),
                                                                 controlsFontField,
                                                                 button(ELLIPSIS,
                                                                         _ -> onFontSelected(controlsFontField))),
-                                                        gridRow(label(fxString(UI_BUNDLE, I18N_MENU, COLON)),
+                                                        gridRow(label(string(UI_BUNDLE, I18N_MENU, COLON)),
                                                                 menuFontField,
                                                                 button(ELLIPSIS,
                                                                         _ -> onFontSelected(menuFontField)))
-                                                ), b -> b.withStyle(STYLE_GRID_PANE))
+                                                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE))
                                         ),
-                                        titledPane(fxString(UI_BUNDLE, I18N_DIALOGS),
-                                                gridPane(List.of(
-                                                                gridRow(dialogFontField,
-                                                                        button(ELLIPSIS,
-                                                                                _ -> onFontSelected(dialogFontField)))
-                                                        ), b -> b.withStyle(STYLE_GRID_PANE)
-                                                )
+                                        titledPane(string(UI_BUNDLE, I18N_DIALOGS),
+                                                apply(gridPane(List.of(
+                                                        gridRow(dialogFontField,
+                                                                button(ELLIPSIS,
+                                                                        _ -> onFontSelected(dialogFontField)))
+                                                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE))
                                         )
                                 )
                         ),
-                        tab(fxString(UI_BUNDLE, I18N_COLORS), false,
-                                gridPane(List.of(
-                                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_NAME, COLON)),
+                        tab(string(UI_BUNDLE, I18N_COLORS),
+                                apply(gridPane(List.of(
+                                        gridRow(label(string(UI_BUNDLE, I18N_FIELD_NAME, COLON)),
                                                 fieldNameColorPicker),
-                                        gridRow(label(fxString(UI_BUNDLE, I18N_FIELD_VALUE, COLON)),
+                                        gridRow(label(string(UI_BUNDLE, I18N_FIELD_VALUE, COLON)),
                                                 fieldValueColorPicker),
-                                        gridRow(SKIP, label(fxString(UI_BUNDLE, I18N_IMPORT))),
-                                        gridRow(label(fxString(ImportAction.ADD.toString(), COLON)),
+                                        gridRow(SKIP, label(string(UI_BUNDLE, I18N_IMPORT))),
+                                        gridRow(label(string(ImportAction.ADD.toString(), COLON)),
                                                 actionAddColorPicker),
-                                        gridRow(label(fxString(ImportAction.REPLACE.toString(), COLON)),
+                                        gridRow(label(string(ImportAction.REPLACE.toString(), COLON)),
                                                 actionReplaceColorPicker),
-                                        gridRow(label(fxString(ImportAction.DELETE.toString(), COLON)),
+                                        gridRow(label(string(ImportAction.DELETE.toString(), COLON)),
                                                 actionDeleteColorPicker),
-                                        gridRow(label(fxString(ImportAction.RESTORE.toString(), COLON)),
+                                        gridRow(label(string(ImportAction.RESTORE.toString(), COLON)),
                                                 actionRestoreColorPicker)
-                                ), b -> b.withStyle(STYLE_GRID_PANE))
+                                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE))
                         )
                 )
         );

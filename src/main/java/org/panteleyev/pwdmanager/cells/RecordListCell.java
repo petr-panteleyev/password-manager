@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.cells;
 
 import javafx.scene.control.Label;
@@ -12,7 +10,7 @@ import javafx.scene.layout.Priority;
 import org.panteleyev.pwdmanager.model.Picture;
 import org.panteleyev.pwdmanager.model.WalletRecord;
 
-import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.model.Picture.SMALL_IMAGE_SIZE;
 import static org.panteleyev.pwdmanager.model.Picture.imageView;

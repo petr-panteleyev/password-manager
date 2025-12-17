@@ -1,13 +1,10 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.fx.WindowManager;
 import org.panteleyev.pwdmanager.ApplicationFiles;
 import org.panteleyev.pwdmanager.TemplateEngine;
 import org.panteleyev.pwdmanager.model.FieldType;
@@ -20,6 +17,7 @@ import java.util.function.Consumer;
 
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
+import static org.panteleyev.fx.WindowManager.windowManager;
 import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
 
 public final class Settings {
@@ -77,7 +75,7 @@ public final class Settings {
     }
 
     public void reloadCssFile() {
-        WindowManager.newInstance().getControllers().forEach(
+        windowManager().getControllers().forEach(
                 c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
         );
     }

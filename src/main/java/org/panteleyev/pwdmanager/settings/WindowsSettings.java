@@ -1,20 +1,19 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
 import org.panteleyev.commons.xml.XMLEventReaderWrapper;
 import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.StagePositionAndSize;
-import org.panteleyev.fx.WindowManager;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.panteleyev.fx.WindowManager.windowManager;
 
 final class WindowsSettings {
     private static final double DEFAULT_WIDTH = 1024.0;
@@ -42,7 +41,7 @@ final class WindowsSettings {
     }
 
     void save(OutputStream out) {
-        WindowManager.newInstance().getControllerStream().forEach(this::storeWindowDimensions);
+        windowManager().getControllerStream().forEach(this::storeWindowDimensions);
 
         try (var w = XMLStreamWriterWrapper.newInstance(out)) {
             w.document(ROOT_ELEMENT, () -> {

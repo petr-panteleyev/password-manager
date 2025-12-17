@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
@@ -11,10 +9,9 @@ import org.panteleyev.pwdmanager.model.RecordType;
 
 import static java.util.Objects.requireNonNull;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TYPE;
 
@@ -28,11 +25,11 @@ public final class CardDialog extends RecordDialog {
     }
 
     private void initialize() {
-        setTitle(fxString(UI_BUNDLE, I18N_CARD));
+        setTitle(string(UI_BUNDLE, I18N_CARD));
         createDefaultButtons(UI_BUNDLE);
 
         initLists();
-        setTypeLabelText(fxString(UI_BUNDLE, I18N_TYPE, COLON));
+        setTypeLabelText(string(UI_BUNDLE, I18N_TYPE, COLON));
 
         getNameEdit().setText("");
         getTypeList().getSelectionModel().select(defaultType);

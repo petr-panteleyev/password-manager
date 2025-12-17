@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.collections.FXCollections;
@@ -24,24 +22,28 @@ import javafx.scene.layout.Priority;
 import org.panteleyev.commons.password.PasswordGenerator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.factories.TableFactory;
+import org.panteleyev.pwdmanager.EditableField;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldTypeCell;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldValueCell;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Picture;
-import org.panteleyev.pwdmanager.EditableField;
 
 import java.util.List;
 import java.util.Optional;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.TabFactory.tab;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.TabFactory.tab;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
+import static org.panteleyev.fx.factories.TableFactory.tableValueColumn;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.MainWindowController.newConfirmationAlert;
@@ -72,8 +74,10 @@ public final class EditCardDialog extends BaseDialog<Card> {
     private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
-    private final MenuItem generateMenuItem = menuItem(fxString(UI_BUNDLE, I18N_GENERATE), SHORTCUT_G,
-            _ -> onGeneratePassword());
+    private final MenuItem generateMenuItem = apply(menuItem(string(UI_BUNDLE, I18N_GENERATE)), item -> {
+        item.setAccelerator(SHORTCUT_G);
+        item.setOnAction(_ -> onGeneratePassword());
+    });
 
     public EditCardDialog(Controller owner, Card card) {
         super(owner, settings().getDialogCssFileUrl());
@@ -104,21 +108,20 @@ public final class EditCardDialog extends BaseDialog<Card> {
 
         var pane = new BorderPane(cardContentView);
 
-        var optionsPane = gridPane(
+        var optionsPane = apply(gridPane(
                 List.of(
-                        gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), cardNameEdit),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
-                ), b -> b.withStyle(STYLE_GRID_PANE)
-        );
+                        gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), cardNameEdit),
+                        gridRow(label(string(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
+                )), p -> p.getStyleClass().add(STYLE_GRID_PANE));
         optionsPane.setPadding(new Insets(5, 5, 5, 5));
         GridPane.setHgrow(cardNameEdit, Priority.ALWAYS);
 
         var noteEditor = new TextArea();
 
         var tabPane = new TabPane(
-                tab(fxString(UI_BUNDLE, I18M_FIELDS), false, pane),
-                tab(fxString(UI_BUNDLE, I18N_NOTES), false, noteEditor),
-                tab(fxString(UI_BUNDLE, I18N_PROPERTIES), false, optionsPane));
+                tab(string(UI_BUNDLE, I18M_FIELDS), pane),
+                tab(string(UI_BUNDLE, I18N_NOTES), noteEditor),
+                tab(string(UI_BUNDLE, I18N_PROPERTIES), optionsPane));
 
         getDialogPane().setContent(tabPane);
         createDefaultButtons(UI_BUNDLE);
@@ -153,48 +156,56 @@ public final class EditCardDialog extends BaseDialog<Card> {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-                menuItem(fxString(UI_BUNDLE, I18N_ADD), SHORTCUT_N, _ -> onNewField()),
+                apply(menuItem(string(UI_BUNDLE, I18N_ADD)), item -> {
+                    item.setAccelerator(SHORTCUT_N);
+                    item.setOnAction(_ -> onNewField());
+                }),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_DELETE), DELETE, _ -> onDeleteField()),
+                apply(menuItem(string(UI_BUNDLE, I18N_DELETE)), item -> {
+                    item.setAccelerator(DELETE);
+                    item.setOnAction(_ -> onDeleteField());
+                }),
                 new SeparatorMenuItem(),
                 generateMenuItem,
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI_BUNDLE, I18N_UP), SHORTCUT_U, _ -> onFieldUp()),
-                menuItem(fxString(UI_BUNDLE, I18N_DOWN), SHORTCUT_D, _ -> onFieldDown())
+                apply(menuItem(string(UI_BUNDLE, I18N_UP)), item -> {
+                    item.setAccelerator(SHORTCUT_U);
+                    item.setOnAction(_ -> onFieldUp());
+                }),
+                apply(menuItem(string(UI_BUNDLE, I18N_DOWN)), item -> {
+                    item.setAccelerator(SHORTCUT_D);
+                    item.setOnAction(_ -> onFieldDown());
+                })
         );
     }
 
     private List<TableColumn<EditableField, ?>> createEditorColumns() {
-        var fieldNameColumn = new TableColumn<EditableField, String>();
-        fieldNameColumn.setSortable(false);
-        fieldNameColumn.setResizable(false);
-        fieldNameColumn.setReorderable(false);
-        fieldNameColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
-        fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        fieldNameColumn.setCellValueFactory(p -> p.getValue().nameProperty());
-
-        var fieldTypeColumn = new TableColumn<EditableField, FieldType>();
-        fieldTypeColumn.setSortable(false);
-        fieldTypeColumn.setResizable(false);
-        fieldTypeColumn.setReorderable(false);
-        fieldTypeColumn.setStyle("-fx-alignment: CENTER;");
-        fieldTypeColumn.setCellFactory(_ -> new EditRecordFieldTypeCell());
-        fieldTypeColumn.setCellValueFactory(p -> p.getValue().typeProperty());
-
-        var fieldValueColumn = new TableColumn<EditableField, Object>();
-        fieldValueColumn.setSortable(false);
-        fieldValueColumn.setResizable(false);
-        fieldValueColumn.setReorderable(false);
-        fieldValueColumn.setStyle("-fx-alignment: CENTER-LEFT;");
-        fieldValueColumn.setCellFactory(_ -> new EditRecordFieldValueCell());
-        fieldValueColumn.setCellValueFactory(p -> p.getValue().valueProperty());
-
         var w = cardContentView.widthProperty().subtract(5);
-        fieldNameColumn.prefWidthProperty().bind(w.multiply(0.33));
-        fieldTypeColumn.prefWidthProperty().bind(w.multiply(0.33));
-        fieldValueColumn.prefWidthProperty().bind(w.multiply(0.33));
-
-        return List.of(fieldNameColumn, fieldTypeColumn, fieldValueColumn);
+        return List.of(apply(tableStringColumn(), c -> {
+            c.setSortable(false);
+            c.setResizable(false);
+            c.setReorderable(false);
+            c.setStyle("-fx-alignment: CENTER-RIGHT;");
+            c.setCellFactory(TextFieldTableCell.forTableColumn());
+            c.setCellValueFactory(p -> p.getValue().nameProperty());
+            c.widthBinding(w.multiply(0.33));
+        }), apply(TableFactory.<EditableField, FieldType>tableValueColumn(), c -> {
+            c.setSortable(false);
+            c.setResizable(false);
+            c.setReorderable(false);
+            c.setStyle("-fx-alignment: CENTER;");
+            c.setCellFactory(_ -> new EditRecordFieldTypeCell());
+            c.setCellValueFactory(p -> p.getValue().typeProperty());
+            c.widthBinding(w.multiply(0.33));
+        }), apply(tableValueColumn(), c -> {
+            c.setSortable(false);
+            c.setResizable(false);
+            c.setReorderable(false);
+            c.setStyle("-fx-alignment: CENTER-LEFT;");
+            c.setCellFactory(_ -> new EditRecordFieldValueCell());
+            c.setCellValueFactory(p -> p.getValue().valueProperty());
+            c.widthBinding(w.multiply(0.33));
+        }));
     }
 
     private Optional<EditableField> getSelectedField() {
@@ -202,14 +213,14 @@ public final class EditCardDialog extends BaseDialog<Card> {
     }
 
     private void onNewField() {
-        var f = new EditableField(FieldType.STRING, fxString(UI_BUNDLE, I18N_NEW_FIELD), "");
+        var f = new EditableField(FieldType.STRING, string(UI_BUNDLE, I18N_NEW_FIELD), "");
         editableFields.add(f);
         cardContentView.getSelectionModel().select(f);
     }
 
     private void onDeleteField() {
         getSelectedField().ifPresent(sel -> {
-            var message = String.format(fxString(UI_BUNDLE, I18N_SURE_TO_DELETE_FIELD), sel.getName());
+            var message = String.format(string(UI_BUNDLE, I18N_SURE_TO_DELETE_FIELD), sel.getName());
             newConfirmationAlert(message).showAndWait()
                     .filter(x -> x == ButtonType.YES)
                     .ifPresent(_ -> editableFields.remove(sel));

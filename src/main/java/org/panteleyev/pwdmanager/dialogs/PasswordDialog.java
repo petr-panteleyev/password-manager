@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
@@ -19,11 +17,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -40,17 +39,16 @@ public final class PasswordDialog extends BaseDialog<String> {
     public PasswordDialog(Controller owner, File file, boolean change) {
         super(owner, settings().getDialogCssFileUrl());
 
-        setTitle(fxString(UI_BUNDLE, I18N_PASSWORD));
+        setTitle(string(UI_BUNDLE, I18N_PASSWORD));
 
         passwordEdit.setPrefColumnCount(32);
 
-        getDialogPane().setContent(gridPane(
+        getDialogPane().setContent(apply(gridPane(
                 List.of(
-                        gridRow(label(fxString(UI_BUNDLE, I18N_FILE, COLON)), label(file.getAbsolutePath())),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_PASSWORD, COLON)), passwordEdit),
-                        change ? gridRow(label(fxString(UI_BUNDLE, I18N_REPEAT, COLON)), passwordEdit2) : gridRow()
-                ), b -> b.withStyle(STYLE_GRID_PANE)
-        ));
+                        gridRow(label(string(UI_BUNDLE, I18N_FILE, COLON)), label(file.getAbsolutePath())),
+                        gridRow(label(string(UI_BUNDLE, I18N_PASSWORD, COLON)), passwordEdit),
+                        change ? gridRow(label(string(UI_BUNDLE, I18N_REPEAT, COLON)), passwordEdit2) : gridRow()
+                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE)));
 
         createDefaultButtons(UI_BUNDLE);
 

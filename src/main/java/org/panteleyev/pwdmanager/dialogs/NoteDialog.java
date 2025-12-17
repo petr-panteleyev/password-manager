@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.application.Platform;
@@ -16,12 +14,13 @@ import org.panteleyev.pwdmanager.model.Note;
 import java.util.List;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.FxFactory.textField;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.TextFieldFactory.textField;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -38,10 +37,9 @@ public final class NoteDialog extends BaseDialog<Note> {
 
         setTitle(UI_BUNDLE.getString(I18N_NOTE));
 
-        getDialogPane().setContent(gridPane(
-                List.of(gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit)),
-                b -> b.withStyle(STYLE_GRID_PANE)
-        ));
+        getDialogPane().setContent(apply(gridPane(
+                        List.of(gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit))),
+                pane -> pane.getStyleClass().add(STYLE_GRID_PANE)));
         createDefaultButtons(UI_BUNDLE);
 
         setResultConverter(buttonType -> OK.equals(buttonType) ? new Note(nameEdit.getText()) : null);

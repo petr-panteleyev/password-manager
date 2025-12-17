@@ -1,7 +1,5 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.cells;
 
 import javafx.scene.control.ComboBox;
@@ -13,7 +11,7 @@ import org.panteleyev.pwdmanager.model.FieldType;
 
 import java.time.LocalDate;
 
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
 
 public class EditRecordFieldTypeCell extends TableCell<EditableField, FieldType> {
     private final ComboBox<FieldType> typeComboBox = comboBox(FieldType.values());

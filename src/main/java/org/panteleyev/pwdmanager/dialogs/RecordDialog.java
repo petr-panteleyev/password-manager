@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
 import javafx.collections.FXCollections;
@@ -20,11 +18,12 @@ import org.panteleyev.pwdmanager.model.RecordType;
 
 import java.util.List;
 
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.COLON;
+import static org.panteleyev.fx.factories.StringFactory.string;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -38,7 +37,7 @@ abstract class RecordDialog extends BaseDialog<Card> {
     private final TextField nameEdit = new TextField();
     private final ComboBox<RecordType> typeList = new ComboBox<>();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
-    private final Label typeLabel = label(fxString(UI_BUNDLE, I18N_TYPE, COLON));
+    private final Label typeLabel = label(string(UI_BUNDLE, I18N_TYPE, COLON));
 
     RecordDialog(Controller owner) {
         super(owner, settings().getDialogCssFileUrl());
@@ -47,13 +46,13 @@ abstract class RecordDialog extends BaseDialog<Card> {
 
         typeList.setOnAction(_ -> onCardTypeSelected());
 
-        getDialogPane().setContent(gridPane(
+        getDialogPane().setContent(apply(gridPane(
                 List.of(
-                        gridRow(label(fxString(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit),
+                        gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit),
                         gridRow(typeLabel, typeList),
-                        gridRow(label(fxString(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
-                ), b -> b.withStyle(STYLE_GRID_PANE)
-        ));
+                        gridRow(label(string(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
+                )
+        ), pane -> pane.getStyleClass().add(STYLE_GRID_PANE)));
     }
 
     TextField getNameEdit() {
