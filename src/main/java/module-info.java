@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 open module password.manager {
     requires java.xml;
@@ -12,7 +12,6 @@ open module password.manager {
     requires org.panteleyev.commons;
     requires org.panteleyev.fx;
     requires org.panteleyev.freedesktop;
-    requires org.panteleyev.functional;
 
     requires org.controlsfx.controls;
 }

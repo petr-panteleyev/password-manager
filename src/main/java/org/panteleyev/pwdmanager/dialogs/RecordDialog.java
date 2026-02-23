@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
@@ -18,7 +18,6 @@ import org.panteleyev.pwdmanager.model.RecordType;
 
 import java.util.List;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.StringFactory.COLON;
 import static org.panteleyev.fx.factories.StringFactory.string;
@@ -46,13 +45,13 @@ abstract class RecordDialog extends BaseDialog<Card> {
 
         typeList.setOnAction(_ -> onCardTypeSelected());
 
-        getDialogPane().setContent(apply(gridPane(
+        getDialogPane().setContent(gridPane(
                 List.of(
                         gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit),
                         gridRow(typeLabel, typeList),
                         gridRow(label(string(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
-                )
-        ), pane -> pane.getStyleClass().add(STYLE_GRID_PANE)));
+                ), null, List.of(STYLE_GRID_PANE)
+        ));
     }
 
     TextField getNameEdit() {

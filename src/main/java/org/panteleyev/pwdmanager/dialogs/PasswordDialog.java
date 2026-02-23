@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
@@ -17,7 +17,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.StringFactory.COLON;
 import static org.panteleyev.fx.factories.StringFactory.string;
@@ -43,12 +42,13 @@ public final class PasswordDialog extends BaseDialog<String> {
 
         passwordEdit.setPrefColumnCount(32);
 
-        getDialogPane().setContent(apply(gridPane(
+        getDialogPane().setContent(gridPane(
                 List.of(
                         gridRow(label(string(UI_BUNDLE, I18N_FILE, COLON)), label(file.getAbsolutePath())),
                         gridRow(label(string(UI_BUNDLE, I18N_PASSWORD, COLON)), passwordEdit),
                         change ? gridRow(label(string(UI_BUNDLE, I18N_REPEAT, COLON)), passwordEdit2) : gridRow()
-                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE)));
+                ),
+                null, List.of(STYLE_GRID_PANE)));
 
         createDefaultButtons(UI_BUNDLE);
 

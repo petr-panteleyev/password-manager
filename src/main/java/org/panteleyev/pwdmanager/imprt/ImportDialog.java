@@ -1,4 +1,4 @@
-// Copyright © 2021-2025 Petr Panteleyev
+// Copyright © 2021-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.imprt;
 
@@ -26,10 +26,8 @@ import java.util.Optional;
 
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.factories.StringFactory.string;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
 import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_P;
@@ -54,7 +52,7 @@ public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     );
 
     private final ObservableList<ImportRecord> importRecords = FXCollections.observableArrayList();
-    private final TableView<ImportRecord> tableView = new TableView<>(importRecords);
+    private final TableView<ImportRecord> tableView = table(importRecords);
 
     private static class TimestampCell extends TableCell<ImportRecord, Long> {
         @Override
@@ -90,31 +88,6 @@ public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         setTitle(UI_BUNDLE.getString(I18N_IMPORT));
         setResizable(true);
 
-        tableView.setPrefSize(1024, 768);
-        tableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        tableView.setContextMenu(createContextMenu());
-
-        var w = tableView.widthProperty().subtract(20);
-
-        tableView.setRowFactory(_ -> new ImportRow());
-
-        tableView.getColumns().setAll(List.of(
-                apply(tableStringColumn(string(UI_BUNDLE, I18N_TITLE)), c -> {
-                    c.valueConverter(r -> r.cardToImport().name());
-                    c.widthBinding(w.multiply(0.35));
-                }),
-                apply(TableFactory.<ImportRecord, Long>tableValueColumn(string(UI_BUNDLE, I18N_UPDATED)), c -> {
-                    c.setCellFactory(_ -> new TimestampCell());
-                    c.valueConverter(r -> r.cardToImport().modified());
-                    c.widthBinding(w.multiply(0.35));
-                }),
-                apply(TableFactory.<ImportRecord, ImportAction>tableValueColumn(string(UI_BUNDLE, I18N_ACTION)),
-                        c -> {
-                            c.valueConverter(ImportRecord::getEffectiveAction);
-                            c.widthBinding(w.multiply(0.35));
-                        })
-        ));
-
         setResultConverter(buttonType -> {
             if (OK.equals(buttonType)) {
                 return importRecords.stream()
@@ -146,11 +119,10 @@ public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     }
 
     private ContextMenu createContextMenu() {
-        var toggleMenuItem = apply(checkMenuItem(string(UI_BUNDLE, I18N_SKIP)), item -> {
-            item.setAccelerator(SHORTCUT_P);
-            item.setOnAction(_ -> onToggleApproval());
-            item.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-        });
+        var toggleMenuItem = checkMenuItem(string(UI_BUNDLE, I18N_SKIP));
+        toggleMenuItem.setAccelerator(SHORTCUT_P);
+        toggleMenuItem.setOnAction(_ -> onToggleApproval());
+        toggleMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
 
         var menu = new ContextMenu(
                 toggleMenuItem
@@ -161,5 +133,29 @@ public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
         );
 
         return menu;
+    }
+
+    private TableView<ImportRecord> table(ObservableList<ImportRecord> records) {
+        var tableView = new TableView<>(records);
+
+        tableView.setPrefSize(1024, 768);
+        tableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        tableView.setContextMenu(createContextMenu());
+        tableView.setRowFactory(_ -> new ImportRow());
+
+        var w = tableView.widthProperty().subtract(20);
+        var titleColumn = TableFactory.<ImportRecord>tableStringColumn(string(UI_BUNDLE, I18N_TITLE));
+        titleColumn.valueConverter(r -> r.cardToImport().name());
+        titleColumn.widthBinding(w.multiply(0.35));
+        var modifiedColumn = TableFactory.<ImportRecord, Long>tableValueColumn(string(UI_BUNDLE, I18N_UPDATED));
+        modifiedColumn.setCellFactory(_ -> new TimestampCell());
+        modifiedColumn.valueConverter(r -> r.cardToImport().modified());
+        modifiedColumn.widthBinding(w.multiply(0.35));
+        var actionColumn = TableFactory.<ImportRecord, ImportAction>tableValueColumn(string(UI_BUNDLE, I18N_ACTION));
+        actionColumn.valueConverter(ImportRecord::getEffectiveAction);
+        actionColumn.widthBinding(w.multiply(0.35));
+
+        tableView.getColumns().setAll(List.of(titleColumn, modifiedColumn, actionColumn));
+        return tableView;
     }
 }

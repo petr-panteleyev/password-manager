@@ -1,4 +1,4 @@
-// Copyright © 2020-2025 Petr Panteleyev
+// Copyright © 2020-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
@@ -25,7 +25,6 @@ import java.util.Map;
 
 import static javafx.collections.FXCollections.observableArrayList;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.Controller.SKIP;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.BoxFactory.vBox;
@@ -126,7 +125,7 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
                         tab(string(UI_BUNDLE, I18N_FONTS),
                                 vBox(10,
                                         titledPane(string(UI_BUNDLE, I18N_CONTROLS),
-                                                apply(gridPane(List.of(
+                                                gridPane(List.of(
                                                         gridRow(label(string(UI_BUNDLE, I18N_TEXT, COLON)),
                                                                 controlsFontField,
                                                                 button(ELLIPSIS,
@@ -135,19 +134,19 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
                                                                 menuFontField,
                                                                 button(ELLIPSIS,
                                                                         _ -> onFontSelected(menuFontField)))
-                                                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE))
+                                                ), null, List.of(STYLE_GRID_PANE))
                                         ),
                                         titledPane(string(UI_BUNDLE, I18N_DIALOGS),
-                                                apply(gridPane(List.of(
+                                                gridPane(List.of(
                                                         gridRow(dialogFontField,
                                                                 button(ELLIPSIS,
                                                                         _ -> onFontSelected(dialogFontField)))
-                                                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE))
+                                                ), null, List.of(STYLE_GRID_PANE))
                                         )
                                 )
                         ),
                         tab(string(UI_BUNDLE, I18N_COLORS),
-                                apply(gridPane(List.of(
+                                gridPane(List.of(
                                         gridRow(label(string(UI_BUNDLE, I18N_FIELD_NAME, COLON)),
                                                 fieldNameColorPicker),
                                         gridRow(label(string(UI_BUNDLE, I18N_FIELD_VALUE, COLON)),
@@ -161,7 +160,7 @@ public final class SettingsDialog extends BaseDialog<ButtonType> {
                                                 actionDeleteColorPicker),
                                         gridRow(label(string(ImportAction.RESTORE.toString(), COLON)),
                                                 actionRestoreColorPicker)
-                                )), pane -> pane.getStyleClass().add(STYLE_GRID_PANE))
+                                ), null, List.of(STYLE_GRID_PANE))
                         )
                 )
         );

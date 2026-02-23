@@ -1,10 +1,9 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -67,7 +66,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Objects.requireNonNull;
-import static org.panteleyev.commons.functional.Extensions.apply;
 import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.FxAction.fxAction;
@@ -139,14 +137,8 @@ public final class MainWindowController extends Controller {
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private final ObservableList<WalletRecord> recordList = FXCollections.observableArrayList();
 
-    private final SortedList<WalletRecord> sortedList = apply(new SortedList<>(recordList),
-            list -> list.setComparator(COMPARE_BY_ACTIVE
-                    .thenComparing(COMPARE_BY_FAVORITE)
-                    .thenComparing(COMPARE_BY_NAME)));
-
-    private final FilteredList<WalletRecord> filteredList = apply(sortedList.filtered(defaultFilter),
-            list -> list.predicateProperty().bind(defaultFilter));
-
+    private final SortedList<WalletRecord> sortedList = recordSortedList(recordList);
+    private final FilteredList<WalletRecord> filteredList = recordFilteredList(sortedList, defaultFilter);
     private final ListView<WalletRecord> cardListView = new ListView<>(filteredList);
 
     private final BorderPane leftPane = new BorderPane(cardListView);
@@ -160,20 +152,37 @@ public final class MainWindowController extends Controller {
     private String currentPassword;
 
     // Actions
+    private final FxAction newCardAction = fxAction(string(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS))
+            .onAction(_ -> onNewCard())
+            .accelerator(SHORTCUT_N);
+    private final FxAction newNoteAction = fxAction(string(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS))
+            .onAction(_ -> onNewNote())
+            .accelerator(SHORTCUT_T);
     private final FxAction editCardAction = fxAction(string(UI_BUNDLE, I18N_EDIT_BUTTON, ELLIPSIS))
-            .onAction(_ -> onEditCard()).accelerator(SHORTCUT_E).disable(true);
+            .onAction(_ -> onEditCard())
+            .accelerator(SHORTCUT_E)
+            .disable(true);
     private final FxAction deleteCardAction = fxAction(string(UI_BUNDLE, I18N_DELETE))
-            .onAction(_ -> onDeleteRecord()).accelerator(SHIFT_DELETE).disable(true);
-    private final FxAction restoreCardAction = apply(fxAction(string(UI_BUNDLE, I18N_RESTORE))
-            .onAction(_ -> onRestoreRecord()), action -> action.visible(false));
-    private final FxAction favoriteAction = apply(fxAction(string(UI_BUNDLE, I18N_FAVORITE))
-            .onAction(_ -> onFavorite()).accelerator(SHORTCUT_I).disable(true), action -> action.selected(false));
+            .onAction(_ -> onDeleteRecord())
+            .accelerator(SHIFT_DELETE)
+            .disable(true);
+    private final FxAction restoreCardAction = fxAction(string(UI_BUNDLE, I18N_RESTORE))
+            .onAction(_ -> onRestoreRecord())
+            .visible(false);
+    private final FxAction favoriteAction = fxAction(string(UI_BUNDLE, I18N_FAVORITE))
+            .onAction(_ -> onFavorite())
+            .accelerator(SHORTCUT_I)
+            .disable(true)
+            .selected(false);
     private final FxAction pasteAction = fxAction(string(UI_BUNDLE, I18N_PASTE))
-            .onAction(_ -> onCardPaste()).accelerator(SHORTCUT_V).disable(true);
+            .onAction(_ -> onCardPaste())
+            .accelerator(SHORTCUT_V)
+            .disable(true);
 
     public MainWindowController(Stage stage, StartupParameters params) {
         super(stage, settings().getMainCssFilePath());
 
+        setupActions();
         setupWindow(new BorderPane(createControls(), createMainMenu(), null, null, null));
 
         cardListView.getSelectionModel().selectedItemProperty().addListener(_ -> onListViewSelected());
@@ -199,103 +208,98 @@ public final class MainWindowController extends Controller {
     }
 
     public static Alert newConfirmationAlert(String message) {
-        return apply(new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO), alert -> {
-            alert.setTitle(string(UI_BUNDLE, I18N_CONFIRMATION));
-            alert.setHeaderText(string(UI_BUNDLE, I18N_CONFIRMATION));
-        });
+        var alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        alert.setTitle(string(UI_BUNDLE, I18N_CONFIRMATION));
+        alert.setHeaderText(string(UI_BUNDLE, I18N_CONFIRMATION));
+        return alert;
     }
 
     private MenuBar createMainMenu() {
+        // Edit
+        var filterMenuItem = menuItem(string(UI_BUNDLE, I18N_FILTER), _ -> onFilter());
+        filterMenuItem.setAccelerator(SHORTCUT_F);
+        var copyMenuItem = menuItem(string(UI_BUNDLE, I18N_COPY), _ -> onCardCopy());
+        copyMenuItem.setAccelerator(SHORTCUT_C);
+
         var editMenu = menu(
                 string(UI_BUNDLE, I18N_EDIT),
                 editCardAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS)), item -> {
-                    item.setAccelerator(SHORTCUT_N);
-                    item.setOnAction(_ -> onNewCard());
-                    item.disableProperty().bind(
-                            currentFile.isNull().or(searchTextField.textProperty().isEmpty().not()));
-                }),
-                apply(menuItem(string(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS)), item -> {
-                    item.setAccelerator(SHORTCUT_T);
-                    item.setOnAction(_ -> onNewNote());
-                    item.disableProperty().bind(
-                            currentFile.isNull().or(searchTextField.textProperty().isEmpty().not()));
-                }),
+                newCardAction.createMenuItem(),
+                newNoteAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_FILTER)), item -> {
-                    item.setAccelerator(SHORTCUT_F);
-                    item.setOnAction(_ -> onFilter());
-                }),
+                filterMenuItem,
                 new SeparatorMenuItem(),
                 favoriteAction.createCheckMenuItem(),
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_COPY)), item -> {
-                    item.setAccelerator(SHORTCUT_C);
-                    item.setOnAction(_ -> onCardCopy());
-                }),
+                copyMenuItem,
                 pasteAction.createMenuItem(),
                 new SeparatorMenuItem(),
                 deleteCardAction.createMenuItem(),
                 restoreCardAction.createMenuItem()
         );
 
-        var showDeletedItemsMenuItem = apply(checkMenuItem(string(UI_BUNDLE, I18N_SHOW_DELETED)),
-                item -> item.setSelected(false));
+        var showDeletedItemsMenuItem = checkMenuItem(string(UI_BUNDLE, I18N_SHOW_DELETED));
+        showDeletedItemsMenuItem.setSelected(false);
         showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
         showDeletedRecords.addListener((_, _, newValue) -> onShowDeletedItems(newValue));
 
+        // File
+        var newFileMenuItem = menuItem(string(UI_BUNDLE, I18N_NEW_FILE), _ -> onNewFile());
+        var openFileMenuItem = menuItem(string(UI_BUNDLE, I18N_OPEN), _ -> onOpenFile());
+        openFileMenuItem.setAccelerator(SHORTCUT_O);
+        var exitMenuItem = menuItem(string(UI_BUNDLE, I18N_EXIT), _ -> onExit());
+        // Tools
+        var importMenuItem = menuItem(string(UI_BUNDLE, I18N_IMPORT, ELLIPSIS), _ -> onImportFile());
+        importMenuItem.disableProperty().bind(currentFile.isNull());
+        var exportMenuItem = menuItem(string(UI_BUNDLE, I18N_EXPORT, ELLIPSIS), _ -> onExportFile());
+        exportMenuItem.disableProperty().bind(currentFile.isNull());
+        var purgeMenuItem = menuItem(string(UI_BUNDLE, I18N_PURGE, ELLIPSIS), _ -> onPurge());
+        purgeMenuItem.disableProperty().bind(currentFile.isNull());
+        var changePasswordMenuItem = menuItem(string(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS),
+                _ -> onChangePassword());
+        changePasswordMenuItem.disableProperty().bind(currentFile.isNull());
+        var optionsMenuItem = menuItem(string(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS), _ -> onOptions());
+        optionsMenuItem.setAccelerator(SHORTCUT_ALT_S);
+        var desktopEntryMenuItem = menuItem(string(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY),
+                _ -> onCreateDesktopEntry());
+        // Help
+        var aboutMenuItem = menuItem(string(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS), _ -> onAbout());
+
         var menuBar = menuBar(
                 menu(string(UI_BUNDLE, I18N_FILE),
-                        apply(menuItem(string(UI_BUNDLE, I18N_NEW_FILE)), item -> item.setOnAction(_ -> onNewFile())),
-                        apply(menuItem(string(UI_BUNDLE, I18N_OPEN)), item -> {
-                            item.setAccelerator(SHORTCUT_O);
-                            item.setOnAction(_ -> onOpenFile());
-                        }),
+                        newFileMenuItem,
+                        openFileMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem(string(UI_BUNDLE, I18N_EXIT)), item -> item.setOnAction(_ -> onExit()))),
+                        exitMenuItem),
                 // Edit
                 editMenu,
-                menu(string(UI_BUNDLE, I18N_VIEW),
-                        showDeletedItemsMenuItem),
+                menu(string(UI_BUNDLE, I18N_VIEW), showDeletedItemsMenuItem),
                 // Tools
                 menu(string(UI_BUNDLE, I18N_TOOLS),
-                        apply(menuItem(string(UI_BUNDLE, I18N_IMPORT, ELLIPSIS)), item -> {
-                            item.setOnAction(_ -> onImportFile());
-                            item.disableProperty().bind(currentFile.isNull());
-                        }),
-                        apply(menuItem(string(UI_BUNDLE, I18N_EXPORT, ELLIPSIS)), item -> {
-                            item.setOnAction(_ -> onExportFile());
-                            item.disableProperty().bind(currentFile.isNull());
-                        }),
+                        importMenuItem,
+                        exportMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem(string(UI_BUNDLE, I18N_PURGE, ELLIPSIS)), item -> {
-                            item.setOnAction(_ -> onPurge());
-                            item.disableProperty().bind(currentFile.isNull());
-                        }),
+                        purgeMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem(string(UI_BUNDLE, I18N_CHANGE_PASSWORD, ELLIPSIS)), item -> {
-                            item.setOnAction(_ -> onChangePassword());
-                            item.disableProperty().bind(currentFile.isNull());
-                        }),
+                        changePasswordMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem(string(UI_BUNDLE, I18N_OPTIONS, ELLIPSIS)), item -> {
-                            item.setAccelerator(SHORTCUT_ALT_S);
-                            item.setOnAction(_ -> onOptions());
-                        }),
+                        optionsMenuItem,
                         isLinux() ? new SeparatorMenuItem() : null,
-                        isLinux() ? apply(menuItem(string(UI_BUNDLE, I18N_CREATE_DESKTOP_ENTRY)),
-                                item -> item.setOnAction(_ -> onCreateDesktopEntry())) : null
+                        isLinux() ? desktopEntryMenuItem : null
                 ),
                 // Help
-                menu(string(UI_BUNDLE, I18N_HELP),
-                        apply(menuItem(string(UI_BUNDLE, I18N_HELP_ABOUT, ELLIPSIS)),
-                                item -> item.setOnAction(_ -> onAbout()))
-                )
+                menu(string(UI_BUNDLE, I18N_HELP), aboutMenuItem)
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         return menuBar;
+    }
+
+    private void setupActions() {
+        var binding = currentFile.isNull().or(searchTextField.textProperty().isEmpty().not());
+        newCardAction.disableProperty().bind(binding);
+        newNoteAction.disableProperty().bind(binding);
     }
 
     private Control createControls() {
@@ -319,23 +323,13 @@ public final class MainWindowController extends Controller {
                 new SeparatorMenuItem(),
                 favoriteAction.createCheckMenuItem(),
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_NEW_CARD, ELLIPSIS)), item -> {
-                    item.setAccelerator(SHORTCUT_N);
-                    item.setOnAction(_ -> onNewCard());
-                    item.disableProperty().bind(
-                            currentFile.isNull().or(searchTextField.textProperty().isEmpty().not()));
-                }),
-                apply(menuItem(string(UI_BUNDLE, I18N_NEW_NOTE, ELLIPSIS)), item -> {
-                    item.setAccelerator(SHORTCUT_T);
-                    item.setOnAction(_ -> onNewNote());
-                    item.disableProperty().bind(
-                            currentFile.isNull().or(searchTextField.textProperty().isEmpty().not()));
-                }),
+                newCardAction.createMenuItem(),
+                newNoteAction.createMenuItem(),
                 new SeparatorMenuItem(),
                 deleteCardAction.createMenuItem(),
                 restoreCardAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_COPY)), item -> item.setOnAction(_ -> onCardCopy())),
+                menuItem(string(UI_BUNDLE, I18N_COPY), _ -> onCardCopy()),
                 pasteAction.createMenuItem()
         );
     }
@@ -355,10 +349,6 @@ public final class MainWindowController extends Controller {
 
     private Optional<WalletRecord> getSelectedItem() {
         return Optional.ofNullable(cardListView.getSelectionModel().getSelectedItem());
-    }
-
-    private ReadOnlyObjectProperty<WalletRecord> selectedItemProperty() {
-        return cardListView.getSelectionModel().selectedItemProperty();
     }
 
     private void onExit() {
@@ -748,5 +738,23 @@ public final class MainWindowController extends Controller {
             }
             return new ByteArrayInputStream(outputStream.toByteArray());
         }
+    }
+
+    //
+
+    private static SortedList<WalletRecord> recordSortedList(ObservableList<WalletRecord> list) {
+        var sortedList = new SortedList<>(list);
+        sortedList.setComparator(COMPARE_BY_ACTIVE
+                .thenComparing(COMPARE_BY_FAVORITE)
+                .thenComparing(COMPARE_BY_NAME));
+        return sortedList;
+    }
+
+    private static FilteredList<WalletRecord> recordFilteredList(ObservableList<WalletRecord> list,
+            PredicateProperty<WalletRecord> predicate)
+    {
+        var filteredList = list.filtered(predicate);
+        filteredList.predicateProperty().bind(predicate);
+        return filteredList;
     }
 }

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
-  SPDX-License-Identifier: BSD-2-Clause
-  -->
+<!-- Copyright © 2017-2026 Petr Panteleyev -->
+<!-- SPDX-License-Identifier: BSD-2-Clause -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>25.12.1</version>
+    <version>26.2.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -92,22 +90,21 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
-        <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.14.1</mavenCompilerPluginVersion>
+        <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
+        <mavenCompilerPluginVersion>3.15.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
-        <jlinkMavenPluginVersion>1.2.0</jlinkMavenPluginVersion>
-        <jpackageMavenPluginVersion>1.7.1</jpackageMavenPluginVersion>
+        <jlinkMavenPluginVersion>1.2.1</jlinkMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.7.3</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>25.0.1</javaFxVersion>
+        <javaFxVersion>25.0.2</javaFxVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
-        <orgPanteleyevFunctionalVersion>1.1.0</orgPanteleyevFunctionalVersion>
-        <javaFxHelpersVersion>2.0.0</javaFxHelpersVersion>
+        <javaFxHelpersVersion>2.3.2</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
-        <jUnitVersion>6.0.0</jUnitVersion>
+        <jUnitVersion>6.0.3</jUnitVersion>
     </properties>
 
     <dependencies>
@@ -146,11 +143,6 @@
             <groupId>org.panteleyev</groupId>
             <artifactId>commons</artifactId>
             <version>${javaCommonsVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.panteleyev</groupId>
-            <artifactId>org-panteleyev-functional</artifactId>
-            <version>${orgPanteleyevFunctionalVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -211,9 +203,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
                 <configuration>
-                    <argLine>
-                        --enable-native-access=javafx.graphics
-                    </argLine>
+                    <argLine>--enable-native-access=javafx.graphics</argLine>
                 </configuration>
             </plugin>
             <plugin>

@@ -1,7 +1,8 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
+import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -34,14 +35,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.fx.factories.StringFactory.COLON;
 import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.TabFactory.tab;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
-import static org.panteleyev.fx.factories.TableFactory.tableValueColumn;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
@@ -74,10 +72,7 @@ public final class EditCardDialog extends BaseDialog<Card> {
     private final TextField cardNameEdit = new TextField();
     private final ComboBox<Picture> pictureList = new ComboBox<>();
 
-    private final MenuItem generateMenuItem = apply(menuItem(string(UI_BUNDLE, I18N_GENERATE)), item -> {
-        item.setAccelerator(SHORTCUT_G);
-        item.setOnAction(_ -> onGeneratePassword());
-    });
+    private final MenuItem generateMenuItem;
 
     public EditCardDialog(Controller owner, Card card) {
         super(owner, settings().getDialogCssFileUrl());
@@ -95,6 +90,9 @@ public final class EditCardDialog extends BaseDialog<Card> {
                 createEditorColumns()
         );
 
+        generateMenuItem = menuItem(string(UI_BUNDLE, I18N_GENERATE), _ -> onGeneratePassword());
+        generateMenuItem.setAccelerator(SHORTCUT_G);
+
         var contextMenu = createContextMenu();
         contextMenu.setOnShowing(_ ->
                 generateMenuItem.setDisable(getSelectedField()
@@ -108,11 +106,12 @@ public final class EditCardDialog extends BaseDialog<Card> {
 
         var pane = new BorderPane(cardContentView);
 
-        var optionsPane = apply(gridPane(
+        var optionsPane = gridPane(
                 List.of(
                         gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), cardNameEdit),
                         gridRow(label(string(UI_BUNDLE, I18N_ICON, COLON)), pictureList)
-                )), p -> p.getStyleClass().add(STYLE_GRID_PANE));
+                ),
+                null, List.of(STYLE_GRID_PANE));
         optionsPane.setPadding(new Insets(5, 5, 5, 5));
         GridPane.setHgrow(cardNameEdit, Priority.ALWAYS);
 
@@ -155,57 +154,66 @@ public final class EditCardDialog extends BaseDialog<Card> {
     }
 
     private ContextMenu createContextMenu() {
+        var addFieldMenuItem = menuItem(string(UI_BUNDLE, I18N_ADD), _ -> onNewField());
+        addFieldMenuItem.setAccelerator(SHORTCUT_N);
+        var deleteFieldMenuItem = menuItem(string(UI_BUNDLE, I18N_DELETE), _ -> onDeleteField());
+        deleteFieldMenuItem.setAccelerator(DELETE);
+        var fieldUpMenuItem = menuItem(string(UI_BUNDLE, I18N_UP), _ -> onFieldUp());
+        fieldUpMenuItem.setAccelerator(SHORTCUT_U);
+        var fieldDownMenuItem = menuItem(string(UI_BUNDLE, I18N_DOWN), _ -> onFieldDown());
+        fieldDownMenuItem.setAccelerator(SHORTCUT_D);
+
         return new ContextMenu(
-                apply(menuItem(string(UI_BUNDLE, I18N_ADD)), item -> {
-                    item.setAccelerator(SHORTCUT_N);
-                    item.setOnAction(_ -> onNewField());
-                }),
+                addFieldMenuItem,
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_DELETE)), item -> {
-                    item.setAccelerator(DELETE);
-                    item.setOnAction(_ -> onDeleteField());
-                }),
+                deleteFieldMenuItem,
                 new SeparatorMenuItem(),
                 generateMenuItem,
                 new SeparatorMenuItem(),
-                apply(menuItem(string(UI_BUNDLE, I18N_UP)), item -> {
-                    item.setAccelerator(SHORTCUT_U);
-                    item.setOnAction(_ -> onFieldUp());
-                }),
-                apply(menuItem(string(UI_BUNDLE, I18N_DOWN)), item -> {
-                    item.setAccelerator(SHORTCUT_D);
-                    item.setOnAction(_ -> onFieldDown());
-                })
+                fieldUpMenuItem,
+                fieldDownMenuItem
         );
     }
 
     private List<TableColumn<EditableField, ?>> createEditorColumns() {
         var w = cardContentView.widthProperty().subtract(5);
-        return List.of(apply(tableStringColumn(), c -> {
-            c.setSortable(false);
-            c.setResizable(false);
-            c.setReorderable(false);
-            c.setStyle("-fx-alignment: CENTER-RIGHT;");
-            c.setCellFactory(TextFieldTableCell.forTableColumn());
-            c.setCellValueFactory(p -> p.getValue().nameProperty());
-            c.widthBinding(w.multiply(0.33));
-        }), apply(TableFactory.<EditableField, FieldType>tableValueColumn(), c -> {
-            c.setSortable(false);
-            c.setResizable(false);
-            c.setReorderable(false);
-            c.setStyle("-fx-alignment: CENTER;");
-            c.setCellFactory(_ -> new EditRecordFieldTypeCell());
-            c.setCellValueFactory(p -> p.getValue().typeProperty());
-            c.widthBinding(w.multiply(0.33));
-        }), apply(tableValueColumn(), c -> {
-            c.setSortable(false);
-            c.setResizable(false);
-            c.setReorderable(false);
-            c.setStyle("-fx-alignment: CENTER-LEFT;");
-            c.setCellFactory(_ -> new EditRecordFieldValueCell());
-            c.setCellValueFactory(p -> p.getValue().valueProperty());
-            c.widthBinding(w.multiply(0.33));
-        }));
+        return List.of(fieldNameColumn(w), fieldTypeColumn(w), fieldValueColumn(w));
+    }
+
+    private static TableColumn<EditableField, String> fieldNameColumn(DoubleBinding width) {
+        var column = TableFactory.<EditableField>tableStringColumn();
+        column.setSortable(false);
+        column.setResizable(false);
+        column.setReorderable(false);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellFactory(TextFieldTableCell.forTableColumn());
+        column.setCellValueFactory(p -> p.getValue().nameProperty());
+        column.widthBinding(width.multiply(0.33));
+        return column;
+    }
+
+    private static TableColumn<EditableField, FieldType> fieldTypeColumn(DoubleBinding width) {
+        var column = TableFactory.<EditableField, FieldType>tableValueColumn();
+        column.setSortable(false);
+        column.setResizable(false);
+        column.setReorderable(false);
+        column.setStyle("-fx-alignment: CENTER;");
+        column.setCellFactory(_ -> new EditRecordFieldTypeCell());
+        column.setCellValueFactory(p -> p.getValue().typeProperty());
+        column.widthBinding(width.multiply(0.33));
+        return column;
+    }
+
+    private static TableColumn<EditableField, Object> fieldValueColumn(DoubleBinding width) {
+        var column = TableFactory.<EditableField, Object>tableValueColumn();
+        column.setSortable(false);
+        column.setResizable(false);
+        column.setReorderable(false);
+        column.setStyle("-fx-alignment: CENTER-LEFT;");
+        column.setCellFactory(_ -> new EditRecordFieldValueCell());
+        column.setCellValueFactory(p -> p.getValue().valueProperty());
+        column.widthBinding(width.multiply(0.33));
+        return column;
     }
 
     private Optional<EditableField> getSelectedField() {

@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
@@ -14,7 +14,6 @@ import org.panteleyev.pwdmanager.model.Note;
 import java.util.List;
 
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.StringFactory.COLON;
 import static org.panteleyev.fx.factories.StringFactory.string;
@@ -37,9 +36,10 @@ public final class NoteDialog extends BaseDialog<Note> {
 
         setTitle(UI_BUNDLE.getString(I18N_NOTE));
 
-        getDialogPane().setContent(apply(gridPane(
-                        List.of(gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit))),
-                pane -> pane.getStyleClass().add(STYLE_GRID_PANE)));
+        getDialogPane().setContent(gridPane(
+                List.of(gridRow(label(string(UI_BUNDLE, I18N_TITLE, COLON)), nameEdit)),
+                null, List.of(STYLE_GRID_PANE)
+        ));
         createDefaultButtons(UI_BUNDLE);
 
         setResultConverter(buttonType -> OK.equals(buttonType) ? new Note(nameEdit.getText()) : null);
