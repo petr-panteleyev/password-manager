@@ -7,7 +7,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>26.2.1</version>
+    <version>26.3.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -97,11 +97,11 @@
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
         <jlinkMavenPluginVersion>1.2.1</jlinkMavenPluginVersion>
-        <jpackageMavenPluginVersion>1.7.3</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.7.4</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>25.0.2</javaFxVersion>
+        <javaFxVersion>26</javaFxVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
-        <javaFxHelpersVersion>2.3.2</javaFxHelpersVersion>
+        <javaFxHelpersVersion>2.4.2</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
         <jUnitVersion>6.0.3</jUnitVersion>
@@ -292,6 +292,7 @@
                         <option>-XX:+UseCompactObjectHeaders</option>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--sun-misc-unsafe-memory-access=allow</option>
+                        <option>-Djavafx.autoproxy.disable=true</option>
                     </javaOptions>
                 </configuration>
             </plugin>
@@ -320,6 +321,7 @@
                                 <modulepath/>
                                 <argument>--module</argument>
                                 <argument>${appModule}/${appMainClass}</argument>
+                                <argument>-Djavafx.autoproxy.disable=true</argument>
                                 <!--suppress UnresolvedMavenProperty -->
                                 <argument>-Dpassword.file=${password.file}</argument>
                             </arguments>
@@ -344,6 +346,7 @@
                                 <modulepath/>
                                 <argument>--module</argument>
                                 <argument>${appModule}/${appMainClass}</argument>
+                                <argument>-Djavafx.autoproxy.disable=true</argument>
                                 <!--suppress UnresolvedMavenProperty -->
                                 <argument>-Dpassword.file=${password.file}</argument>
                             </arguments>
