@@ -1,7 +1,5 @@
-/*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.model;
 
 import javafx.scene.image.Image;
@@ -16,6 +14,7 @@ public enum CardType {
     UNION_PAY("Union Pay", Picture.UNIONPAY),
     VISA("VISA", Picture.VISA),
     OTHER("Other", Picture.CREDIT_CARD);
+
     private final String name;
     private final Picture picture;
 

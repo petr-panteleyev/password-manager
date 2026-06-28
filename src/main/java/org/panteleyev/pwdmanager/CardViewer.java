@@ -186,7 +186,7 @@ final class CardViewer extends BorderPane {
         var value = field.getValueAsString();
         if (field.type() == FieldType.CREDIT_CARD_NUMBER) {
             // remove all spaces from credit card number
-            value = value.replaceAll(" ", "");
+            value = value.replace(" ", "");
         }
 
         content.putString(value);

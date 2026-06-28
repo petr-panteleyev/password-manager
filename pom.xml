@@ -7,7 +7,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>26.3.1</version>
+    <version>26.6.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -96,16 +96,22 @@
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
-        <jlinkMavenPluginVersion>1.2.1</jlinkMavenPluginVersion>
-        <jpackageMavenPluginVersion>1.7.4</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>26</javaFxVersion>
+        <javaFxVersion>26.0.1</javaFxVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
-        <javaFxHelpersVersion>2.4.2</javaFxHelpersVersion>
+        <javaFxHelpersVersion>2.6.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
-        <jUnitVersion>6.0.3</jUnitVersion>
+        <jUnitVersion>6.1.0</jUnitVersion>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>panteleyev.org</id>
+            <url>https://www.panteleyev.org/mvn/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -225,20 +231,17 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-                Remove JavaFX jars to enable jlink with SDK
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>${mavenCleanPluginVersion}</version>
                 <executions>
                     <execution>
-                        <id>clean-javafx</id>
-                        <phase>package</phase>
+                        <id>clean-jfx</id>
                         <goals>
                             <goal>clean</goal>
                         </goals>
+                        <phase>package</phase>
                         <configuration>
                             <excludeDefaultDirectories>true</excludeDefaultDirectories>
                             <filesets>
@@ -255,25 +258,6 @@
             </plugin>
             <plugin>
                 <groupId>org.panteleyev</groupId>
-                <artifactId>jlink-maven-plugin</artifactId>
-                <version>${jlinkMavenPluginVersion}</version>
-                <configuration>
-                    <output>${project.build.directory}/jlink</output>
-                    <modulePaths>
-                        <modulePath>${project.build.directory}/jmods</modulePath>
-                        <!--suppress UnresolvedMavenProperty -->
-                        <modulePath>${JAVAFX_JMODS}</modulePath>
-                    </modulePaths>
-                    <addModules>
-                        <addModule>${appModule}</addModule>
-                    </addModules>
-                    <noHeaderFiles>true</noHeaderFiles>
-                    <noManPages>true</noManPages>
-                    <stripDebug>true</stripDebug>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
                 <version>${jpackageMavenPluginVersion}</version>
 
@@ -282,18 +266,25 @@
                     <appVersion>${project.version}</appVersion>
                     <vendor>panteleyev.org</vendor>
                     <module>${appModule}/${appMainClass}</module>
-                    <runtimeImage>target/jlink</runtimeImage>
+                    <modulePaths>
+                        <modulePath>${project.build.directory}/jmods</modulePath>
+                        <modulePath>${env.JAVAFX_JMODS}</modulePath>
+                    </modulePaths>
                     <destination>target/dist</destination>
                     <removeDestination>true</removeDestination>
                     <javaOptions>
                         <option>-XX:NewRatio=1</option>
-                        <option>-Xms250m</option>
-                        <option>-Xmx250m</option>
                         <option>-XX:+UseCompactObjectHeaders</option>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--sun-misc-unsafe-memory-access=allow</option>
                         <option>-Djavafx.autoproxy.disable=true</option>
                     </javaOptions>
+                    <jLink>
+                        <noHeaderFiles>true</noHeaderFiles>
+                        <noManPages>true</noManPages>
+                        <stripDebug>true</stripDebug>
+                        <stripNativeCommands>true</stripNativeCommands>
+                    </jLink>
                 </configuration>
             </plugin>
             <plugin>
@@ -312,8 +303,6 @@
                         <configuration>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-Xms250m</argument>
-                                <argument>-Xmx250m</argument>
                                 <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
@@ -335,8 +324,6 @@
                         <configuration>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-Xms250m</argument>
-                                <argument>-Xmx250m</argument>
                                 <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>

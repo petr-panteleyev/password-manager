@@ -1,10 +1,10 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.model;
 
 import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 public record Note(
         UUID uuid,
@@ -14,10 +14,13 @@ public record Note(
         boolean active,
         long modified
 ) implements WalletRecord {
+
+    @SuppressWarnings({"DataFlowIssue"})
     public Note {
-        if (note == null) {
-            note = "";
-        }
+        uuid = requireNonNull(uuid, "UUID must not be null");
+        name = requireNonNull(name, "Name must not be null");
+
+        note = note == null ? "" : note;
     }
 
     public Note(String name) {

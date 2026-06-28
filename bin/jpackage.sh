@@ -2,4 +2,4 @@
 
 # Copyright © 2026 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
-mvn -DskipTests=true clean verify jlink:jlink jpackage:jpackage
+mvn -DskipTests=true clean verify jpackage:jpackage

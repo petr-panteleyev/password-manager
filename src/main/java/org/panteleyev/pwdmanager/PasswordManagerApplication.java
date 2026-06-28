@@ -1,11 +1,8 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;

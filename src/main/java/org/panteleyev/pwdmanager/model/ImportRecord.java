@@ -1,11 +1,17 @@
-/*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.model;
+
+import static java.util.Objects.requireNonNull;
 
 public record ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport,
                            boolean approved) {
+
+    @SuppressWarnings("DataFlowIssue")
+    public ImportRecord {
+        action = requireNonNull(action, "Action must not be null");
+        cardToImport = requireNonNull(cardToImport, "Card to import must not be null");
+    }
 
     public ImportRecord(ImportAction action, WalletRecord existingCard, WalletRecord cardToImport) {
         this(action, existingCard, cardToImport, true);
