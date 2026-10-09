@@ -71,3 +71,16 @@
     -fx-control-inner-background: ${actionRestoreColor};
     -fx-control-inner-background-alt: ${actionRestoreColor};
 }
+
+.totpCode {
+    -fx-font-family: "${dialogFontFamily}";
+    -fx-font-size: xx-large;
+}
+
+.progress-indicator .percentage {
+    -fx-fill: null;
+}
+
+.progress-indicator {
+    -fx-padding: 0 0 -16 0; /* Отступ снизу 16 пикселей */
+}

@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.bundles;
 
 import java.util.ListResourceBundle;
@@ -17,6 +15,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_P
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_TYPE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CAR_BODY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CLOSE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COLORS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONFIRMATION;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONTROLS;
@@ -111,6 +110,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_CARD_PROVIDER, "Кто выпустил"},
                 {I18N_CARD_TYPE, "Тип карты"},
                 {I18N_CHANGE_PASSWORD, "Изменить пароль"},
+                {I18N_CLOSE, "Закрыть"},
                 {I18N_COLORS, "Цвета"},
                 {I18N_CONFIRMATION, "Подтверждение"},
                 {I18N_CONTROLS, "Элементы управления"},

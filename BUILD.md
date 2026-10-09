@@ -2,8 +2,8 @@
 
 Prerequisites:
 - JDK 25+
-- JavaFX 26
-- Maven 3.9.14
+- JavaFX 27
+- Maven 3.9+
 
 ```shell script
 export JAVA_HOME=/path/to/jdk-25
@@ -25,7 +25,7 @@ To open specific file add ```-Dpassword.file=<file>``` to the command line.
 Download and unpack [JavaFX JMODs distribution](https://jdk.java.net/javafx26/).
 
 ```shell
-export JAVAFX_JMODS=/path/to/javafx-jmods-26
+export JAVAFX_JMODS=/path/to/javafx-jmods-27
 mvn -DskipTests=true clean verify jpackage:jpackage
 ```
 

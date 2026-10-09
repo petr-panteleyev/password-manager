@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
@@ -21,6 +22,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.panteleyev.pwdmanager.dialogs.TotpDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.CardType;
 import org.panteleyev.pwdmanager.model.Field;
@@ -30,6 +32,7 @@ import org.panteleyev.pwdmanager.model.Picture;
 
 import java.util.List;
 
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.TabFactory.tab;
 import static org.panteleyev.pwdmanager.Constants.MASK;
@@ -95,9 +98,9 @@ final class CardViewer extends BorderPane {
             nameLabel.getStyleClass().add(STYLE_FIELD_NAME);
 
             var valueLabel = switch (field.getType()) {
-                case LINK -> {
+                case LINK, EMAIL -> {
                     var label = new Hyperlink(field.getValueAsString());
-                    label.setOnAction(_ -> onHyperlinkClick(field.getValueAsString()));
+                    label.setOnAction(_ -> onHyperlinkClick(field.getType(), field.getValueAsString()));
                     yield label;
                 }
                 case CARD_TYPE -> {
@@ -159,8 +162,13 @@ final class CardViewer extends BorderPane {
         noteArea.setText(note.note());
     }
 
-    private void onHyperlinkClick(String url) {
-        showDocument(url);
+    private void onHyperlinkClick(FieldType type, String url) {
+        var effective = switch (type) {
+            case FieldType.EMAIL -> "mailto:" + url;
+            default -> url;
+        };
+
+        showDocument(effective);
     }
 
     private void onContentViewDoubleClick(FieldWrapper field, Labeled label) {
@@ -173,10 +181,19 @@ final class CardViewer extends BorderPane {
     }
 
     private ContextMenu createContextMenu(FieldWrapper field) {
+        var contextMenu = new ContextMenu();
+
         var copyMenuItem = new MenuItem(UI_BUNDLE.getString(I18N_COPY) + " '" + field.getName() + "'");
         copyMenuItem.setOnAction(_ -> onCopy(field.getField()));
+        contextMenu.getItems().add(copyMenuItem);
 
-        return new ContextMenu(copyMenuItem);
+        if (field.getType() == FieldType.TOTP_CODE) {
+            var totpMenuItem = menuItem("TOTP", _ -> onTotp(field.getField()));
+            contextMenu.getItems().add(new SeparatorMenuItem());
+            contextMenu.getItems().add(totpMenuItem);
+        }
+
+        return contextMenu;
     }
 
     private void onCopy(Field field) {
@@ -191,6 +208,12 @@ final class CardViewer extends BorderPane {
 
         content.putString(value);
         cb.setContent(content);
+    }
+
+    private void onTotp(Field field) {
+        if (field.value() instanceof String stringValue) {
+            new TotpDialog(field.name(), stringValue).showAndWait();
+        }
     }
 
     private static GridPane setupGrid() {

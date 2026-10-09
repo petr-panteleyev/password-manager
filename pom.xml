@@ -7,7 +7,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>26.6.1</version>
+    <version>26.10.1</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -91,19 +91,19 @@
         <!-- Plugins -->
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.15.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.16.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>26.0.1</javaFxVersion>
+        <javaFxVersion>27</javaFxVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
         <javaFxHelpersVersion>2.6.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
-        <jUnitVersion>6.1.0</jUnitVersion>
+        <jUnitVersion>6.1.3</jUnitVersion>
     </properties>
 
     <repositories>
@@ -149,6 +149,11 @@
             <groupId>org.panteleyev</groupId>
             <artifactId>commons</artifactId>
             <version>${javaCommonsVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.17.1</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -209,7 +214,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
                 <configuration>
-                    <argLine>--enable-native-access=javafx.graphics</argLine>
+                    <argLine>--enable-native-access=javafx.graphics,ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -274,7 +279,6 @@
                     <removeDestination>true</removeDestination>
                     <javaOptions>
                         <option>-XX:NewRatio=1</option>
-                        <option>-XX:+UseCompactObjectHeaders</option>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--sun-misc-unsafe-memory-access=allow</option>
                         <option>-Djavafx.autoproxy.disable=true</option>
@@ -303,7 +307,6 @@
                         <configuration>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <argument>--module-path</argument>
@@ -324,7 +327,6 @@
                         <configuration>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <!--suppress UnresolvedMavenProperty -->

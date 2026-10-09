@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.bundles;
 
 import java.util.ListResourceBundle;
@@ -14,6 +12,7 @@ import static org.panteleyev.pwdmanager.model.FieldType.EXPIRATION_MONTH;
 import static org.panteleyev.pwdmanager.model.FieldType.HIDDEN;
 import static org.panteleyev.pwdmanager.model.FieldType.LINK;
 import static org.panteleyev.pwdmanager.model.FieldType.LONG_PASSWORD;
+import static org.panteleyev.pwdmanager.model.FieldType.TOTP_CODE;
 import static org.panteleyev.pwdmanager.model.FieldType.PIN;
 import static org.panteleyev.pwdmanager.model.FieldType.SHORT_PASSWORD;
 import static org.panteleyev.pwdmanager.model.FieldType.STRING;
@@ -35,7 +34,8 @@ public class FieldTypeBundle_ru_RU extends ListResourceBundle {
                 {UNIX_PASSWORD.name(), "Пароль UNIX"},
                 {CARD_TYPE.name(), "Тип карты"},
                 {DATE.name(), "Дата"},
-                {EXPIRATION_MONTH.name(), "Месяц окончания"}
+                {EXPIRATION_MONTH.name(), "Месяц окончания"},
+                {TOTP_CODE.name(), "Код для TOTP"}
         };
     }
 }

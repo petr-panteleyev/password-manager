@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager;
 
 import org.junit.jupiter.api.Test;
@@ -33,7 +31,8 @@ public class SerializerTest {
                             new Field(FieldType.STRING, randomString(), randomString()),
                             new Field(FieldType.HIDDEN, randomString(), randomString()),
                             new Field(FieldType.CARD_TYPE, randomString(), CardType.MASTERCARD),
-                            new Field(FieldType.DATE, randomString(), LocalDate.now())
+                            new Field(FieldType.DATE, randomString(), LocalDate.now()),
+                            new Field(FieldType.TOTP_CODE, randomString(), randomString())
                     ),
                     randomString(),
                     true, false

@@ -9,6 +9,7 @@ open module password.manager {
     requires javafx.controls;
     requires javafx.graphics;
 
+    requires org.apache.commons.codec;
     requires org.panteleyev.commons;
     requires org.panteleyev.fx;
     requires org.panteleyev.freedesktop;

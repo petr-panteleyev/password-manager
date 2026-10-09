@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.bundles;
 
 public final class Internationalization {
@@ -15,6 +13,7 @@ public final class Internationalization {
     public static final String I18N_CARD_PROVIDER = "I18N_CARD_PROVIDER";
     public static final String I18N_CARD_TYPE = "I18N_CARD_TYPE";
     public static final String I18N_CHANGE_PASSWORD = "I18N_CHANGE_PASSWORD";
+    public static final String I18N_CLOSE = "I18N_CLOSE";
     public static final String I18N_COLORS = "I18N_COLORS";
     public static final String I18N_CONFIRMATION = "I18N_CONFIRMATION";
     public static final String I18N_CONTROLS = "I18N_CONTROLS";

@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.model;
 
 import org.panteleyev.pwdmanager.bundles.FieldTypeBundle;
@@ -22,7 +20,8 @@ public enum FieldType {
     LONG_PASSWORD(true),
     CARD_TYPE,
     DATE,
-    EXPIRATION_MONTH;
+    EXPIRATION_MONTH,
+    TOTP_CODE(true);
 
     private static final ResourceBundle BUNDLE = getBundle(FieldTypeBundle.class.getCanonicalName());
 

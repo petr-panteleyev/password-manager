@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.bundles;
 
 import java.util.ListResourceBundle;
@@ -17,6 +15,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_P
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CARD_TYPE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CAR_BODY;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CHANGE_PASSWORD;
+import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CLOSE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COLORS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONFIRMATION;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CONTROLS;
@@ -110,12 +109,13 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_CARD_PROVIDER, "Card Provider"},
                 {I18N_CARD_TYPE, "Card Type"},
                 {I18N_CHANGE_PASSWORD, "Change Password"},
+                {I18N_CLOSE, "Close"},
                 {I18N_COLORS, "Colors"},
                 {I18N_CONFIRMATION, "Confirmation"},
                 {I18N_CONTROLS, "Controls"},
                 {I18N_COPY, "Copy"},
                 {I18N_DELETE, "Delete"},
-                {I18N_DELETE_FINALLY, "Finally delete"},
+                {I18N_DELETE_FINALLY, "Finally Delete"},
                 {I18N_DELETED, "Deleted"},
                 {I18N_DIALOGS, "Dialogs"},
                 {I18N_DIGITS, "Digits"},
