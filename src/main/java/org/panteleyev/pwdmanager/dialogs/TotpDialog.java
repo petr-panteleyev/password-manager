@@ -28,10 +28,10 @@ import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_CLOSE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_COPY;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public class TotpDialog extends BaseDialog<Void> {
     private static final long DELAY = 1000L;
@@ -94,7 +94,7 @@ public class TotpDialog extends BaseDialog<Void> {
 
         var cb = Clipboard.getSystemClipboard();
         var content = new ClipboardContent();
-        content.putString(codeLabel.getText());
+        content.putString(codeLabel.getText().trim());
         cb.setContent(content);
     }
 }

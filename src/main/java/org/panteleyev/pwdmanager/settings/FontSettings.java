@@ -1,14 +1,12 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import org.panteleyev.commons.xml.XMLEventReaderWrapper;
-import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
+import org.panteleyev.xml.XMLEventReaderWrapper;
+import org.panteleyev.xml.XMLStreamWriterWrapper;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;
@@ -72,7 +70,8 @@ public final class FontSettings {
 
                                     var font = Font.font(family,
                                             style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
-                                            style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
+                                            style.toLowerCase().contains(
+                                                    "italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
                                             size);
 
                                     fontMap.put(option, font);

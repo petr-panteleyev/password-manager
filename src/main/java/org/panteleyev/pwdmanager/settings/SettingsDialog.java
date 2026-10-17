@@ -39,7 +39,6 @@ import static org.panteleyev.fx.factories.TitledPaneFactory.titledPane;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
@@ -59,6 +58,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASSWO
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SYMBOLS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TEXT;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPPER_CASE;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class SettingsDialog extends BaseDialog<ButtonType> {
     private final ComboBox<FieldType> typeComboBox = new ComboBox<>();

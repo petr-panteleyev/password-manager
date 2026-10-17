@@ -1,4 +1,4 @@
-// Copyright © 2022-2025 Petr Panteleyev
+// Copyright © 2022-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.fx.WindowManager.windowManager;
+import static org.panteleyev.pwdmanager.ApplicationFiles.files;
 import static org.panteleyev.pwdmanager.TemplateEngine.templateEngine;
 
 public final class Settings {
@@ -33,7 +34,13 @@ public final class Settings {
     private String dialogCssEncoded = "";
     private String aboutDialogCssEncoded = "";
 
-    public Settings(ApplicationFiles files) {
+    private static final Settings SETTINGS = new Settings(files());
+
+    public static Settings settings() {
+        return SETTINGS;
+    }
+
+    private Settings(ApplicationFiles files) {
         this.files = files;
     }
 

@@ -3,13 +3,9 @@
 package org.panteleyev.pwdmanager;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -22,20 +18,16 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.control.textfield.TextFields;
-import org.panteleyev.commons.crypto.AES;
 import org.panteleyev.freedesktop.Utility;
 import org.panteleyev.freedesktop.entry.DesktopEntryBuilder;
 import org.panteleyev.freedesktop.entry.DesktopEntryType;
 import org.panteleyev.freedesktop.menu.Category;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.FxAction;
-import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.pwdmanager.cells.RecordListCell;
 import org.panteleyev.pwdmanager.dialogs.AboutDialog;
 import org.panteleyev.pwdmanager.dialogs.CardDialog;
@@ -43,22 +35,18 @@ import org.panteleyev.pwdmanager.dialogs.EditCardDialog;
 import org.panteleyev.pwdmanager.dialogs.EditNoteDialog;
 import org.panteleyev.pwdmanager.dialogs.NoteDialog;
 import org.panteleyev.pwdmanager.dialogs.PasswordDialog;
-import org.panteleyev.pwdmanager.filters.FieldContentFilter;
-import org.panteleyev.pwdmanager.filters.RecordNameFilter;
 import org.panteleyev.pwdmanager.imprt.ImportDialog;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Note;
 import org.panteleyev.pwdmanager.model.RecordType;
 import org.panteleyev.pwdmanager.model.WalletRecord;
+import org.panteleyev.pwdmanager.service.ClipboardService;
+import org.panteleyev.pwdmanager.service.FileService;
+import org.panteleyev.pwdmanager.service.FileServiceException;
+import org.panteleyev.pwdmanager.service.SearchService;
 import org.panteleyev.pwdmanager.settings.SettingsDialog;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,7 +68,6 @@ import static org.panteleyev.fx.factories.TextFieldFactory.searchField;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
 import static org.panteleyev.pwdmanager.Constants.EXTENSION_FILTER;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.SHIFT_DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_C;
@@ -126,29 +113,24 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TOOLS;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UNABLE_TO_READ_FILE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_VIEW;
 import static org.panteleyev.pwdmanager.imprt.ImportUtil.calculateImport;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_ACTIVE;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_FAVORITE;
-import static org.panteleyev.pwdmanager.model.Card.COMPARE_BY_NAME;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class MainWindowController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
-    private final BooleanProperty showDeletedRecords = new SimpleBooleanProperty(false);
-    private final PredicateProperty<WalletRecord> defaultFilter = new PredicateProperty<>(WalletRecord::active);
     private final SimpleObjectProperty<File> currentFile = new SimpleObjectProperty<>();
     private final ObservableList<WalletRecord> recordList = FXCollections.observableArrayList();
 
-    private final SortedList<WalletRecord> sortedList = recordSortedList(recordList);
-    private final FilteredList<WalletRecord> filteredList = recordFilteredList(sortedList, defaultFilter);
-    private final ListView<WalletRecord> cardListView = new ListView<>(filteredList);
-
+    private final SearchService searchService = new SearchService(recordList);
+    private final ListView<WalletRecord> cardListView = new ListView<>(searchService.getFilteredList());
     private final BorderPane leftPane = new BorderPane(cardListView);
     private final TitledPane treeViewPane = new TitledPane("", leftPane);
-
-    private final TextField searchTextField = searchField(TextFields::createClearableTextField, this::doSearch);
-
+    private final TextField searchTextField =
+            searchField(TextFields::createClearableTextField, searchService::doSearch);
     private final BorderPane recordViewPane = new BorderPane();
 
     private final CardViewer cardContentView = new CardViewer();
+    private final FileService fileService = new FileService();
+    private final ClipboardService clipboardService = new ClipboardService();
     private String currentPassword;
 
     // Actions
@@ -241,8 +223,7 @@ public final class MainWindowController extends Controller {
 
         var showDeletedItemsMenuItem = checkMenuItem(string(UI_BUNDLE, I18N_SHOW_DELETED));
         showDeletedItemsMenuItem.setSelected(false);
-        showDeletedRecords.bind(showDeletedItemsMenuItem.selectedProperty());
-        showDeletedRecords.addListener((_, _, newValue) -> onShowDeletedItems(newValue));
+        showDeletedItemsMenuItem.selectedProperty().bindBidirectional(searchService.showDeletedRecordsProperty());
 
         // File
         var newFileMenuItem = menuItem(string(UI_BUNDLE, I18N_NEW_FILE), _ -> onNewFile());
@@ -334,19 +315,6 @@ public final class MainWindowController extends Controller {
         );
     }
 
-    private void doSearch(String newValue) {
-        if (newValue.isEmpty()) {
-            filteredList.predicateProperty().bind(defaultFilter);
-        } else {
-            filteredList.predicateProperty().bind(
-                    PredicateProperty.and(List.of(
-                            defaultFilter,
-                            new PredicateProperty<>(new RecordNameFilter(newValue).or(new FieldContentFilter(newValue)))
-                    ))
-            );
-        }
-    }
-
     private Optional<WalletRecord> getSelectedItem() {
         return Optional.ofNullable(cardListView.getSelectionModel().getSelectedItem());
     }
@@ -361,15 +329,11 @@ public final class MainWindowController extends Controller {
     private void onImportFile() {
         var file = fileChooser(string(UI_BUNDLE, I18N_OPEN), List.of(EXTENSION_FILTER))
                 .showOpenDialog(getStage());
-        if (file == null || !file.exists()) {
-            return;
-        }
+        if (file == null || !file.exists()) return;
 
         new PasswordDialog(this, file, false).showAndWait().ifPresent(password -> {
-            try (var fileInputStream = new FileInputStream(file);
-                 var decypheredInputStream = decypheredInputStream(fileInputStream, password)
-            ) {
-                var list = Serializer.deserialize(decypheredInputStream);
+            try {
+                var list = fileService.loadDocument(file, password);
 
                 var importRecords = calculateImport(recordList, list);
                 if (importRecords.isEmpty()) {
@@ -388,8 +352,15 @@ public final class MainWindowController extends Controller {
                         }
                     });
                 }
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
+            } catch (FileServiceException ex) {
+                LOGGER.log(Level.SEVERE, "Exception while importing file " + file.getAbsolutePath(), ex);
+                Platform.runLater(() -> {
+                    var alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle(string(UI_BUNDLE, I18N_ERROR));
+                    alert.setHeaderText("Unable to import file");
+                    alert.setContentText(ex.getUserMessage());
+                    alert.showAndWait();
+                });
             }
         });
     }
@@ -397,11 +368,11 @@ public final class MainWindowController extends Controller {
     private void onExportFile() {
         var file = fileChooser(string(UI_BUNDLE, I18N_SAVE), List.of(EXTENSION_FILTER))
                 .showSaveDialog(getStage());
-        if (file != null) {
-            new PasswordDialog(this, file, false)
-                    .showAndWait()
-                    .ifPresent(password -> writeDocument(file, password));
-        }
+        if (file == null) return;
+
+        new PasswordDialog(this, file, false)
+                .showAndWait()
+                .ifPresent(password -> writeDocument(file, password));
     }
 
     private void processNewRecord(WalletRecord newRecord) {
@@ -486,11 +457,10 @@ public final class MainWindowController extends Controller {
         }
 
         var pasteEnable = false;
-        var cb = Clipboard.getSystemClipboard();
-        if (item != null && cb.hasContent(Card.DATA_FORMAT)) {
-            var sourceId = (UUID) cb.getContent(Card.DATA_FORMAT);
+        if (item != null && clipboardService.isClipboardHasRecord()) {
+            var sourceId = clipboardService.getClipboardUuid();
             var sourceItem = findRecordById(sourceId);
-            pasteEnable = sourceItem.isPresent();
+            pasteEnable = sourceItem != null && sourceItem.isPresent();
         }
         pasteAction.disable(!pasteEnable);
 
@@ -527,20 +497,15 @@ public final class MainWindowController extends Controller {
         new AboutDialog(this).showAndWait();
     }
 
-    private void putCardToClipboard(WalletRecord record) {
-        var cb = Clipboard.getSystemClipboard();
-        var content = new ClipboardContent();
-        content.put(Card.DATA_FORMAT, record.uuid());
-        cb.setContent(content);
-    }
-
     private void onCardCopy() {
-        getSelectedItem().ifPresent(this::putCardToClipboard);
+        getSelectedItem().ifPresent(clipboardService::putRecordToClipboard);
     }
 
     private void onCardPaste() {
-        var cb = Clipboard.getSystemClipboard();
-        var sourceId = (UUID) cb.getContent(Card.DATA_FORMAT);
+        var sourceId = clipboardService.getClipboardUuid();
+        if (sourceId == null) {
+            return;
+        }
 
         findByUuid(sourceId).ifPresent(sourceRecord -> {
             var newRecord = sourceRecord.copyWithNewUuid();
@@ -562,9 +527,8 @@ public final class MainWindowController extends Controller {
 
     private void updateListItem(WalletRecord card) {
         var index = getIndexByUUID(card.uuid());
-        if (index != -1) {
-            recordList.set(index, card);
-        }
+        if (index == -1) return;
+        recordList.set(index, card);
     }
 
     private void onFavorite() {
@@ -578,7 +542,7 @@ public final class MainWindowController extends Controller {
     }
 
     private Optional<WalletRecord> findRecordById(UUID uuid) {
-        return sortedList.stream().filter(x -> x.uuid().equals(uuid)).findFirst();
+        return searchService.getRecordList().stream().filter(x -> x.uuid().equals(uuid)).findFirst();
     }
 
     private void setTitle() {
@@ -617,10 +581,8 @@ public final class MainWindowController extends Controller {
     private void loadDocument(File file, String password, boolean changeSettings) {
         currentPassword = password;
 
-        try (var fileInputStream = new FileInputStream(file);
-             var decypheredInputStream = decypheredInputStream(fileInputStream, password)
-        ) {
-            var list = Serializer.deserialize(decypheredInputStream);
+        try {
+            var list = fileService.loadDocument(file, password);
             recordList.setAll(list);
 
             currentFile.set(file);
@@ -629,11 +591,12 @@ public final class MainWindowController extends Controller {
             }
 
             setTitle();
-        } catch (Exception ex) {
+        } catch (FileServiceException ex) {
             var path = file.getAbsolutePath();
-            var alert = new Alert(Alert.AlertType.ERROR, ex.toString());
+            var alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(string(UI_BUNDLE, I18N_ERROR));
             alert.setHeaderText(string(UI_BUNDLE, I18N_UNABLE_TO_READ_FILE, ": ") + path);
+            alert.setContentText(ex.getUserMessage());
             alert.showAndWait();
             LOGGER.log(Level.SEVERE, "Exception while reading file " + path, ex);
         }
@@ -658,20 +621,17 @@ public final class MainWindowController extends Controller {
     }
 
     private void writeDocument(File file, String password) {
-        try (var bOut = new ByteArrayOutputStream()) {
-            if (!password.isEmpty()) {
-                try (var cOut = AES.aes256().getOutputStream(bOut, password)) {
-                    Serializer.serialize(cOut, recordList);
-                }
-            } else {
-                Serializer.serialize(bOut, recordList);
-            }
-
-            try (var fOut = new FileOutputStream(file)) {
-                fOut.write(bOut.toByteArray());
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        try {
+            fileService.writeDocument(file, password, recordList);
+        } catch (FileServiceException ex) {
+            LOGGER.log(Level.SEVERE, "Exception while writing file " + file.getAbsolutePath(), ex);
+            Platform.runLater(() -> {
+                var alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle(string(UI_BUNDLE, I18N_ERROR));
+                alert.setHeaderText("Unable to save file");
+                alert.setContentText(ex.getUserMessage());
+                alert.showAndWait();
+            });
         }
     }
 
@@ -692,10 +652,6 @@ public final class MainWindowController extends Controller {
         settings().saveWindowsSettings();
     }
 
-    private void onShowDeletedItems(boolean show) {
-        defaultFilter.set(show ? _ -> true : WalletRecord::active);
-    }
-
     private void onPurge() {
         newConfirmationAlert(string(UI_BUNDLE, I18N_SURE_TO_PURGE)).showAndWait()
                 .filter(x -> x.equals(ButtonType.YES))
@@ -706,9 +662,8 @@ public final class MainWindowController extends Controller {
     }
 
     private void onCreateDesktopEntry() {
-        if (!isLinux()) {
-            return;
-        }
+        if (!isLinux()) return;
+
         Utility.getExecutablePath().ifPresent(command -> {
             var execFile = new File(command);
             var rootDir = execFile.getParentFile().getParentFile().getAbsolutePath();
@@ -725,36 +680,5 @@ public final class MainWindowController extends Controller {
                     .build();
             desktopEntry.write("password-manager");
         });
-    }
-
-    private InputStream decypheredInputStream(InputStream inputStream, String password) throws IOException {
-        try (var outputStream = new ByteArrayOutputStream()) {
-            if (!password.isEmpty()) {
-                try (var cin = AES.aes256().getInputStream(inputStream, password)) {
-                    cin.transferTo(outputStream);
-                }
-            } else {
-                inputStream.transferTo(outputStream);
-            }
-            return new ByteArrayInputStream(outputStream.toByteArray());
-        }
-    }
-
-    //
-
-    private static SortedList<WalletRecord> recordSortedList(ObservableList<WalletRecord> list) {
-        var sortedList = new SortedList<>(list);
-        sortedList.setComparator(COMPARE_BY_ACTIVE
-                .thenComparing(COMPARE_BY_FAVORITE)
-                .thenComparing(COMPARE_BY_NAME));
-        return sortedList;
-    }
-
-    private static FilteredList<WalletRecord> recordFilteredList(ObservableList<WalletRecord> list,
-            PredicateProperty<WalletRecord> predicate)
-    {
-        var filteredList = list.filtered(predicate);
-        filteredList.predicateProperty().bind(predicate);
-        return filteredList;
     }
 }

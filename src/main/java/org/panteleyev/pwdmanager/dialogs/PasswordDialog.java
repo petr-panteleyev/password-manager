@@ -23,11 +23,11 @@ import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_FILE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PASSWORD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_REPEAT;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class PasswordDialog extends BaseDialog<String> {
     private final ValidationSupport validation = new ValidationSupport();

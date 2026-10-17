@@ -35,7 +35,7 @@ public final class TotpGenerator {
 
         // Get current Unix timestamp and calculate time step
         var seconds = Instant.now().getEpochSecond();
-        var currentTimeStep = Instant.now().getEpochSecond() / TIME_STEP_SECONDS;
+        var currentTimeStep = seconds / TIME_STEP_SECONDS;
 
         // Convert time step to 8-byte array (big endian)
         var timeBytes = ByteBuffer.allocate(8)

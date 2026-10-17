@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 import static java.lang.Thread.setDefaultUncaughtExceptionHandler;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javafx.application.Platform.runLater;
+import static org.panteleyev.pwdmanager.ApplicationFiles.files;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
-import static org.panteleyev.pwdmanager.GlobalContext.files;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class PasswordManagerApplication extends Application {
     private static final Logger LOGGER = Logger.getLogger(PasswordManagerApplication.class.getName());

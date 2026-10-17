@@ -24,11 +24,11 @@ import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.STYLE_GRID_PANE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_ICON;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TYPE;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 abstract class RecordDialog extends BaseDialog<Card> {
     private final ValidationSupport validation = new ValidationSupport();

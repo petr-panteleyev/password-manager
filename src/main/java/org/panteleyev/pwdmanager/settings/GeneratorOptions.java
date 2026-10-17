@@ -1,10 +1,8 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
-import org.panteleyev.commons.password.PasswordCharacterSet;
+import org.panteleyev.password.PasswordCharacterSet;
 
 import java.util.EnumSet;
 import java.util.Set;

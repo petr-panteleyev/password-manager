@@ -1,7 +1,5 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager;
 
 import org.panteleyev.freedesktop.directory.XDGBaseDirectory;
@@ -20,7 +18,7 @@ import java.util.function.Consumer;
 
 import static org.panteleyev.freedesktop.Utility.isLinux;
 
-public class ApplicationFiles {
+public final class ApplicationFiles {
     public enum AppFile {
         COLORS("colors.xml"),
         FONTS("fonts.xml"),
@@ -43,6 +41,8 @@ public class ApplicationFiles {
         }
     }
 
+    private static final ApplicationFiles FILES = new ApplicationFiles();
+
     private static final String PACKAGE_NAME = "panteleyev.org";
     private static final String APP_NAME = "PasswordManager";
     private static final String LOGS_DIR_NAME = "logs";
@@ -53,7 +53,11 @@ public class ApplicationFiles {
 
     private final Map<AppFile, Path> fileMap = new EnumMap<>(AppFile.class);
 
-    public ApplicationFiles() {
+    public static ApplicationFiles files() {
+        return FILES;
+    }
+
+    private ApplicationFiles() {
         if (isLinux()) {
             configDirectory = XDGBaseDirectory.getConfigHome()
                     .resolve(PACKAGE_NAME)

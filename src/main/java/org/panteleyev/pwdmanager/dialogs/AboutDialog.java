@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.dialogs;
 
@@ -18,10 +18,10 @@ import java.util.TimeZone;
 import static org.panteleyev.fx.factories.BoxFactory.vBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.pwdmanager.Constants.APP_TITLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Styles.BIG_SPACING;
 import static org.panteleyev.pwdmanager.Styles.SMALL_SPACING;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ABOUT_LABEL;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class AboutDialog extends BaseDialog<Object> {
     private record BuildInformation(String version, String timestamp) {

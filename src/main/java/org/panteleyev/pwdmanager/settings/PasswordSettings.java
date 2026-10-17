@@ -1,12 +1,10 @@
-/*
- Copyright © 2022-2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager.settings;
 
-import org.panteleyev.commons.xml.XMLEventReaderWrapper;
-import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 import org.panteleyev.pwdmanager.model.FieldType;
+import org.panteleyev.xml.XMLEventReaderWrapper;
+import org.panteleyev.xml.XMLStreamWriterWrapper;
 
 import javax.xml.namespace.QName;
 import java.io.InputStream;

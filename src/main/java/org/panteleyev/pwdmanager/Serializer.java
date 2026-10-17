@@ -1,16 +1,14 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.pwdmanager;
 
-import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 import org.panteleyev.pwdmanager.model.Card;
 import org.panteleyev.pwdmanager.model.Field;
 import org.panteleyev.pwdmanager.model.FieldType;
 import org.panteleyev.pwdmanager.model.Note;
 import org.panteleyev.pwdmanager.model.Picture;
 import org.panteleyev.pwdmanager.model.WalletRecord;
+import org.panteleyev.xml.XMLStreamWriterWrapper;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -21,7 +19,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,10 +28,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.panteleyev.pwdmanager.Constants.BUILD_INFO_BUNDLE;
 
 public class Serializer {
+    private static final Logger LOGGER = Logger.getLogger(Serializer.class.getName());
+
     private enum CardClass {
         CARD,
         NOTE,
@@ -82,12 +84,9 @@ public class Serializer {
         var schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         try {
             var schema = schemaFactory.newSchema(Serializer.class.getResource(SCHEMA_URL));
-            var factory = DocumentBuilderFactory.newInstance();
-            factory.setSchema(schema);
-            factory.setValidating(false);
-            DOCUMENT_BUILDER = factory.newDocumentBuilder();
+            DOCUMENT_BUILDER = createSecureDocumentBuilder(schema);
             DOCUMENT_BUILDER.setErrorHandler(HANDLER);
-        } catch (SAXException | ParserConfigurationException ex) {
+        } catch (SAXException ex) {
             // There should not be any exceptions so just fail.
             throw new RuntimeException(ex);
         }
@@ -248,5 +247,36 @@ public class Serializer {
     private static UUID readUuidAttribute(Element element) {
         var uuidString = element.getAttribute(ATTR_UUID.getLocalPart());
         return uuidString.isEmpty() ? UUID.randomUUID() : UUID.fromString(uuidString);
+    }
+
+    /**
+     * Creates a secure DocumentBuilder with XXE protection enabled.
+     *
+     * @return a configured DocumentBuilder
+     */
+    private static DocumentBuilder createSecureDocumentBuilder(Schema schema) {
+        try {
+            var factory = DocumentBuilderFactory.newInstance();
+            factory.setSchema(schema);
+            factory.setValidating(false);
+
+            // Enable secure processing to prevent XXE attacks
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+            // Disallow DOCTYPE declarations entirely
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+            // Disable external entities
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+            // Do not expand internal entities
+            factory.setExpandEntityReferences(false);
+
+            return factory.newDocumentBuilder();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to create secure DocumentBuilder", e);
+            throw new RuntimeException("Cannot initialize XML parser", e);
+        }
     }
 }

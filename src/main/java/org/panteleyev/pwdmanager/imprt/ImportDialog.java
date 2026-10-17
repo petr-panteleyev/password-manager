@@ -29,7 +29,6 @@ import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_P;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_ADD;
 import static org.panteleyev.pwdmanager.Styles.STYLE_ACTION_DELETE;
@@ -40,6 +39,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_IMPORT
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SKIP;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UPDATED;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class ImportDialog extends BaseDialog<List<ImportRecord>> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");

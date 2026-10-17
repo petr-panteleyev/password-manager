@@ -10,7 +10,8 @@ open module password.manager {
     requires javafx.graphics;
 
     requires org.apache.commons.codec;
-    requires org.panteleyev.commons;
+    requires org.panteleyev.crypto;
+    requires org.panteleyev.xml;
     requires org.panteleyev.fx;
     requires org.panteleyev.freedesktop;
 

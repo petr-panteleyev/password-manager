@@ -20,10 +20,10 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import org.panteleyev.commons.password.PasswordGenerator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.factories.TableFactory;
+import org.panteleyev.password.PasswordGenerator;
 import org.panteleyev.pwdmanager.EditableField;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldTypeCell;
 import org.panteleyev.pwdmanager.cells.EditRecordFieldValueCell;
@@ -43,7 +43,6 @@ import static org.panteleyev.fx.factories.TabFactory.tab;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.pwdmanager.Constants.UI_BUNDLE;
-import static org.panteleyev.pwdmanager.GlobalContext.settings;
 import static org.panteleyev.pwdmanager.MainWindowController.newConfirmationAlert;
 import static org.panteleyev.pwdmanager.Shortcuts.DELETE;
 import static org.panteleyev.pwdmanager.Shortcuts.SHORTCUT_D;
@@ -64,6 +63,7 @@ import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_PROPER
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_SURE_TO_DELETE_FIELD;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_TITLE;
 import static org.panteleyev.pwdmanager.bundles.Internationalization.I18N_UP;
+import static org.panteleyev.pwdmanager.settings.Settings.settings;
 
 public final class EditCardDialog extends BaseDialog<Card> {
     private final ObservableList<EditableField> editableFields;

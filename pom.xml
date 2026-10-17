@@ -7,7 +7,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>password-manager</artifactId>
-    <version>26.10.1</version>
+    <version>26.10.2</version>
     <packaging>jar</packaging>
 
     <profiles>
@@ -99,7 +99,8 @@
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>27</javaFxVersion>
-        <javaCommonsVersion>1.8.0</javaCommonsVersion>
+        <javaXmlVersion>1.0.0</javaXmlVersion>
+        <javaCryptoVersion>1.0.0</javaCryptoVersion>
         <javaFxHelpersVersion>2.6.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
@@ -147,8 +148,13 @@
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
-            <artifactId>commons</artifactId>
-            <version>${javaCommonsVersion}</version>
+            <artifactId>org-panteleyev-xml</artifactId>
+            <version>${javaXmlVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>org-panteleyev-crypto</artifactId>
+            <version>${javaCryptoVersion}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
